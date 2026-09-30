@@ -345,7 +345,34 @@ function AttrEditor({
 		);
 	}
 	if (attr.kind === "color") {
-		return <input type="color" value={String(value)} onChange={(e) => onChange(e.target.value)} />;
+		const color = String(value);
+		const opacity = color.length === 9 ? Number.parseInt(color.slice(7), 16) : 255;
+		return (
+			<div className="flex items-center gap-2">
+				<input
+					type="color"
+					aria-label={attrLabel(attr)}
+					value={color.slice(0, 7)}
+					className="h-7 w-8 shrink-0"
+					onChange={(e) => onChange(e.target.value + (opacity === 255 ? "" : color.slice(7)))}
+				/>
+				<label className="flex min-w-0 items-center gap-1 text-xs text-muted">
+					<input
+						type="number"
+						aria-label={`Opacidad de ${attrLabel(attr)} (%)`}
+						min={0}
+						max={100}
+						value={Math.round((opacity * 100) / 255)}
+						className={`${inputClass} w-14`}
+						onChange={(e) => {
+							const alpha = Math.round((Math.max(0, Math.min(100, Number(e.target.value))) * 255) / 100);
+							onChange(color.slice(0, 7) + (alpha === 255 ? "" : alpha.toString(16).padStart(2, "0")));
+						}}
+					/>
+					%
+				</label>
+			</div>
+		);
 	}
 	// text-like: string, int, hex — commit on Enter/blur, validated by parse()
 	const text = draft ?? attr.format(value);

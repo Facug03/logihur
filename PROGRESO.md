@@ -1,7 +1,7 @@
 # LogiHUR — estado del trabajo
 
 Plan completo: `~/.claude/plans/quiero-hacer-un-https-logisim-app-breezy-stroustrup.md`.
-La implementación sigue sin commitear; el directorio sí tiene repositorio git.
+Las fases 0–4 están implementadas y versionadas en git.
 
 ## Hecho
 
@@ -35,17 +35,51 @@ La implementación sigue sin commitear; el directorio sí tiene repositorio git.
   borrado, acciones de ROM seleccionada, direcciones de 24 bits, datos de 32 bits y modal móvil.
   Build estático OK con `bun run build -- --webpack`; Turbopack falla en este entorno al abrir un puerto
   interno (`Operation not permitted`), incluso en el reintento con permisos ampliados.
+- **Verificación visual y poke de fase 3**: galería de los 24 componentes de Plexores/Aritmética/Memoria
+  abierta en Chrome sin errores de navegador y revisada visualmente. Teclado probado en Registro y
+  Contador (hex), Registro de desplazamiento (hex + espacio para cambiar etapa), RAM y ROM (hex + Tab).
+  En memorias se verificaron los valores reales abriendo el editor hexadecimal después del poke.
+  Capturas de esta sesión: `/private/tmp/logihur-gallery.png` y
+  `/private/tmp/logihur-gallery-poked.png` (artefactos temporales, no versionados).
+- **Golden ampliados**: 32 casos de plexores cubren las cuatro orientaciones y, cuando corresponde,
+  ambas ubicaciones del selector. 4 casos nuevos de RAM combinada/asíncrona: barrido de controles y
+  ciclos de escritura/lectura con búfer controlado externo. Los casos de lectura exigen observar datos
+  almacenados distintos de cero con OE=1 y el búfer externo liberado. Referencias regeneradas ejecutando
+  `bun run golden` contra Logisim 2.7.1: **177/177 coinciden**, **209 tests OK**, Biome y tsc limpios.
+  Cerrados los pendientes de verificación de fase 3.
+- **Fase 4 – E/S**: los ocho componentes de Logisim registrados en `#I/O` y traducidos:
+  - `src/components/io/displays.ts`: LED, display de 7 segmentos y display hexadecimal; polaridad,
+    colores y fondo RGBA, punto decimal, guion para entradas desconocidas o de error.
+  - `controls.ts`: Botón momentáneo y Joystick (2–5 bits), arrastre, límites y retorno al centro.
+  - `keyboard.ts`: Teclado con FIFO de 1–256 caracteres, cursor, inserción, Suprimir, Inicio/Fin,
+    ASCII de 7 bits, disponibilidad, lectura por flanco y borrado. Backspace/Enter/Control+L se
+    almacenan como caracteres de control, igual que en Java.
+  - `tty.ts`: TTY con flancos configurables, enable/clear, salto de línea, retroceso, borrado,
+    ajuste de tamaño, wrap y scroll.
+  - `matrix.ts`: Matriz LED con buses de filas/columnas o selección multiplexada, persistencia en
+    ticks y LED cuadrados/circulares; variantes de selección de una fila o columna.
+  - Framework: `Poker.mouseDragged/keyPressed`, despacho de puntero/teclas en Workspace y App,
+    ticks disponibles para el pintor. Al terminar el poke o cambiar la vista se liberan los controles.
+    El editor de colores conserva/edita opacidad y el renderer respeta `labelcolor`.
+- **Referencia Java para E/S**: `scripts/io-reference.java` ejecuta las fábricas del jar real con
+  trazas compartidas en `tests/golden/io-cases.ts`. `bun run golden:io` captura 392 estados, incluidos
+  los componentes sin salidas (displays, matriz, TTY), en `tests/golden/io-reference.json`.
+  `tests/io-reference.test.ts` comprueba las 15 trazas sin requerir Java en cada ejecución.
+  Además, `tests/io.test.ts` verifica simulación, controles, FIFO, matrices, `.circ` y el ejemplo.
+- **Ejemplo E/S**: `public/examples/io-demo.circ`, disponible en el panel Ejemplos. Contiene los ocho
+  componentes; teclado → TTY con reloj compartido, Botón → LED, joystick con pines X/Y, displays y
+  matriz mostrando A. Logisim Java abre el archivo. Chrome/Playwright comprobó pulsación/liberación,
+  arrastre/límites/centrado del joystick, edición de teclado y recepción de "Hola" en TTY, la paleta y
+  el editor de transparencia, sin errores de navegador. Captura temporal:
+  `/private/tmp/logihur-io-demo.png`. La escritura con teclado virtual móvil sigue para el pulido de
+  fase 6; esta sesión verificó interacción con teclado físico y el layout móvil.
+  Estado: **238 tests OK**, **177 casos de tablas + 392 estados E/S coinciden con Java**;
+  Biome, TypeScript y build estático con Webpack OK.
 
 ## Siguiente (en este orden)
 
-1. Probar en el navegador (`bun run dev -- -p 3123`) que los componentes nuevos se dibujan bien y que
-   el poke con teclado funciona.
-2. Casos golden pendientes: RAM con bus combinado/asíncrono (necesita buffers controlados para manejar
-   el bus), más orientaciones de plexores.
-3. **Fase 4 – E/S**: LED, 7 segmentos, dígito hex, botón, joystick, teclado, matriz LED, TTY
-   (fuentes Java en `.cache/src/src/com/cburch/logisim/std/io/`).
-4. **Fase 5**: análisis combinacional, editor de apariencia, logging, librerías `.circ`.
-5. **Fase 6**: PWA, pulido móvil.
+1. **Fase 5**: análisis combinacional, editor de apariencia, logging, librerías `.circ`.
+2. **Fase 6**: PWA, pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles
 

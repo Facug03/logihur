@@ -42,6 +42,7 @@ if (measureCtx) setTextMeasurer((text: string, font: Font) => measureWith(measur
 const EXAMPLES = [
 	{ file: "half-adder.circ", label: "Semisumador" },
 	{ file: "full-adder.circ", label: "Sumador completo (con subcircuitos)" },
+	{ file: "io-demo.circ", label: "Entrada/salida: teclado, TTY y controles" },
 ];
 
 /** Logisim's default toolbar: two pin presets and three gates. */
@@ -162,6 +163,16 @@ export default function App() {
 			if (target.closest("input, select, textarea")) return;
 			const mod = e.ctrlKey || e.metaKey;
 			const k = e.key.toLowerCase();
+			if (
+				e.ctrlKey &&
+				k === "l" &&
+				ws.tool.kind === "poke" &&
+				ws.pokeCaret?.state.instance.factory.name === "Keyboard"
+			) {
+				ws.pokeKey("\f");
+				e.preventDefault();
+				return;
+			}
 			if (mod) {
 				if (k === "z" && !e.shiftKey) ws.undo();
 				else if (k === "y" || (k === "z" && e.shiftKey)) ws.redo();
@@ -180,6 +191,10 @@ export default function App() {
 				return;
 			}
 			if (ws.tool.kind === "poke" && ws.pokeCaret) {
+				if (ws.pokeKeyPressed(e.key)) {
+					e.preventDefault();
+					return;
+				}
 				// typed keys go to the poked component (registers, memories…)
 				const key = POKE_KEYS[e.key] ?? (e.key.length === 1 ? e.key : null);
 				if (key !== null && ws.pokeKey(key)) {

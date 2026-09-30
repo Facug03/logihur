@@ -113,6 +113,10 @@ export class CanvasInstancePainter implements InstancePainter {
 		return this.ctx.state.getData(this.instance) as T | undefined;
 	}
 
+	getTickCount(): number {
+		return this.ctx.state?.getPropagator().getTickCount() ?? 0;
+	}
+
 	drawBounds(): void {
 		const g = this.g;
 		g.setLineWidth(2);
@@ -216,7 +220,7 @@ export class CanvasInstancePainter implements InstancePainter {
 		g.save();
 		const font = inst.attrs.get(tf.fontAttr);
 		if (font) g.setFont(font);
-		g.setColor("#000000");
+		g.setColor((inst.attrs.getByName("labelcolor") as string | undefined) ?? "#000000");
 		const m = g.measureText(text);
 		let x = tf.x;
 		let y = tf.y;

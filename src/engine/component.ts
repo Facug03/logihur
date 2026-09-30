@@ -92,6 +92,7 @@ export interface InstancePainter {
 	isPortConnected(index: number): boolean;
 	getData<T>(): T | undefined;
 	drawBounds(): void;
+	getTickCount(): number;
 	drawRectangle(x: number, y: number, w: number, h: number, label: string): void;
 	drawDongle(x: number, y: number): void;
 	drawPort(index: number, label?: string, dir?: Direction): void;
@@ -109,6 +110,9 @@ export interface Poker {
 	init?(state: InstanceState, x: number, y: number): boolean;
 	mousePressed?(state: InstanceState, x: number, y: number): void;
 	mouseReleased?(state: InstanceState, x: number, y: number): void;
+	mouseDragged?(state: InstanceState, x: number, y: number): void;
+	/** Non-character keys; return whether the component consumed the key. */
+	keyPressed?(state: InstanceState, key: string): boolean;
 	/** A typed character ("\b" for backspace, "\n" for enter). */
 	keyTyped?(state: InstanceState, key: string): void;
 	/** Draw the caret (e.g. a red box around the edited value). */

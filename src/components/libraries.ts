@@ -25,6 +25,11 @@ import {
 	XOR_GATE,
 } from "./gates/gates";
 import { BUFFER, CONTROLLED_BUFFER, CONTROLLED_INVERTER, NOT_GATE } from "./gates/simple-gates";
+import { BUTTON, JOYSTICK } from "./io/controls";
+import { HEX_DIGIT, LED, SEVEN_SEGMENT } from "./io/displays";
+import { KEYBOARD } from "./io/keyboard";
+import { DOT_MATRIX } from "./io/matrix";
+import { TTY } from "./io/tty";
 import { D_FLIP_FLOP, JK_FLIP_FLOP, SR_FLIP_FLOP, T_FLIP_FLOP } from "./memory/flipflops";
 import { RAM, ROM } from "./memory/mem";
 import { COUNTER, RANDOM, REGISTER, SHIFT_REGISTER } from "./memory/registers";
@@ -114,7 +119,12 @@ export const LIBRARIES: readonly Library[] = [
 		],
 		tools: [],
 	},
-	{ desc: "#I/O", displayKey: "lib.io", factories: [], tools: [] },
+	{
+		desc: "#I/O",
+		displayKey: "lib.io",
+		factories: [BUTTON, JOYSTICK, KEYBOARD, LED, SEVEN_SEGMENT, HEX_DIGIT, DOT_MATRIX, TTY],
+		tools: [],
+	},
 	{
 		desc: "#Base",
 		displayKey: "lib.base",

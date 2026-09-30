@@ -386,6 +386,9 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 				redraw();
 				return;
 			}
+			case "poke":
+				ws.pokeDrag(Math.round(p.x), Math.round(p.y));
+				return;
 			case "pan":
 				if (d.moved) {
 					v.originX -= (p.sx - prev.x) / v.zoom;

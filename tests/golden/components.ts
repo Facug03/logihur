@@ -25,6 +25,7 @@ import {
 	MULTIPLEXER,
 	PRIORITY_ENCODER,
 } from "@/components/plexers/plexers";
+import { CONSTANT } from "@/components/wiring/constant";
 import { PIN } from "@/components/wiring/pin";
 import { SPLITTER } from "@/components/wiring/splitter";
 import { TUNNEL } from "@/components/wiring/tunnel";
@@ -42,6 +43,9 @@ export interface ComponentCase {
 	floating?: number[];
 	/** Port indices treated as outputs even if declared otherwise. */
 	outputs?: number[];
+	/** Fixed control levels and input clock order for sequential write/read cycles. */
+	fixed?: Record<number, number>;
+	inputOrder?: number[];
 }
 
 /** Build a project whose main circuit wires every port of one component. */
@@ -60,7 +64,15 @@ export function componentCircuit(c: ComponentCase): Project {
 	const tunnel = (x: number, y: number, label: string, width: number) =>
 		circ.addComponent(make(TUNNEL, x, y, { facing: "west", label, width }));
 
-	comp.ends.forEach((end, i) => {
+	const orderedEnds = comp.ends.map((end, i) => ({ end, i }));
+	if (c.inputOrder) {
+		const rank = (i: number) => {
+			const at = c.inputOrder?.indexOf(i) ?? -1;
+			return at < 0 ? comp.ends.length + i : at;
+		};
+		orderedEnds.sort((a, b) => rank(a.i) - rank(b.i));
+	}
+	orderedEnds.forEach(({ end, i }) => {
 		const label = `n${i}`;
 		const isOutput = end.type === "output" || c.outputs?.includes(i);
 		tunnel(locX(end.loc), locY(end.loc), label, end.width);
@@ -73,6 +85,12 @@ export function componentCircuit(c: ComponentCase): Project {
 			return;
 		}
 		if (c.floating?.includes(i)) return;
+		if (c.fixed?.[i] !== undefined) {
+			circ.addComponent(
+				make(CONSTANT, locX(end.loc), locY(end.loc), { width: end.width, value: c.fixed[i] }),
+			);
+			return;
+		}
 		if (end.width === 1) {
 			circ.addComponent(make(PIN, 100, inY, { facing: "east", label: `i${i}` }));
 			tunnel(100, inY, label, 1);
@@ -219,6 +237,14 @@ export const COMPONENT_CASES: ComponentCase[] = [
 	},
 	...["combined", "asynch"].map((bus) => ({
 		name: `ram-a2-d2-${bus}`,
+		factory: RAM,
+		attrs: { addrWidth: 2, dataWidth: 2, bus },
+		outputs: [0],
+		fixed: { 2: 1, 4: 0 },
+		inputOrder: bus === "combined" ? [5, 3, 1] : [3, 1],
+	})),
+	...["combined", "asynch"].map((bus) => ({
+		name: `ram-a2-d2-${bus}-controls`,
 		factory: RAM,
 		attrs: { addrWidth: 2, dataWidth: 2, bus },
 		outputs: [0],

@@ -14,6 +14,7 @@ bun run lint       # Biome
 bun run format     # Biome con fixes
 bun run typecheck  # TypeScript
 bun run golden     # regenera los casos contra Logisim real (requiere Java y el jar en .cache/)
+bun run golden:io  # captura estados internos de E/S contra las fábricas Java originales
 ```
 
 ## Fidelidad
@@ -21,6 +22,8 @@ bun run golden     # regenera los casos contra Logisim real (requiere Java y el 
 `tests/golden/` contiene circuitos (fixtures + aleatorios generados con semilla) cuya salida fue
 grabada ejecutando Logisim 2.7.1 real (`-tty table`). `bun run test` verifica que LogiHUR produce
 exactamente la misma tabla, y que Logisim puede abrir los `.circ` que escribe LogiHUR.
+`tests/io-reference.test.ts` compara además 392 estados de E/S capturados de las fábricas Java
+originales: incluye los displays, la matriz LED y el TTY, cuyo estado visible no sale por pines.
 
 ## Estructura
 
@@ -28,7 +31,7 @@ exactamente la misma tabla, y que Logisim puede abrir los `.circ` que escribe Lo
   propagador y estados de circuito (`simulation.ts`), apariencia de subcircuitos. Portado de
   `com.cburch.logisim.{data,circuit,instance}`.
 - `src/components/` — librerías de componentes con los mismos nombres, atributos y valores por defecto
-  que Logisim (`wiring/`, `gates/`, `base/`, subcircuitos).
+  que Logisim (`wiring/`, `gates/`, `plexers/`, `arith/`, `memory/`, `io/`, `base/`, subcircuitos).
 - `src/format/` — lectura/escritura de `.circ` (port de `XmlReader`/`XmlWriter`).
 - `src/sim/` — simulador headless (incluye el modo `-tty table` de Logisim).
 - `src/render/` — dibujo en Canvas 2D con la misma geometría que Logisim.

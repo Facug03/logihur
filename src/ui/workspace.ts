@@ -100,6 +100,7 @@ export class Workspace {
 	}
 
 	setProject(project: Project, fileName: string): void {
+		this.stopPoking();
 		this.stopTicking();
 		this.disposeSimulators();
 		this.project = project;
@@ -185,6 +186,7 @@ export class Workspace {
 
 	setCircuit(c: Circuit): void {
 		if (c === this.circuit && this.viewStack.length === 1) return;
+		this.stopPoking();
 		this.circuit = c;
 		this.clearSelection();
 		this.resetView();
@@ -194,6 +196,7 @@ export class Workspace {
 	/** View the inside of a subcircuit instance (Logisim: "View <name>"). */
 	enterSubcircuit(inst: Instance): void {
 		if (!(inst.factory instanceof SubcircuitFactory)) return;
+		this.stopPoking();
 		const sub = inst.factory.getSubstate(this.viewState, inst);
 		this.viewStack.push({ state: sub, via: inst });
 		this.clearSelection();
@@ -201,6 +204,7 @@ export class Workspace {
 	}
 
 	leaveSubcircuit(levels = 1): void {
+		this.stopPoking();
 		let n = levels;
 		while (n-- > 0 && this.viewStack.length > 1) this.viewStack.pop();
 		this.clearSelection();
@@ -651,6 +655,22 @@ export class Workspace {
 		this.changed();
 	}
 
+	pokeDrag(x: number, y: number): void {
+		const active = this.activePoker;
+		if (!active || !this.pokePressed || !active.poker.mouseDragged) return;
+		active.poker.mouseDragged(active.state, x, y);
+		this.propagate();
+		this.changed();
+	}
+
+	pokeKeyPressed(key: string): boolean {
+		const caret = this.pokeCaret;
+		if (!caret?.poker.keyPressed?.(caret.state, key)) return false;
+		this.propagate();
+		this.changed();
+		return true;
+	}
+
 	/** The poker that receives typed keys (Logisim's poke caret). */
 	get pokeCaret(): { poker: Poker; state: InstanceStateImpl } | null {
 		const active = this.activePoker;
@@ -674,7 +694,10 @@ export class Workspace {
 		const active = this.activePoker;
 		this.activePoker = null;
 		this.pokePressed = false;
-		if (active) active.poker.stopEditing?.(active.state);
+		if (active?.poker.stopEditing) {
+			active.poker.stopEditing(active.state);
+			this.propagate();
+		}
 	}
 
 	setGateShape(shape: typeof prefs.gateShape): void {

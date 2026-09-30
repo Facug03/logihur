@@ -27,6 +27,21 @@ describe.skipIf(cases.length === 0)("matches Logisim 2.7.1 (-tty table)", () => 
 			const result = sim.runTtyTable(5000);
 			expect(result.code).toBe(code);
 			expect(result.lines).toEqual(lines);
+			if (/^comp-ram-a2-d2-(combined|asynch)$/.test(name)) {
+				// A driven write bus alone is insufficient coverage: observe stored data
+				// while OE=1 has released the external buffer and RAM is driving the bus.
+				const outputs = sim.pins().filter((p) => !p.input);
+				const oe = outputs.findIndex((p) => p.label === "p_i3");
+				const data = outputs.findIndex((p) => p.label === "p_o0");
+				expect(oe).toBeGreaterThanOrEqual(0);
+				expect(data).toBeGreaterThanOrEqual(0);
+				expect(
+					lines.some((line) => {
+						const values = line.split("\t");
+						return values[oe] === "1" && /^(01|10|11)$/.test(values[data]);
+					}),
+				).toBe(true);
+			}
 		});
 	}
 });
