@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Plus, Star, Trash2 } from "lucide-react";
+import { ChevronRight, MoreHorizontal, Plus, Star, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { LIBRARIES } from "@/components/libraries";
 import { loadImage, type MemContents } from "@/components/memory/mem-contents";
@@ -72,7 +72,13 @@ function attrLabel(attr: AnyAttribute): string {
 
 // --- circuits ---------------------------------------------------------------
 
-export function CircuitsPanel({ ws }: { ws: Workspace }) {
+export function CircuitsPanel({
+	ws,
+	onCircuitMenu,
+}: {
+	ws: Workspace;
+	onCircuitMenu?: (circuit: Circuit, clientX: number, clientY: number) => void;
+}) {
 	const [adding, setAdding] = useState(false);
 	const [name, setName] = useState("");
 	const tool = ws.tool;
@@ -120,8 +126,14 @@ export function CircuitsPanel({ ws }: { ws: Workspace }) {
 					const toolActive = tool.kind === "add" && tool.factory === factory;
 					const canInsert = !ws.project.wouldCreateCycle(ws.viewCircuit, c);
 					return (
+						// biome-ignore lint/a11y/noStaticElementInteractions: right-click shortcut; the "más acciones" button offers the same menu
 						<div
 							key={c.id}
+							onContextMenu={(e) => {
+								if (!onCircuitMenu) return;
+								e.preventDefault();
+								onCircuitMenu(c, e.clientX, e.clientY);
+							}}
 							className={`group flex items-center gap-1 rounded-md pr-1 ${active ? "bg-accent/10" : "hover:bg-black/5"}`}
 						>
 							<button
@@ -152,6 +164,20 @@ export function CircuitsPanel({ ws }: { ws: Workspace }) {
 							>
 								<Star className={`size-3.5 ${isMain ? "fill-current" : ""}`} />
 							</button>
+							{onCircuitMenu && (
+								<button
+									type="button"
+									title={`Más acciones para ${c.name}`}
+									aria-label={`Más acciones para ${c.name}`}
+									onClick={(e) => {
+										const b = e.currentTarget.getBoundingClientRect();
+										onCircuitMenu(c, b.left, b.bottom + 4);
+									}}
+									className="rounded p-1 text-muted hover:text-foreground md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+								>
+									<MoreHorizontal className="size-3.5" />
+								</button>
+							)}
 							<button
 								type="button"
 								title="Borrar circuito"

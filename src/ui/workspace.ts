@@ -10,6 +10,13 @@ import { TEXT, TEXT_TEXT } from "@/components/base/text";
 import { RAM, ROM, ROM_CONTENTS } from "@/components/memory/mem";
 import type { MemContents } from "@/components/memory/mem-contents";
 import { SubcircuitFactory } from "@/components/subcircuit";
+import {
+	computeDistribution,
+	getBitEnds,
+	SPLITTER,
+	SPLITTER_FANOUT,
+	splitterBitAttr,
+} from "@/components/wiring/splitter";
 import { History, Transaction } from "@/editor/history";
 import { repairWires } from "@/editor/wires";
 import type { AnyAttribute, AttributeSet } from "@/engine/attributes";
@@ -598,6 +605,32 @@ export class Workspace {
 		});
 	}
 
+	/** Menu Tool "Borrar": one component, whether or not it is selected. */
+	deleteComponent(comp: Instance): void {
+		this.selection.delete(comp);
+		this.edit("Borrar", (tx, c) => tx.removeComponent(c, comp));
+	}
+
+	/** SplitterDistributeItem: the bit layout of `order` (1 ascending, -1 descending), or null if already so. */
+	splitterDistribution(comp: Instance, order: number): number[] | null {
+		if (comp.factory !== SPLITTER) return null;
+		const actual = getBitEnds(comp.attrs);
+		const desired = computeDistribution(comp.attrs.get(SPLITTER_FANOUT), actual.length, order);
+		return actual.every((v, i) => v === desired[i]) ? null : desired;
+	}
+
+	distributeSplitter(comp: Instance, order: number): void {
+		const desired = this.splitterDistribution(comp, order);
+		if (!desired) return;
+		this.edit(order > 0 ? "Distribuir ascendente" : "Distribuir descendente", (tx, c) => {
+			tx.changeAttributes(c, comp, (attrs) => {
+				desired.forEach((end, i) => {
+					SPLITTER.setAttribute(attrs, splitterBitAttr(i), end);
+				});
+			});
+		});
+	}
+
 	moveSelection(dx: number, dy: number): void {
 		if ((dx === 0 && dy === 0) || !this.hasSelection()) return;
 		const comps = Array.from(this.selection);
@@ -820,6 +853,18 @@ export class Workspace {
 		});
 		this.setCircuit(target);
 		return target;
+	}
+
+	/** The explorer's up/down arrows: reorder circuits in the project. */
+	moveCircuit(circuit: Circuit, delta: number): void {
+		const from = this.project.circuits.indexOf(circuit);
+		const to = from + delta;
+		if (from < 0 || to < 0 || to >= this.project.circuits.length) return;
+		this.edit(
+			delta < 0 ? "Mover circuito arriba" : "Mover circuito abajo",
+			(tx) => tx.moveCircuit(this.project, circuit, to),
+			false,
+		);
 	}
 
 	setMainCircuit(circuit: Circuit): void {

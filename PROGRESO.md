@@ -165,6 +165,13 @@ Las fases 0–4 están implementadas y versionadas en git.
   recarga offline con editor y analizador operativos; actualización simulada muestra el aviso,
   recarga y borra la caché vieja.
 
+- **Menús contextuales y reordenamiento** (`src/ui/ContextMenu.tsx`): Menu Tool en el lienzo
+  (clic derecho, Ctrl+clic, pulsación larga de 500 ms en táctil) con los ítems de `MenuTool` y los
+  `MenuExtender` de subcircuitos, memorias y separadores; menú de circuito en el panel (clic
+  derecho o ⋯). Nueva operación deshacible `moveCircuit` en el historial. Popover manual (el
+  light dismiss cerraba el menú al soltar la presión que lo abrió). Tests en
+  `tests/context-menu.test.ts`; Playwright en escritorio y táctil.
+
 ## Siguiente (en este orden)
 
 1. **Fase 5 (resto)**: editor de apariencia, logging, librerías `.circ`; copiar/pegar en la tabla.

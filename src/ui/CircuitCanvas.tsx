@@ -27,7 +27,11 @@ interface Props {
 	ws: Workspace;
 	version: number;
 	onZoomChange?: (zoom: number) => void;
+	/** Menu Tool: right click, Ctrl+click or a long press on a component. */
+	onComponentMenu?: (inst: Instance, clientX: number, clientY: number) => void;
 }
+
+const LONG_PRESS_MS = 500;
 
 const snap = (v: number) => Math.round(v / 10) * 10;
 
@@ -74,7 +78,7 @@ type Gesture =
 	| { mode: "place" };
 
 export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function CircuitCanvas(
-	{ ws, version, onZoomChange },
+	{ ws, version, onZoomChange, onComponentMenu },
 	ref,
 ) {
 	const wrapRef = useRef<HTMLDivElement>(null);
@@ -162,6 +166,11 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 		wire: null as Wire | null,
 	});
 	const lastTap = useRef<{ t: number; inst: Instance | null }>({ t: 0, inst: null });
+	const longPress = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const cancelLongPress = () => {
+		if (longPress.current) clearTimeout(longPress.current);
+		longPress.current = null;
+	};
 
 	const drawOverlay = (g: CanvasGraphics) => {
 		const gs = gesture.current;
@@ -326,6 +335,7 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 		const p = toCircuit(e.clientX, e.clientY);
 		pointers.current.set(e.pointerId, { x: p.sx, y: p.sy });
 		if (pointers.current.size === 2) {
+			cancelLongPress();
 			const [a, b] = Array.from(pointers.current.values());
 			gesture.current = {
 				mode: "pinch",
@@ -350,13 +360,26 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 			gesture.current = { mode: "pan" };
 			return;
 		}
-		if (e.button === 2) {
-			gesture.current = { mode: "none" };
-			return;
-		}
 		const tool = ws.tool;
 		const target = hitComponent(circuit, p.x, p.y);
+		// Logisim maps Button3 and Ctrl+Button1 to the Menu Tool
+		if (e.button === 2 || (e.button === 0 && e.ctrlKey && !e.metaKey)) {
+			gesture.current = { mode: "none" };
+			if (target && tool.kind !== "text") onComponentMenu?.(target, e.clientX, e.clientY);
+			return;
+		}
 		d.target = target;
+		cancelLongPress();
+		if (touch && target && (tool.kind === "edit" || tool.kind === "wiring") && onComponentMenu) {
+			const { clientX, clientY } = e;
+			longPress.current = setTimeout(() => {
+				longPress.current = null;
+				if (down.current.moved || pointers.current.size !== 1) return;
+				gesture.current = { mode: "none" };
+				onComponentMenu(target, clientX, clientY);
+				redraw();
+			}, LONG_PRESS_MS);
+		}
 
 		switch (tool.kind) {
 			case "text":
@@ -423,7 +446,10 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 		pointers.current.set(e.pointerId, { x: p.sx, y: p.sy });
 		const v = getView();
 		const d = down.current;
-		if (Math.hypot(p.sx - d.sx, p.sy - d.sy) > 4) d.moved = true;
+		if (Math.hypot(p.sx - d.sx, p.sy - d.sy) > 4) {
+			d.moved = true;
+			cancelLongPress();
+		}
 
 		switch (gs.mode) {
 			case "pinch": {
@@ -477,6 +503,7 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 	const onPointerUp = (e: React.PointerEvent) => {
 		const p = toCircuit(e.clientX, e.clientY);
 		pointers.current.delete(e.pointerId);
+		cancelLongPress();
 		const gs = gesture.current;
 		const d = down.current;
 		if (gs.mode === "pinch") {

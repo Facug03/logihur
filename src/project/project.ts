@@ -123,6 +123,14 @@ export class Project {
 		if (this.mainCircuit === c) this.mainCircuit = this.circuits[0] ?? null;
 	}
 
+	/** Reorder: `c` ends up at `index`, main circuit unchanged. */
+	moveCircuit(c: Circuit, index: number): void {
+		const from = this.circuits.indexOf(c);
+		if (from < 0 || from === index) return;
+		this.circuits.splice(from, 1);
+		this.circuits.splice(index, 0, c);
+	}
+
 	/** Circuits (other than c) that contain c as a subcircuit. */
 	getUsers(c: Circuit): Circuit[] {
 		const f = this.factories.get(c);

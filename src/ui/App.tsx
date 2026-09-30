@@ -23,8 +23,12 @@ import { Toaster, toast } from "sonner";
 import type { AnalyzerTab } from "@/analyze/analyze";
 import { AND_GATE, OR_GATE } from "@/components/gates/gates";
 import { NOT_GATE } from "@/components/gates/simple-gates";
+import { loadImage } from "@/components/memory/mem-contents";
+import { SubcircuitFactory } from "@/components/subcircuit";
 import { PIN } from "@/components/wiring/pin";
 import type { Font } from "@/engine/attributes";
+import type { Circuit } from "@/engine/circuit";
+import type { Instance } from "@/engine/component";
 import type { Direction } from "@/engine/geom";
 import { setTextMeasurer } from "@/engine/graphics";
 import { t } from "@/i18n/es";
@@ -32,7 +36,9 @@ import { measureWith } from "@/render/canvas-graphics";
 import { AnalyzeMenu } from "./analyzer/AnalyzeMenu";
 import { AnalyzerDialog } from "./analyzer/AnalyzerDialog";
 import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
+import { ContextMenu, type MenuEntry, type MenuRequest } from "./ContextMenu";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";
+import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
 import { Disclosure, PanelResize } from "./PanelControls";
 import { ProjectMenu } from "./ProjectMenu";
 import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
@@ -212,6 +218,123 @@ export default function App() {
 		}
 	};
 
+	const [menu, setMenu] = useState<MenuRequest | null>(null);
+	const [memoryEditing, setMemoryEditing] = useState<Instance | null>(null);
+	const memoryFileRef = useRef<HTMLInputElement>(null);
+	const memoryTarget = useRef<Instance | null>(null);
+	const showAttributes = () => (desktopRight ? setRightVisible(true) : setRightOpen(true));
+
+	const analyze = () => {
+		const result = ws.analyzeViewedCircuit();
+		if (result.ok) setAnalyzer({ tab: result.tab, notice: result.notice });
+		else toast.error(t("analyze.errorTitle"), { description: result.error, duration: 8000 });
+	};
+
+	/** MenuTool: a selection menu, or a component menu plus its MenuExtender items. */
+	const openComponentMenu = (inst: Instance, x: number, y: number) => {
+		if (ws.selection.has(inst) && ws.selection.size + ws.selectedWires.size > 1) {
+			setMenu({
+				x,
+				y,
+				title: `${ws.selection.size + ws.selectedWires.size} elementos seleccionados`,
+				items: [
+					{ label: "Eliminar Selección", danger: true, onSelect: () => ws.deleteSelection() },
+					{ label: "Cortar Selección", onSelect: () => ws.cut() },
+					{ label: "Copiar Selección", onSelect: () => ws.copy() },
+				],
+			});
+			return;
+		}
+		ws.select(inst);
+		const items: MenuEntry[] = [
+			{ label: "Borrar", danger: true, onSelect: () => ws.deleteComponent(inst) },
+			{ label: "Mostrar Atributos", onSelect: showAttributes },
+		];
+		if (inst.factory instanceof SubcircuitFactory) {
+			items.push("separator", {
+				label: `Vista ${inst.factory.name}`,
+				onSelect: () => ws.enterSubcircuit(inst),
+			});
+		}
+		const contents = ws.memoryContents(inst);
+		if (contents) {
+			items.push(
+				"separator",
+				{ label: "Editar Contenidos...", onSelect: () => setMemoryEditing(inst) },
+				{
+					label: "Borrar Contenidos",
+					onSelect: () => {
+						const next = contents.clone();
+						next.clear();
+						ws.setMemoryContents(inst, next);
+					},
+				},
+				{
+					label: "Cargar Imagen...",
+					onSelect: () => {
+						memoryTarget.current = inst;
+						memoryFileRef.current?.click();
+					},
+				},
+				{
+					label: "Salvar Imagen...",
+					onSelect: () => downloadMemory(contents, `${inst.factory.name.toLowerCase()}.hex`),
+				},
+			);
+		}
+		if (inst.factory.name === "Splitter") {
+			items.push(
+				"separator",
+				{
+					label: "Distribuir ascendente",
+					disabled: ws.splitterDistribution(inst, 1) === null,
+					onSelect: () => ws.distributeSplitter(inst, 1),
+				},
+				{
+					label: "Distribuir descendente",
+					disabled: ws.splitterDistribution(inst, -1) === null,
+					onSelect: () => ws.distributeSplitter(inst, -1),
+				},
+			);
+		}
+		setMenu({ x, y, title: componentName(inst), items });
+	};
+
+	/** The explorer's circuit popup (Popups.CircuitPopup) plus the up/down arrows. */
+	const openCircuitMenu = (c: Circuit, x: number, y: number) => {
+		const index = ws.project.circuits.indexOf(c);
+		const isMain = ws.project.mainCircuit === c;
+		setMenu({
+			x,
+			y,
+			title: c.name,
+			items: [
+				{ label: "Editar Circuito", onSelect: () => ws.setCircuit(c) },
+				{
+					label: t("analyze.projectAnalyzeCircuitItem"),
+					onSelect: () => {
+						ws.setCircuit(c);
+						analyze();
+					},
+				},
+				"separator",
+				{ label: "Mover Arriba", disabled: index <= 0, onSelect: () => ws.moveCircuit(c, -1) },
+				{
+					label: "Mover Abajo",
+					disabled: index >= ws.project.circuits.length - 1,
+					onSelect: () => ws.moveCircuit(c, 1),
+				},
+				"separator",
+				{
+					label: "Seleccionar Como Circuito Principal",
+					disabled: isMain,
+					onSelect: () => ws.setMainCircuit(c),
+				},
+				{ label: "Eliminar Circuito", danger: true, onSelect: () => ws.removeCircuit(c) },
+			],
+		});
+	};
+
 	const pwaState = useSyncExternalStore(pwa.subscribe, pwa.getState, pwa.getState);
 	// biome-ignore lint/correctness/useExhaustiveDependencies: register once; openText only uses stable refs
 	useEffect(() => {
@@ -367,6 +490,38 @@ export default function App() {
 					}}
 				/>
 			)}
+			{menu && <ContextMenu menu={menu} onClose={() => setMenu(null)} />}
+			{memoryEditing && ws.memoryContents(memoryEditing) && (
+				<HexEditor
+					contents={ws.memoryContents(memoryEditing) as NonNullable<ReturnType<typeof ws.memoryContents>>}
+					onClose={() => setMemoryEditing(null)}
+					onAccept={(next) => {
+						ws.setMemoryContents(memoryEditing, next);
+						setMemoryEditing(null);
+					}}
+				/>
+			)}
+			<input
+				ref={memoryFileRef}
+				type="file"
+				accept=".hex,.txt"
+				hidden
+				aria-label="Cargar imagen de memoria"
+				onChange={async (e) => {
+					const file = e.target.files?.[0];
+					const inst = memoryTarget.current;
+					e.target.value = "";
+					const contents = inst && ws.memoryContents(inst);
+					if (!file || !inst || !contents) return;
+					try {
+						const next = contents.clone();
+						loadImage(next, await file.text());
+						ws.setMemoryContents(inst, next);
+					} catch (err) {
+						setError(memoryImageError(err));
+					}
+				}}
+			/>
 			{analyzer && (
 				<AnalyzerDialog
 					ws={ws}
@@ -541,11 +696,7 @@ export default function App() {
 				<Divider />
 				<AnalyzeMenu
 					circuitName={ws.viewCircuit.name}
-					onAnalyze={() => {
-						const result = ws.analyzeViewedCircuit();
-						if (result.ok) setAnalyzer({ tab: result.tab, notice: result.notice });
-						else toast.error(t("analyze.errorTitle"), { description: result.error, duration: 8000 });
-					}}
+					onAnalyze={analyze}
 					onOpen={() => setAnalyzer({ tab: "inputs", notice: null })}
 				/>
 
@@ -594,7 +745,7 @@ export default function App() {
 							<X className="size-4" />
 						</IconButton>
 					</div>
-					<CircuitsPanel ws={ws} />
+					<CircuitsPanel ws={ws} onCircuitMenu={openCircuitMenu} />
 					<div className="mx-3 h-px bg-line" />
 					<LibraryPanel ws={ws} onPick={() => setLeftOpen(false)} />
 					<div className="mx-3 h-px bg-line" />
@@ -636,7 +787,13 @@ export default function App() {
 				/>
 				{/* canvas */}
 				<main className="relative min-w-0 flex-1">
-					<CircuitCanvas ref={canvasRef} ws={ws} version={version} onZoomChange={setZoom} />
+					<CircuitCanvas
+						ref={canvasRef}
+						ws={ws}
+						version={version}
+						onZoomChange={setZoom}
+						onComponentMenu={openComponentMenu}
+					/>
 
 					<div className="absolute left-3 top-3 flex items-center gap-1 rounded-lg border border-line bg-panel/95 py-1 pl-1 pr-3 text-sm shadow-sm">
 						{ws.viewStack.length > 1 ? (

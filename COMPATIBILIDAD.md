@@ -19,10 +19,10 @@ Se contrastó la documentación oficial y las fuentes del jar 2.7.1 extraídas e
 | Reiniciar simulación | Implementado sobre toda la jerarquía del circuito raíz. |
 | Tooltips de la barra | Visibles con mouse y foco, incluido sobre acciones deshabilitadas; las ayudas de simulación describen la acción y el estado. |
 | Agregar / quitar circuitos | Implementado en el panel Circuitos. |
-| Flechas para reordenar circuitos | Pendiente: no hay control de reordenamiento todavía. |
+| Flechas para reordenar circuitos | Implementado como Mover Arriba / Mover Abajo en el menú de cada circuito (clic derecho o botón ⋯); deshacible, conserva el circuito principal y el orden se guarda en el `.circ`. |
 | Llave: vista de librerías / árbol de simulación | Panel de librerías implementado. Árbol de instancias de simulación pendiente; hay navegación entrando en subcircuitos y volviendo con la ruta del lienzo. |
 | Botones diseño / apariencia | Diseño implementado. Editor gráfico de apariencia pendiente de fase 5; se lee/dibuja la apariencia de subcircuitos. |
-| Menu Tool / menú contextual de componentes | Pendiente. Algunas acciones están en Atributos, pero no existe el menú contextual completo. |
+| Menu Tool / menú contextual de componentes | Implementado: clic derecho o Ctrl+clic (como Button3 / Ctrl Button1 de Logisim) y pulsación larga en táctil. Componente: Borrar, Mostrar Atributos y extensiones (Vista de subcircuito; Editar/Borrar Contenidos, Cargar/Salvar Imagen en RAM/ROM; Distribuir ascendente/descendente en separadores). Selección múltiple: Eliminar, Cortar y Copiar Selección. Menú de circuito: Editar, Analizar, Mover, Seleccionar como principal y Eliminar. Pendientes: Editar Apariencia y Estadísticas del circuito. |
 | Barra configurable y mapeo de botones del mouse | Pendiente: la barra web es fija; no aplica la configuración de `<toolbar>` / `<mappings>` del archivo al editor. |
 | Análisis combinacional | Implementado (botón Σ): Analizar Circuito y ventana con Entradas, Salidas, Tabla, Expresión y Minimizado, mapa de Karnaugh y Crear Circuito (dos entradas / sólo NAND, reemplazo con confirmación y deshacer). 511 casos verificados contra Logisim 2.7.1. Pendiente: copiar/pegar regiones de la tabla (TableTabClip). |
 | Logging y cargar librerías `.circ` | Pendientes de fase 5. |

@@ -18,7 +18,8 @@ type Op =
 	| { kind: "static"; circuit: Circuit; before: AttributeSet; after: AttributeSet }
 	| { kind: "addCircuit"; project: Project; circuit: Circuit; index: number }
 	| { kind: "removeCircuit"; project: Project; circuit: Circuit; index: number }
-	| { kind: "main"; project: Project; from: Circuit | null; to: Circuit | null };
+	| { kind: "main"; project: Project; from: Circuit | null; to: Circuit | null }
+	| { kind: "moveCircuit"; project: Project; circuit: Circuit; from: number; to: number };
 
 function apply(op: Op, forward: boolean): void {
 	switch (op.kind) {
@@ -56,6 +57,9 @@ function apply(op: Op, forward: boolean): void {
 			break;
 		case "main":
 			op.project.mainCircuit = forward ? op.to : op.from;
+			break;
+		case "moveCircuit":
+			op.project.moveCircuit(op.circuit, forward ? op.to : op.from);
 			break;
 	}
 }
@@ -113,6 +117,11 @@ export class Transaction {
 	removeCircuit(project: Project, circuit: Circuit): void {
 		const index = project.circuits.indexOf(circuit);
 		if (index >= 0) this.run({ kind: "removeCircuit", project, circuit, index });
+	}
+
+	moveCircuit(project: Project, circuit: Circuit, to: number): void {
+		const from = project.circuits.indexOf(circuit);
+		if (from >= 0 && from !== to) this.run({ kind: "moveCircuit", project, circuit, from, to });
 	}
 
 	setMain(project: Project, to: Circuit): void {
