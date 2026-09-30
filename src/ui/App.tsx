@@ -37,6 +37,7 @@ import { Disclosure, PanelResize } from "./PanelControls";
 import { ProjectMenu } from "./ProjectMenu";
 import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
 import { useMediaQuery, usePreference } from "./preferences";
+import { onLaunchFiles, pwa } from "./pwa";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { Tooltip } from "./Tooltip";
 import { TICK_FREQUENCIES, Workspace } from "./workspace";
@@ -211,6 +212,29 @@ export default function App() {
 		}
 	};
 
+	const pwaState = useSyncExternalStore(pwa.subscribe, pwa.getState, pwa.getState);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: register once; openText only uses stable refs
+	useEffect(() => {
+		pwa.start();
+		onLaunchFiles(async (file) => openText(await file.text(), file.name));
+	}, []);
+	useEffect(() => {
+		if (!pwaState.updateReady) return;
+		toast("Hay una versión nueva de LogiHUR.", {
+			id: "pwa-update",
+			duration: Number.POSITIVE_INFINITY,
+			description: "Tu trabajo queda guardado en este navegador.",
+			action: {
+				label: "Actualizar",
+				onClick: () =>
+					pwa.applyUpdate(() => {
+						ws.finishTextEditing();
+						ws.flushAutosave();
+					}),
+			},
+		});
+	}, [pwaState.updateReady, ws]);
+
 	const onOpenFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		e.target.value = "";
@@ -376,6 +400,8 @@ export default function App() {
 					ws={ws}
 					onSelect={() => requestAnimationFrame(() => canvasRef.current?.fit())}
 					onDelete={setProjectToDelete}
+					pwa={pwaState}
+					onInstall={() => pwa.install()}
 				/>
 
 				<IconButton label={t("menu.new")} onClick={() => ws.newProject()}>

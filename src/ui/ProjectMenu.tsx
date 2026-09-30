@@ -1,17 +1,22 @@
 "use client";
 
-import { Check, ChevronDown, Files, Trash2, Undo2 } from "lucide-react";
+import { Check, ChevronDown, Download, Files, Share, Trash2, Undo2 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import type { PwaState } from "./pwa";
 import type { Workspace } from "./workspace";
 
 export function ProjectMenu({
 	ws,
 	onSelect,
 	onDelete,
+	pwa,
+	onInstall,
 }: {
 	ws: Workspace;
 	onSelect: () => void;
 	onDelete: (project: { id: number; name: string }) => void;
+	pwa: PwaState;
+	onInstall: () => void;
 }) {
 	const id = useId();
 	const ref = useRef<HTMLElement>(null);
@@ -101,6 +106,28 @@ export function ProjectMenu({
 						</div>
 					))}
 				</div>
+				{pwa.canInstall && (
+					<button
+						type="button"
+						onClick={() => {
+							close();
+							onInstall();
+						}}
+						className="mt-1 flex w-full items-center gap-2 border-t border-line px-2 pt-3 pb-2 text-left text-sm hover:bg-black/5"
+					>
+						<Download className="size-4 shrink-0" />
+						<span>
+							Instalar LogiHUR
+							<span className="block text-xs text-muted">Funciona sin conexión y abre archivos .circ</span>
+						</span>
+					</button>
+				)}
+				{pwa.iosHint && (
+					<p className="mt-1 flex gap-2 border-t border-line px-2 pt-3 pb-1 text-xs text-muted">
+						<Share className="size-4 shrink-0" />
+						Para instalarla: Compartir → Agregar a inicio. Después funciona sin conexión.
+					</p>
+				)}
 			</section>
 		</>
 	);

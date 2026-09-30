@@ -155,10 +155,20 @@ Las fases 0–4 están implementadas y versionadas en git.
     un circuito sólo NAND, definir una tabla a mano y obtener su expresión; sin errores de consola.
   - **262 tests OK**, Biome y TypeScript limpios.
 
+- **Fase 6 – PWA**: `src/app/manifest.ts` (instalable, standalone, íconos propios incluido maskable,
+  `file_handlers` para abrir `.circ` con doble clic en escritorio vía `launchQueue`). `bun run build`
+  ejecuta `scripts/build-sw.ts`, que genera `out/sw.js` desde `src/pwa/sw.template.js` precacheando
+  todo el export (≈2 MB) bajo una caché con hash de contenido: funciona sin conexión desde la primera
+  visita y cada deploy reemplaza la caché anterior. `src/ui/pwa.ts`: registro sólo en producción,
+  aviso "Hay una versión nueva" con Actualizar (guarda antes de recargar), "Instalar LogiHUR" en el
+  menú de proyectos y la indicación Compartir → Agregar a inicio en iOS. Playwright sobre `out/`:
+  recarga offline con editor y analizador operativos; actualización simulada muestra el aviso,
+  recarga y borra la caché vieja.
+
 ## Siguiente (en este orden)
 
 1. **Fase 5 (resto)**: editor de apariencia, logging, librerías `.circ`; copiar/pegar en la tabla.
-2. **Fase 6**: PWA, pulido móvil (incluido teclado virtual para el componente Teclado).
+2. **Fase 6 (resto)**: pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles
 

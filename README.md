@@ -8,7 +8,7 @@ Simulador de circuitos lógicos para estudiantes de la UNAHUR: una versión web,
 ```bash
 bun install        # dependencias
 bun run dev        # servidor de desarrollo
-bun run build      # export estático en out/
+bun run build      # export estático en out/ + service worker (PWA offline)
 bun run test       # tests (Vitest)
 bun run lint       # Biome
 bun run format     # Biome con fixes
@@ -36,6 +36,13 @@ expresiones del circuito visible; la ventana también permite definir entradas/s
 tabla (clic o teclas 0/1/x), escribir expresiones, ver el mapa de Karnaugh y la expresión minimizada, y
 **Crear circuito** (opcionalmente sólo con puertas de dos entradas o sólo NAND).
 La revisión de funciones presentes y pendientes está en [COMPATIBILIDAD.md](COMPATIBILIDAD.md).
+
+## Instalación y uso sin conexión
+
+LogiHUR es una PWA: desde el menú de proyectos se puede **Instalar LogiHUR** (en iPhone/iPad:
+Compartir → Agregar a inicio). Después de la primera visita funciona sin conexión, y la app
+instalada en escritorio abre archivos `.circ` con doble clic. Cuando hay una versión nueva aparece
+un aviso para actualizar; el trabajo queda guardado antes de recargar.
 
 ## Fidelidad
 
