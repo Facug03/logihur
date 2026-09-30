@@ -29,7 +29,7 @@ export function DeleteProjectDialog({
 			aria-labelledby="delete-project-title"
 			aria-describedby="delete-project-description"
 			onCancel={onClose}
-			className="m-auto w-[min(440px,calc(100vw-24px))] rounded-xl border border-line bg-panel p-5 text-foreground shadow-xl backdrop:bg-black/30"
+			className="modal-motion m-auto w-[min(440px,calc(100vw-24px))] rounded-xl border border-line bg-panel p-5 text-foreground shadow-xl backdrop:bg-black/30"
 		>
 			<h2 id="delete-project-title" className="text-lg font-semibold">
 				Eliminar proyecto

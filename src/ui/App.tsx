@@ -104,7 +104,7 @@ function IconButton({
 					aria-pressed={active}
 					disabled={disabled}
 					onClick={onClick}
-					className={`inline-flex size-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:opacity-35 ${
+					className={`inline-flex size-9 shrink-0 items-center justify-center rounded-md press disabled:opacity-35 ${
 						active ? "bg-accent/15 ring-1 ring-accent/40" : "hover:bg-black/5"
 					} ${className}`}
 				>
@@ -570,17 +570,16 @@ export default function App() {
 				</aside>
 
 				{leftVisible && <PanelResize side="left" width={leftWidth} onChange={setLeftWidth} />}
-				{(leftOpen || rightOpen) && (
-					<button
-						type="button"
-						aria-label="Cerrar paneles"
-						onClick={() => {
-							setLeftOpen(false);
-							setRightOpen(false);
-						}}
-						className={`absolute inset-0 z-10 bg-black/20 ${leftOpen ? "md:hidden" : "lg:hidden"}`}
-					/>
-				)}
+				<button
+					type="button"
+					aria-label="Cerrar paneles"
+					data-open={leftOpen || rightOpen ? "" : undefined}
+					onClick={() => {
+						setLeftOpen(false);
+						setRightOpen(false);
+					}}
+					className={`drawer-scrim absolute inset-0 z-10 bg-black/20 ${leftOpen ? "md:hidden" : "lg:hidden"}`}
+				/>
 				{/* canvas */}
 				<main className="relative min-w-0 flex-1">
 					<CircuitCanvas ref={canvasRef} ws={ws} version={version} onZoomChange={setZoom} />

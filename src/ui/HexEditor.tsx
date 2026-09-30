@@ -102,7 +102,7 @@ export function HexEditor({
 				onClose();
 			}}
 			onKeyDown={(e) => e.stopPropagation()}
-			className="fixed inset-0 m-auto max-h-[96dvh] w-[min(960px,96vw)] overflow-auto rounded-xl border border-line bg-white p-4 shadow-xl backdrop:bg-black/40"
+			className="modal-motion fixed inset-0 m-auto max-h-[96dvh] w-[min(960px,96vw)] overflow-auto rounded-xl border border-line bg-white p-4 shadow-xl backdrop:bg-black/40"
 		>
 			<h2 id="hex-title" className="text-lg font-semibold">
 				Editar contenidos de memoria

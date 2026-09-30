@@ -215,7 +215,7 @@ export function LibraryPanel({ ws, onPick }: { ws: Workspace; onPick?: () => voi
 function LibraryDisclosure({ id, children }: { id: string; children: React.ReactNode }) {
 	const [open, setOpen] = usePreference(`library.${id}`, id === "#Gates" || id === "#Wiring");
 	return (
-		<details className="group" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
+		<details className="disclosure-motion group" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
 			{children}
 		</details>
 	);

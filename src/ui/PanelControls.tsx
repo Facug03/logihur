@@ -17,7 +17,11 @@ export function Disclosure({
 }) {
 	const [open, setOpen] = usePreference(`section.${id}`, defaultOpen);
 	return (
-		<details open={open} onToggle={(e) => setOpen(e.currentTarget.open)} className="group/disclosure">
+		<details
+			open={open}
+			onToggle={(e) => setOpen(e.currentTarget.open)}
+			className="disclosure-motion group/disclosure"
+		>
 			<summary className="flex cursor-pointer list-none items-center gap-1 rounded-md px-1 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted hover:bg-black/5">
 				<ChevronRight className="size-3.5 transition-transform group-open/disclosure:rotate-90" />
 				{title}

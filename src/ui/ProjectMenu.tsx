@@ -53,7 +53,7 @@ export function ProjectMenu({
 				popover="auto"
 				aria-label="Proyectos"
 				style={position}
-				className="fixed inset-auto m-0 w-72 max-w-[calc(100vw-16px)] rounded-lg border border-line bg-panel p-2 text-foreground shadow-lg"
+				className="popover-motion fixed inset-auto m-0 w-72 max-w-[calc(100vw-16px)] rounded-lg border border-line bg-panel p-2 text-foreground shadow-lg"
 			>
 				<p className="px-2 py-1 text-xs font-semibold text-muted">Proyectos</p>
 				{ws.canReturnToProject && (

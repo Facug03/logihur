@@ -3,6 +3,10 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+// Once a tooltip has been seen, neighbours open without delay or animation.
+const WARM_MS = 400;
+let lastHidden = 0;
+
 export function Tooltip({
 	label,
 	description,
@@ -15,22 +19,28 @@ export function Tooltip({
 	const ref = useRef<HTMLSpanElement>(null);
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const id = useId();
-	const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
+	const [position, setPosition] = useState<{ left: number; top: number; instant: boolean } | null>(null);
 	const hide = () => {
 		if (timer.current) clearTimeout(timer.current);
 		timer.current = null;
+		if (position) lastHidden = Date.now();
 		setPosition(null);
 	};
 	const show = (delay: number) => {
 		if (timer.current) clearTimeout(timer.current);
-		timer.current = setTimeout(() => {
-			const bounds = ref.current?.getBoundingClientRect();
-			if (bounds)
-				setPosition({
-					left: Math.max(8, Math.min(bounds.left, window.innerWidth - 288)),
-					top: bounds.bottom + 8,
-				});
-		}, delay);
+		const instant = Date.now() - lastHidden < WARM_MS;
+		timer.current = setTimeout(
+			() => {
+				const bounds = ref.current?.getBoundingClientRect();
+				if (bounds)
+					setPosition({
+						left: Math.max(8, Math.min(bounds.left, window.innerWidth - 288)),
+						top: bounds.bottom + 8,
+						instant,
+					});
+			},
+			instant ? 0 : delay,
+		);
 	};
 	useEffect(
 		() => () => {
@@ -73,8 +83,9 @@ export function Tooltip({
 					<div
 						id={id}
 						role="tooltip"
-						className="pointer-events-none fixed z-50 max-w-[280px] rounded-md border border-line bg-panel px-3 py-2 text-xs text-foreground shadow-md"
-						style={position}
+						data-instant={position.instant ? "" : undefined}
+						className="tooltip-motion pointer-events-none fixed z-50 max-w-[280px] rounded-md border border-line bg-panel px-3 py-2 text-xs text-foreground shadow-md"
+						style={{ left: position.left, top: position.top }}
 					>
 						<div className="font-medium">{label}</div>
 						{description && <p className="mt-1 leading-relaxed text-muted">{description}</p>}
