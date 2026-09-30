@@ -3,6 +3,7 @@
 // selection, undo history and simulation controls (Logisim's Project,
 // Simulator and tool framework).
 
+import { TEXT, TEXT_TEXT } from "@/components/base/text";
 import { RAM, ROM, ROM_CONTENTS } from "@/components/memory/mem";
 import type { MemContents } from "@/components/memory/mem-contents";
 import { SubcircuitFactory } from "@/components/subcircuit";
@@ -19,6 +20,7 @@ import { readCirc } from "@/format/circ-reader";
 import { writeCirc } from "@/format/circ-writer";
 import { Project } from "@/project/project";
 import { Simulator } from "@/sim/simulator";
+import { editableAttribute, type TextEditing } from "./text-editing";
 
 /** Tick frequencies offered by Logisim's Simulate > Tick Frequency menu. */
 export const TICK_FREQUENCIES = [4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5, 0.25];
@@ -27,6 +29,7 @@ export type Tool =
 	| { kind: "poke" }
 	| { kind: "edit" }
 	| { kind: "wiring" }
+	| { kind: "text"; factory: typeof TEXT; attrs: AttributeSet }
 	| { kind: "add"; id: string; factory: ComponentFactory; attrs: AttributeSet };
 
 type Listener = () => void;
@@ -49,6 +52,8 @@ export class Workspace {
 	viewStack: { state: CircuitState; via: Instance | null }[] = [];
 
 	tool: Tool = { kind: "edit" };
+	textEditing: TextEditing | null = null;
+	stepPoints = new Map<CircuitState, Set<Loc>>();
 	/** Attributes of each "add" tool, kept between uses like Logisim's tools. */
 	private toolAttrs = new Map<string, AttributeSet>();
 
@@ -101,6 +106,7 @@ export class Workspace {
 	}
 
 	setProject(project: Project, fileName: string): void {
+		this.finishTextEditing();
 		this.stopPoking();
 		this.stopTicking();
 		this.disposeSimulators();
@@ -180,6 +186,7 @@ export class Workspace {
 	}
 
 	private resetView(): void {
+		this.stepPoints.clear();
 		this.viewStack = [{ state: this.simulatorFor(this.circuit).root, via: null }];
 	}
 
@@ -193,6 +200,7 @@ export class Workspace {
 	}
 
 	setCircuit(c: Circuit): void {
+		this.finishTextEditing();
 		if (c === this.circuit && this.viewStack.length === 1) return;
 		this.stopPoking();
 		this.circuit = c;
@@ -203,6 +211,7 @@ export class Workspace {
 
 	/** View the inside of a subcircuit instance (Logisim: "View <name>"). */
 	enterSubcircuit(inst: Instance): void {
+		this.finishTextEditing();
 		if (!(inst.factory instanceof SubcircuitFactory)) return;
 		this.stopPoking();
 		const sub = inst.factory.getSubstate(this.viewState, inst);
@@ -212,6 +221,7 @@ export class Workspace {
 	}
 
 	leaveSubcircuit(levels = 1): void {
+		this.finishTextEditing();
 		this.stopPoking();
 		let n = levels;
 		while (n-- > 0 && this.viewStack.length > 1) this.viewStack.pop();
@@ -223,6 +233,8 @@ export class Workspace {
 
 	/** Select an "add component" tool; `preset` customizes a fresh tool. */
 	selectAddTool(factory: ComponentFactory, id = factory.name, preset: Record<string, unknown> = {}): void {
+		this.finishTextEditing();
+		this.stopPoking();
 		let attrs = this.toolAttrs.get(id);
 		if (!attrs) {
 			attrs = factory.createAttributeSet();
@@ -238,9 +250,84 @@ export class Workspace {
 	}
 
 	setTool(tool: Tool): void {
+		this.finishTextEditing();
 		if (tool.kind !== "poke") this.stopPoking();
 		this.tool = tool;
 		if (tool.kind !== "edit") this.clearSelection();
+		this.changed();
+	}
+
+	selectTextTool(): void {
+		this.finishTextEditing();
+		this.stopPoking();
+		let attrs = this.toolAttrs.get("Text Tool");
+		if (!attrs) {
+			attrs = TEXT.createAttributeSet();
+			this.toolAttrs.set("Text Tool", attrs);
+		}
+		this.tool = { kind: "text", factory: TEXT, attrs };
+		this.clearSelection();
+		this.changed();
+	}
+
+	beginTextEditing(x: number, y: number): void {
+		this.finishTextEditing();
+		if (this.tool.kind !== "text") return;
+		const candidates = [...Array.from(this.selection), ...Array.from(this.viewCircuit.components).reverse()];
+		for (const instance of candidates) {
+			const attr = editableAttribute(instance, x, y);
+			if (!attr) continue;
+			this.textEditing = {
+				circuit: this.viewCircuit,
+				instance,
+				attr,
+				creating: false,
+				draft: instance.attrs.get(attr),
+			};
+			this.select(instance);
+			return;
+		}
+		if (x < 0 || y < 0) return;
+		const instance = new Instance(TEXT, loc(Math.round(x), Math.round(y)), this.tool.attrs.clone());
+		this.clearSelection();
+		this.textEditing = {
+			circuit: this.viewCircuit,
+			instance,
+			attr: TEXT_TEXT,
+			creating: true,
+			draft: instance.attrs.get(TEXT_TEXT),
+		};
+		this.changed();
+	}
+
+	updateTextDraft(text: string): void {
+		if (!this.textEditing) return;
+		this.textEditing.draft = text.replace(/[\r\n]/g, "");
+		this.changed();
+	}
+
+	finishTextEditing(commit = true): void {
+		const editing = this.textEditing;
+		if (!editing) return;
+		this.textEditing = null;
+		if (commit && editing.circuit === this.viewCircuit) {
+			const { instance, attr, draft, creating } = editing;
+			if (creating && draft !== "") {
+				instance.attrs.set(attr, draft);
+				this.edit("Agregar etiqueta", (tx, circuit) => tx.addComponent(circuit, instance), false);
+				this.selection = new Set([instance]);
+			} else if (!creating && editing.circuit.components.has(instance)) {
+				if (draft === "" && instance.factory === TEXT) {
+					this.edit("Borrar etiqueta", (tx, circuit) => tx.removeComponent(circuit, instance), false);
+				} else if (draft !== instance.attrs.get(attr)) {
+					this.edit(
+						"Editar texto",
+						(tx, circuit) => tx.changeAttributes(circuit, instance, (attrs) => attrs.set(attr, draft)),
+						false,
+					);
+				}
+			}
+		}
 		this.changed();
 	}
 
@@ -405,7 +492,7 @@ export class Workspace {
 			});
 			return;
 		}
-		if (this.tool.kind === "add") {
+		if (this.tool.kind === "add" || this.tool.kind === "text") {
 			const { factory, attrs } = this.tool;
 			factory.setAttribute(attrs, attr, value);
 			this.changed();
@@ -575,22 +662,32 @@ export class Workspace {
 	// --- simulation ------------------------------------------------------
 
 	propagate(): void {
+		if (this.simEnabled) this.stepPoints.clear();
 		if (this.simEnabled) this.rootSimulator.propagate();
 	}
 
 	setSimEnabled(v: boolean): void {
+		if (v) this.stepPoints.clear();
 		this.simEnabled = v;
 		if (v) this.propagate();
 		this.changed();
 	}
 
 	resetSimulation(): void {
+		this.stepPoints.clear();
 		this.rootSimulator.reset();
+		this.changed();
+	}
+
+	stepSimulation(): void {
+		this.setSimEnabled(false);
+		this.stepPoints = this.rootSimulator.propagator.step();
 		this.changed();
 	}
 
 	/** Simulate > Tick Once. */
 	tickOnce(): void {
+		this.stepPoints.clear();
 		this.rootSimulator.propagator.tick();
 		this.propagate();
 		this.changed();
@@ -619,6 +716,7 @@ export class Workspace {
 		const interval = Math.max(periodMs, 16);
 		const perInterval = Math.max(1, Math.round(interval / periodMs));
 		this.tickTimer = setInterval(() => {
+			if (!this.simEnabled) return;
 			const sim = this.rootSimulator;
 			for (let i = 0; i < perInterval; i++) {
 				sim.propagator.tick();

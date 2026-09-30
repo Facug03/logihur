@@ -8,9 +8,10 @@ import type { Instance } from "@/engine/component";
 import { Bounds, type Loc, loc, locX, locY } from "@/engine/geom";
 import { prefs } from "@/engine/prefs";
 import { WIRE_WIDTH, type Wire } from "@/engine/wire";
-import { CanvasGraphics } from "@/render/canvas-graphics";
+import { CanvasGraphics, cssFont } from "@/render/canvas-graphics";
 import { drawCircuit, drawGrid, type Viewport } from "@/render/circuit-renderer";
 import { CanvasInstancePainter } from "@/render/painter";
+import { textEditorGeometry } from "./text-editing";
 import type { Workspace } from "./workspace";
 
 const MIN_ZOOM = 0.25;
@@ -78,6 +79,7 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 ) {
 	const wrapRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const textInputRef = useRef<HTMLInputElement>(null);
 	const viewsRef = useRef(new Map<object, Viewport>());
 	const [size, setSize] = useState({ w: 0, h: 0 });
 	const [hovered, setHovered] = useState<Instance | null>(null);
@@ -128,21 +130,27 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
-		// React's wheel listener is passive. A native listener must cancel the
-		// browser's trackpad pinch default while React still updates the viewport.
-		const preventBrowserZoom = (event: WheelEvent) => {
-			if (event.ctrlKey || event.metaKey) event.preventDefault();
-		};
+		// React's wheel listener is passive. The canvas handles both axes and
+		// pinch itself, so cancel browser scrolling, history swipes and zoom here.
+		const preventBrowserGesture = (event: WheelEvent) => event.preventDefault();
 		const preventSafariZoom = (event: Event) => event.preventDefault();
-		canvas.addEventListener("wheel", preventBrowserZoom, { passive: false });
+		canvas.addEventListener("wheel", preventBrowserGesture, { passive: false });
 		canvas.addEventListener("gesturestart", preventSafariZoom, { passive: false });
 		canvas.addEventListener("gesturechange", preventSafariZoom, { passive: false });
 		return () => {
-			canvas.removeEventListener("wheel", preventBrowserZoom);
+			canvas.removeEventListener("wheel", preventBrowserGesture);
 			canvas.removeEventListener("gesturestart", preventSafariZoom);
 			canvas.removeEventListener("gesturechange", preventSafariZoom);
 		};
 	}, []);
+
+	const editingInstance = ws.textEditing?.instance;
+	useEffect(() => {
+		if (editingInstance) {
+			textInputRef.current?.focus();
+			textInputRef.current?.select();
+		}
+	}, [editingInstance]);
 
 	const gesture = useRef<Gesture>({ mode: "none" });
 	const pointers = useRef(new Map<number, { x: number; y: number }>());
@@ -177,6 +185,27 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 			}
 			g.restore();
 		};
+
+		g.save();
+		g.setColor("#0000ff");
+		g.setLineWidth(2);
+		for (const point of ws.stepPoints.get(ws.viewState) ?? [])
+			g.drawOval(locX(point) - 4, locY(point) - 4, 8, 8);
+		for (const component of circuit.components) {
+			if (!(component.factory instanceof SubcircuitFactory)) continue;
+			const child = component.factory.getSubstate(ws.viewState, component);
+			if (
+				Array.from(ws.stepPoints.keys()).some((state) => {
+					for (let current: typeof state | null = state; current; current = current.parentState)
+						if (current === child) return true;
+					return false;
+				})
+			) {
+				const b = component.bounds;
+				g.drawRect(b.x - 2, b.y - 2, b.width + 4, b.height + 4);
+			}
+		}
+		g.restore();
 
 		const caret = ws.pokeCaret;
 		if (caret?.poker.paint) {
@@ -330,6 +359,11 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 		d.target = target;
 
 		switch (tool.kind) {
+			case "text":
+				e.preventDefault();
+				ws.beginTextEditing(Math.round(p.x), Math.round(p.y));
+				gesture.current = { mode: "none" };
+				return;
 			case "poke":
 				gesture.current =
 					target && ws.pokePress(target, Math.round(p.x), Math.round(p.y))
@@ -379,6 +413,7 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 				if (h !== hovered) setHovered(h);
 				if (gp !== hoverPoint) setHoverPoint(gp);
 				if (ws.tool.kind === "poke") setCursor(h?.factory.createPoker(h) ? "pointer" : "default");
+				else if (ws.tool.kind === "text") setCursor("text");
 				else if (ws.tool.kind === "add" || ws.tool.kind === "wiring") setCursor("crosshair");
 				else setCursor(isConnectable(circuit, gp) ? "crosshair" : h ? "move" : "default");
 			}
@@ -521,10 +556,14 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 		redraw();
 	};
 
+	const textEditing = ws.textEditing;
+	const textGeometry = textEditing ? textEditorGeometry(textEditing) : null;
+	const view = getView();
+
 	void version;
 
 	return (
-		<div ref={wrapRef} className="absolute inset-0 overflow-hidden">
+		<div ref={wrapRef} className="absolute inset-0 overflow-hidden overscroll-contain">
 			<canvas
 				ref={canvasRef}
 				style={{ width: size.w, height: size.h, cursor }}
@@ -539,6 +578,33 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 				onWheel={onWheel}
 				onContextMenu={(e) => e.preventDefault()}
 			/>
+			{textEditing && textGeometry && (
+				<input
+					ref={textInputRef}
+					aria-label="Editar texto en el circuito"
+					value={textEditing.draft}
+					className="absolute rounded-sm border border-accent bg-white px-1 text-black outline-none"
+					style={{
+						left: (textGeometry.bounds.x - view.originX) * view.zoom - 5,
+						top: (textGeometry.bounds.y - view.originY) * view.zoom - 3,
+						width: Math.max(96, textGeometry.bounds.width * view.zoom + 14),
+						height: Math.max(24, textGeometry.bounds.height * view.zoom + 6),
+						font: cssFont({ ...textGeometry.font, size: textGeometry.font.size * view.zoom }),
+					}}
+					onChange={(e) => ws.updateTextDraft(e.target.value)}
+					onBlur={() => ws.finishTextEditing()}
+					onKeyDown={(e) => {
+						e.stopPropagation();
+						if (e.key === "Enter") {
+							e.preventDefault();
+							ws.finishTextEditing();
+						} else if (e.key === "Escape") {
+							e.preventDefault();
+							ws.finishTextEditing(false);
+						}
+					}}
+				/>
+			)}
 		</div>
 	);
 });

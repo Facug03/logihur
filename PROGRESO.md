@@ -104,6 +104,36 @@ Las fases 0–4 están implementadas y versionadas en git.
     `/private/tmp/logihur-ux-desktop.png` y `/private/tmp/logihur-ux-mobile.png`.
   - **241 tests OK**, Biome, TypeScript y export estático con Webpack OK.
 
+- **Revisión contra Logisim original: barra, Texto y Simular**:
+  - `COMPATIBILIDAD.md` contrasta la documentación oficial 2.7 y las fuentes Java reales de
+    TextTool, SimulationToolbarModel, ExplorerToolbarModel y ProjectToolbarModel. Distingue
+    funciones implementadas y pendientes (menú contextual, árbol de simulación, reordenamiento,
+    barra configurable y editor de apariencia).
+  - Herramienta **Texto (A)** en la barra: etiquetas libres sin ajuste a grilla, edición de
+    etiquetas existentes y de componentes, Enter/clic fuera confirma y Escape cancela. Campo
+    web de una línea con cursor, selección/pegado y entrada móvil. Los borradores no modifican
+    el circuito; agregar, editar y borrar se registran en deshacer/rehacer y se guardan en `.circ`.
+    `src/ui/text-editing.ts` reproduce posición/alineamiento del campo de Logisim; si una etiqueta
+    de componente ya tiene texto, se edita clickeando el texto, no el cuerpo.
+  - `src/ui/Tooltip.tsx`: ayuda visible al pasar el mouse o enfocar los botones, incluso acciones
+    deshabilitadas. Texto explicativo para herramientas y simulación; pausa/reanudar y ticks
+    muestran la acción actual. Se usan los íconos de simulación originales de Logisim.
+  - **Paso de simulación (Ctrl/⌘+I)** usa `Propagator.step()` existente; puntos cambiados con
+    círculos azules y contorno azul en subcircuitos afectados. **Ctrl/⌘+E** pausa/reanuda.
+    Al pausar también se suspenden los ticks automáticos, como `Simulator.updateTicker()` de Java;
+    la preferencia de ticks se conserva para reanudar. Un paso de propagación no incrementa ticks.
+  - Chrome/Playwright: tooltips con mouse/foco/Escape, textos según estado; texto libre, edición,
+    cancelar, borrar, deshacer/rehacer y descarga/reapertura real de `.circ`; etiquetas de pines,
+    botón/atajo de paso y entrada de texto móvil, sin errores. Captura temporal:
+    `/private/tmp/logihur-text-step.png`.
+  - **249 tests OK**, Biome, TypeScript y export estático con Webpack OK.
+
+- **Trackpad: desplazamiento horizontal sin volver atrás**: el listener nativo no pasivo del
+  canvas cancela el comportamiento de rueda del navegador en ambos ejes, manteniendo el pan/zoom
+  del circuito; su contenedor usa `overscroll-behavior: contain` para impedir encadenamiento y
+  navegación horizontal. No se interceptan eventos fuera del canvas. Chrome comprobó desplazamiento
+  en ambos sentidos, cancelación del evento, historial sin cambios y continuidad del zoom.
+
 ## Siguiente (en este orden)
 
 1. **Fase 5**: análisis combinacional, editor de apariencia, logging, librerías `.circ`.

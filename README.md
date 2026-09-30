@@ -27,6 +27,11 @@ secciones y categorías recuerdan su estado al recargar. En móvil se cierran co
 herramienta activa y el autoguardado: es una copia en este navegador; **Guardar** descarga un `.circ`.
 Con trackpad, Ctrl/⌘ + rueda o pellizco hace zoom en el circuito; la rueda desplaza el lienzo.
 
+La herramienta **Texto (A)** permite crear etiquetas en vacío y editar las de componentes. Enter o
+clic fuera confirma; Escape cancela. Los botones de simulación tienen ayudas al pasar el mouse o
+enfocarlos. **Ctrl/⌘+I** avanza un paso de propagación; **Ctrl/⌘+T** avanza un tick de reloj.
+La revisión de funciones presentes y pendientes está en [COMPATIBILIDAD.md](COMPATIBILIDAD.md).
+
 ## Fidelidad
 
 `tests/golden/` contiene circuitos (fixtures + aleatorios generados con semilla) cuya salida fue

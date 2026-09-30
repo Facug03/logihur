@@ -21,6 +21,7 @@ const GROUPS = [
 		title: "Lienzo y componentes",
 		entries: [
 			["Esc", "Volver a edición / cancelar"],
+			["Texto: Enter / Esc", "Confirmar / cancelar edición de texto"],
 			["Flechas", "Orientar el componente"],
 			["2–9", "Cambiar entradas de una puerta"],
 			["Shift + clic / arrastre", "Sumar a la selección"],
@@ -32,6 +33,8 @@ const GROUPS = [
 	{
 		title: "Simulación",
 		entries: [
+			["Ctrl/⌘ + E", "Pausar / reanudar simulación"],
+			["Ctrl/⌘ + I", "Un paso de propagación"],
 			["Ctrl/⌘ + T", "Conmutar reloj una vez"],
 			["Ctrl/⌘ + K", "Activar / detener ticks"],
 			["Ctrl/⌘ + R", "Reiniciar simulación"],

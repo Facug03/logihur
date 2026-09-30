@@ -506,15 +506,19 @@ export function AttributesPanel({ ws }: { ws: Workspace }) {
 	}
 
 	// adding a component: edit the tool's attributes (as Logisim does)
-	if (tool.kind === "add") {
+	if (tool.kind === "add" || tool.kind === "text") {
 		const attrs = tool.factory.getAttributes(tool.attrs);
 		const fanout = tool.attrs.getByName("fanout");
 		return (
 			<div className="flex flex-col">
 				<Header
 					icon={iconFor(tool.factory, tool.attrs.getByName("output") === true)}
-					title={`Herramienta: ${componentName(tool)}`}
-					subtitle="Tocá el lienzo para colocar · flechas para orientar"
+					title={tool.kind === "text" ? "Herramienta: Texto" : `Herramienta: ${componentName(tool)}`}
+					subtitle={
+						tool.kind === "text"
+							? "Clic para crear o editar una etiqueta"
+							: "Tocá el lienzo para colocar · flechas para orientar"
+					}
 				/>
 				<AttrTable
 					rows={attrs

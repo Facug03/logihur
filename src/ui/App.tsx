@@ -3,21 +3,17 @@
 import {
 	AlertTriangle,
 	ChevronLeft,
-	Clock,
 	FilePlus2,
 	FolderOpen,
 	Keyboard,
 	Maximize,
 	Menu,
 	Minus,
-	Pause,
-	Play,
 	Plus,
 	Redo2,
 	RotateCcw,
 	Save,
 	SlidersHorizontal,
-	StepForward,
 	Trash2,
 	Undo2,
 	X,
@@ -37,6 +33,7 @@ import { Disclosure, PanelResize } from "./PanelControls";
 import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
 import { useMediaQuery, usePreference } from "./preferences";
 import { ShortcutsDialog } from "./ShortcutsDialog";
+import { Tooltip } from "./Tooltip";
 import { TICK_FREQUENCIES, Workspace } from "./workspace";
 
 // Text metrics for bounds computed outside painting (tunnels, labels).
@@ -80,6 +77,7 @@ function formatFreq(f: number): string {
 
 function IconButton({
 	label,
+	description,
 	onClick,
 	children,
 	active,
@@ -87,6 +85,7 @@ function IconButton({
 	className = "",
 }: {
 	label: string;
+	description?: string;
 	onClick: () => void;
 	children: React.ReactNode;
 	active?: boolean;
@@ -94,19 +93,23 @@ function IconButton({
 	className?: string;
 }) {
 	return (
-		<button
-			type="button"
-			title={label}
-			aria-label={label}
-			aria-pressed={active}
-			disabled={disabled}
-			onClick={onClick}
-			className={`inline-flex size-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:opacity-35 ${
-				active ? "bg-accent/15 ring-1 ring-accent/40" : "hover:bg-black/5"
-			} ${className}`}
-		>
-			{children}
-		</button>
+		<Tooltip label={label} description={description}>
+			{(tooltipId) => (
+				<button
+					type="button"
+					aria-describedby={tooltipId}
+					aria-label={label}
+					aria-pressed={active}
+					disabled={disabled}
+					onClick={onClick}
+					className={`inline-flex size-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:opacity-35 ${
+						active ? "bg-accent/15 ring-1 ring-accent/40" : "hover:bg-black/5"
+					} ${className}`}
+				>
+					{children}
+				</button>
+			)}
+		</Tooltip>
 	);
 }
 
@@ -261,6 +264,8 @@ export default function App() {
 				else if (k === "d") ws.duplicate();
 				else if (k === "a") ws.selectAll();
 				else if (k === "t") ws.tickOnce();
+				else if (k === "i") ws.stepSimulation();
+				else if (k === "e") ws.setSimEnabled(!ws.simEnabled);
 				else if (k === "k") ws.setTicksEnabled(!ws.ticksEnabled);
 				else if (k === "r") ws.resetSimulation();
 				else if (k === "s") onSave();
@@ -343,6 +348,7 @@ export default function App() {
 
 				<IconButton
 					label="Tocar (cambiar valores)"
+					description="Probá el circuito: cambiá pines, pulsá botones, arrastrá el joystick o escribí en el componente tocado."
 					active={tool.kind === "poke"}
 					onClick={() => ws.setTool({ kind: "poke" })}
 				>
@@ -350,6 +356,7 @@ export default function App() {
 				</IconButton>
 				<IconButton
 					label="Editar (Esc)"
+					description="Seleccioná y mové componentes o cables. Shift suma a la selección; arrastrar desde un puerto permite cablear."
 					active={tool.kind === "edit"}
 					onClick={() => ws.setTool({ kind: "edit" })}
 				>
@@ -357,11 +364,22 @@ export default function App() {
 				</IconButton>
 				<IconButton
 					label="Cablear"
+					description="Arrastrá entre puertos o puntos de la grilla para crear un cable. Escape vuelve a edición."
 					active={tool.kind === "wiring"}
 					onClick={() => ws.setTool({ kind: "wiring" })}
 				>
 					<LogisimIcon name="wiring.gif" size={20} />
 				</IconButton>
+				<IconButton
+					label="Texto"
+					description="Creá una etiqueta con un clic en vacío, o editá el texto de una etiqueta o componente. Enter confirma; Escape cancela."
+					active={tool.kind === "text"}
+					onClick={() => ws.selectTextTool()}
+				>
+					<LogisimIcon name="text.gif" size={20} />
+				</IconButton>
+				<Divider />
+
 				{QUICK_TOOLS.map((q) => (
 					<IconButton
 						key={q.id}
@@ -396,28 +414,49 @@ export default function App() {
 				<Divider />
 
 				<IconButton
-					label={t("sim.enabled")}
+					label={ws.simEnabled ? "Pausar simulación (Ctrl+E)" : "Reanudar simulación (Ctrl+E)"}
+					description={
+						ws.simEnabled
+							? "Detiene la propagación automática de señales. Podés avanzar con Paso de simulación."
+							: "Vuelve a propagar los cambios de entradas y conexiones hasta estabilizar el circuito."
+					}
 					active={ws.simEnabled}
 					onClick={() => ws.setSimEnabled(!ws.simEnabled)}
 				>
-					{ws.simEnabled ? <Play className="size-[18px]" /> : <Pause className="size-[18px]" />}
-				</IconButton>
-				<IconButton label={`${t("sim.reset")} (Ctrl+R)`} onClick={() => ws.resetSimulation()}>
-					<RotateCcw className="size-[18px]" />
-				</IconButton>
-				<IconButton label={`${t("sim.tickOnce")} (Ctrl+T)`} onClick={() => ws.tickOnce()}>
-					<StepForward className="size-[18px]" />
+					<LogisimIcon name={ws.simEnabled ? "simstop.png" : "simplay.png"} size={20} />
 				</IconButton>
 				<IconButton
-					label={`${t("sim.ticksEnabled")} (Ctrl+K)`}
+					label={`${t("sim.reset")} (Ctrl+R)`}
+					description="Borra el estado de registros, memorias y controles de toda la jerarquía; conserva el circuito."
+					onClick={() => ws.resetSimulation()}
+				>
+					<RotateCcw className="size-[18px]" />
+				</IconButton>
+				<IconButton
+					label="Paso de simulación (Ctrl+I)"
+					description="Pausa y avanza un solo paso de propagación. Los puntos que cambian aparecen marcados en azul. No es un tick de reloj."
+					onClick={() => ws.stepSimulation()}
+				>
+					<LogisimIcon name="simstep.png" size={20} />
+				</IconButton>
+				<IconButton
+					label={`${t("sim.tickOnce")} (Ctrl+T)`}
+					description="Avanza un tick de todos los relojes del circuito. Un ciclo completo requiere al menos dos ticks."
+					onClick={() => ws.tickOnce()}
+				>
+					<LogisimIcon name="simtstep.png" size={20} />
+				</IconButton>
+				<IconButton
+					label={`${ws.ticksEnabled ? "Detener ticks automáticos" : "Activar ticks automáticos"} (Ctrl+K)`}
+					description="Activa o detiene los ticks del reloj a la frecuencia elegida. Mientras la simulación está pausada, los ticks automáticos quedan suspendidos."
 					active={ws.ticksEnabled}
 					onClick={() => ws.setTicksEnabled(!ws.ticksEnabled)}
 				>
-					<Clock className="size-[18px]" />
+					<LogisimIcon name={ws.ticksEnabled ? "simtstop.png" : "simtplay.png"} size={20} />
 				</IconButton>
 				<select
 					aria-label={t("sim.tickFreq")}
-					title={t("sim.tickFreq")}
+					title="Frecuencia de ticks por segundo. Un ciclo de reloj necesita al menos dos ticks."
 					value={ws.tickFrequency}
 					onChange={(e) => ws.setTickFrequency(Number(e.target.value))}
 					className="h-8 shrink-0 rounded-md border border-line bg-panel px-1 text-xs"
@@ -592,11 +631,13 @@ export default function App() {
 				<span className="min-w-0 flex-1 truncate">
 					{tool.kind === "add"
 						? `Colocar ${componentName(tool)} · flechas: orientar · Esc: editar`
-						: tool.kind === "wiring"
-							? "Cablear · clic para iniciar y terminar · Esc: cancelar"
-							: tool.kind === "poke"
-								? "Tocar · clic para cambiar valores y probar controles"
-								: "Editar · arrastrá para seleccionar o mover · Shift: sumar selección"}
+						: tool.kind === "text"
+							? "Texto · clic para crear o editar · Enter: confirmar · Esc: cancelar"
+							: tool.kind === "wiring"
+								? "Cablear · clic para iniciar y terminar · Esc: cancelar"
+								: tool.kind === "poke"
+									? "Tocar · clic para cambiar valores y probar controles"
+									: "Editar · arrastrá para seleccionar o mover · Shift: sumar selección"}
 				</span>
 				<span className="hidden shrink-0 sm:inline">
 					{ws.simEnabled ? "Simulación activa" : "Simulación pausada"}
