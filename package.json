@@ -12,7 +12,8 @@
 		"test:watch": "vitest",
 		"typecheck": "tsc --noEmit",
 		"golden": "bun scripts/golden.ts",
-		"golden:io": "bun scripts/golden-io.ts"
+		"golden:io": "bun scripts/golden-io.ts",
+		"golden:analyze": "bun scripts/golden-analyze.ts"
 	},
 	"dependencies": {
 		"lucide-react": "^1.49.0",

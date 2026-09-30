@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Toaster, toast } from "sonner";
+import type { AnalyzerTab } from "@/analyze/analyze";
 import { AND_GATE, OR_GATE } from "@/components/gates/gates";
 import { NOT_GATE } from "@/components/gates/simple-gates";
 import { PIN } from "@/components/wiring/pin";
@@ -28,6 +29,8 @@ import type { Direction } from "@/engine/geom";
 import { setTextMeasurer } from "@/engine/graphics";
 import { t } from "@/i18n/es";
 import { measureWith } from "@/render/canvas-graphics";
+import { AnalyzeMenu } from "./analyzer/AnalyzeMenu";
+import { AnalyzerDialog } from "./analyzer/AnalyzerDialog";
 import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";
 import { Disclosure, PanelResize } from "./PanelControls";
@@ -141,6 +144,7 @@ export default function App() {
 	const [rightWidth, setRightWidth] = usePreference<number>("rightWidth", 288);
 	const [shortcutsOpen, setShortcutsOpen] = useState(false);
 	const [projectToDelete, setProjectToDelete] = useState<{ id: number; name: string } | null>(null);
+	const [analyzer, setAnalyzer] = useState<{ tab: AnalyzerTab; notice: string | null } | null>(null);
 	const [loadingExample, setLoadingExample] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const autosaveStatus = ws.autosaveStatus;
@@ -339,6 +343,19 @@ export default function App() {
 					}}
 				/>
 			)}
+			{analyzer && (
+				<AnalyzerDialog
+					ws={ws}
+					initialTab={analyzer.tab}
+					notice={analyzer.notice}
+					onClose={() => setAnalyzer(null)}
+					onBuilt={() => {
+						setAnalyzer(null);
+						ws.notify(`Se creó el circuito ${ws.viewCircuit.name}.`);
+						requestAnimationFrame(() => canvasRef.current?.fit());
+					}}
+				/>
+			)}
 			{/* top bar */}
 			<header className="flex h-12 shrink-0 items-center gap-0.5 overflow-x-auto border-b border-line bg-panel px-2 [scrollbar-width:none]">
 				<IconButton
@@ -494,6 +511,17 @@ export default function App() {
 						</option>
 					))}
 				</select>
+
+				<Divider />
+				<AnalyzeMenu
+					circuitName={ws.viewCircuit.name}
+					onAnalyze={() => {
+						const result = ws.analyzeViewedCircuit();
+						if (result.ok) setAnalyzer({ tab: result.tab, notice: result.notice });
+						else toast.error(t("analyze.errorTitle"), { description: result.error, duration: 8000 });
+					}}
+					onOpen={() => setAnalyzer({ tab: "inputs", notice: null })}
+				/>
 
 				<div className="ml-auto flex items-center pl-2">
 					<IconButton label="Alejar" onClick={() => canvasRef.current?.zoomBy(1 / 1.25)}>

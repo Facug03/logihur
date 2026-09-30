@@ -3,6 +3,9 @@
 // selection, undo history and simulation controls (Logisim's Project,
 // Simulator and tool framework).
 
+import { type AnalyzeResult, analyzeCircuit } from "@/analyze/analyze";
+import { buildCircuit } from "@/analyze/circuit-builder";
+import { AnalyzerModel } from "@/analyze/model";
 import { TEXT, TEXT_TEXT } from "@/components/base/text";
 import { RAM, ROM, ROM_CONTENTS } from "@/components/memory/mem";
 import type { MemContents } from "@/components/memory/mem-contents";
@@ -82,6 +85,8 @@ export class Workspace {
 	dirty = false;
 	autosaveStatus: "idle" | "pending" | "saved" | "error" = "idle";
 	readonly history = new History();
+	/** The combinational analysis window's model; like Logisim's, it outlives projects. */
+	readonly analyzer = new AnalyzerModel();
 	private clipboard: ClipboardData | null = null;
 
 	private listeners = new Set<Listener>();
@@ -789,6 +794,32 @@ export class Workspace {
 			},
 			false,
 		);
+	}
+
+	// --- combinational analysis (Project > Analyze Circuit) --------------
+
+	analyzeViewedCircuit(): AnalyzeResult {
+		this.finishTextEditing();
+		return analyzeCircuit(this.analyzer, this.project, this.viewCircuit);
+	}
+
+	/** BuildCircuitButton: a new circuit, or replace the contents of an existing one. */
+	buildAnalyzedCircuit(name: string, twoInputs: boolean, useNands: boolean): Circuit {
+		const built = buildCircuit(this.analyzer, twoInputs, useNands);
+		const existing = this.project.getCircuit(name);
+		const target = existing ?? new Circuit(name);
+		this.edit(existing ? "Reemplazar circuito" : "Crear circuito", (tx) => {
+			if (existing) {
+				for (const comp of Array.from(existing.components)) tx.removeComponent(existing, comp);
+				for (const w of Array.from(existing.wires.values())) tx.removeWire(existing, w);
+			} else {
+				tx.addCircuit(this.project, target);
+			}
+			for (const comp of built.components) tx.addComponent(target, comp);
+			for (const w of built.wires) tx.addWire(target, w);
+		});
+		this.setCircuit(target);
+		return target;
 	}
 
 	setMainCircuit(circuit: Circuit): void {

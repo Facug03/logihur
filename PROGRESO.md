@@ -134,9 +134,30 @@ Las fases 0–4 están implementadas y versionadas en git.
   navegación horizontal. No se interceptan eventos fuera del canvas. Chrome comprobó desplazamiento
   en ambos sentidos, cancelación del evento, historial sin cambios y continuidad del zoom.
 
+- **Fase 5 – Análisis combinacional** (`src/analyze/`, `src/ui/analyzer/`):
+  - Modelo portado 1:1 (`VariableList`, `TruthTable`, `OutputExpressions`, misma cadena de eventos):
+    agregar/quitar/mover/renombrar variables mantiene tabla y expresiones consistentes.
+  - Minimización Quine-McCluskey de `Implicant`, reproduciendo el orden de iteración de `HashMap`
+    de Java para que los desempates del cubrimiento greedy den la misma expresión que Logisim.
+  - Parser de expresiones con los mismos operadores, errores (en español) y rangos de error.
+  - `analyze.ts`: expresiones propagadas por cables/compuertas y, si no se puede (componentes no
+    soportados, referencia circular, salidas en conflicto), tabla por simulación, igual que Java.
+  - `circuit-builder.ts`: `CircuitDetermination` + `CircuitBuilder` (dos entradas, sólo NAND,
+    paridad para XOR de más de dos entradas, mismas posiciones de puertas, pines y cables).
+  - UI: botón Σ con "Analizar Circuito" y "Análisis Combinacional"; pestañas Entradas, Salidas,
+    Tabla (virtualizada, cursor de teclado como TableTabCaret), Expresión (vista con barras de
+    negación), Minimizado (mapa de Karnaugh SVG con implicantes, SOP/POS) y Crear Circuito con
+    confirmación de reemplazo; todo deshacible.
+  - `scripts/analyze-reference.java` + `bun run golden:analyze`: 511 casos grabados de Logisim
+    real (179 minimizaciones, 29 textos del parser, 257 circuitos —76 generados con cableado real,
+    incluidos realimentación/conflictos/entradas abiertas— y 46 construcciones). Todos coinciden.
+  - Playwright (escritorio y 390 px): analizar el semisumador, errores del parser, K-map, construir
+    un circuito sólo NAND, definir una tabla a mano y obtener su expresión; sin errores de consola.
+  - **262 tests OK**, Biome y TypeScript limpios.
+
 ## Siguiente (en este orden)
 
-1. **Fase 5**: análisis combinacional, editor de apariencia, logging, librerías `.circ`.
+1. **Fase 5 (resto)**: editor de apariencia, logging, librerías `.circ`; copiar/pegar en la tabla.
 2. **Fase 6**: PWA, pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles

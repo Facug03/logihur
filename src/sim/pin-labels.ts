@@ -4,8 +4,9 @@ import { isInputPin } from "@/components/wiring/pin";
 import type { Circuit } from "@/engine/circuit";
 import type { Instance } from "@/engine/component";
 
-const isIdentStart = (c: string) => /[\p{L}\p{Nl}$_\p{Sc}\p{Pc}]/u.test(c);
-const isIdentPart = (c: string) => isIdentStart(c) || /[\p{Nd}\p{Mn}\p{Mc}]/u.test(c);
+/** Character.isJavaIdentifierStart / isJavaIdentifierPart. */
+export const isIdentStart = (c: string) => /[\p{L}\p{Nl}$_\p{Sc}\p{Pc}]/u.test(c);
+export const isIdentPart = (c: string) => isIdentStart(c) || /[\p{Nd}\p{Mn}\p{Mc}]/u.test(c);
 
 export function toValidLabel(label: string | null | undefined): string | null {
 	if (label == null) return null;

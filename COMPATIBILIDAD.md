@@ -24,7 +24,8 @@ Se contrastó la documentación oficial y las fuentes del jar 2.7.1 extraídas e
 | Botones diseño / apariencia | Diseño implementado. Editor gráfico de apariencia pendiente de fase 5; se lee/dibuja la apariencia de subcircuitos. |
 | Menu Tool / menú contextual de componentes | Pendiente. Algunas acciones están en Atributos, pero no existe el menú contextual completo. |
 | Barra configurable y mapeo de botones del mouse | Pendiente: la barra web es fija; no aplica la configuración de `<toolbar>` / `<mappings>` del archivo al editor. |
-| Análisis combinacional, logging y cargar librerías `.circ` | Pendientes de fase 5. |
+| Análisis combinacional | Implementado (botón Σ): Analizar Circuito y ventana con Entradas, Salidas, Tabla, Expresión y Minimizado, mapa de Karnaugh y Crear Circuito (dos entradas / sólo NAND, reemplazo con confirmación y deshacer). 511 casos verificados contra Logisim 2.7.1. Pendiente: copiar/pegar regiones de la tabla (TableTabClip). |
+| Logging y cargar librerías `.circ` | Pendientes de fase 5. |
 
 La edición de texto usa un campo web de una línea sobre el lienzo. Conserva la regla original:
 si un componente aún no tiene etiqueta, un clic en su cuerpo la edita; si ya tiene etiqueta, se edita
