@@ -41,6 +41,21 @@ interface ClipboardData {
 
 const AUTOSAVE_KEY = "logihur.autosave";
 
+type ProjectKind = "project" | "example";
+interface SavedProject {
+	id: number;
+	name: string;
+	xml: string;
+	dirty: boolean;
+	kind: ProjectKind;
+}
+interface ProjectStore {
+	version: 2;
+	activeId: number;
+	previousId: number | null;
+	projects: SavedProject[];
+}
+
 export class Workspace {
 	project: Project = Project.createEmpty();
 	fileName = "sin-titulo.circ";
@@ -75,6 +90,88 @@ export class Workspace {
 	private activePoker: { poker: Poker; state: InstanceStateImpl } | null = null;
 	private pokePressed = false;
 	private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
+	private savedProjects: SavedProject[] = [];
+	private activeProjectId = 0;
+	private previousProjectId: number | null = null;
+	private projectKind: ProjectKind = "project";
+
+	get projects(): { id: number; name: string; active: boolean }[] {
+		const projects = this.savedProjects.map((p) => ({
+			id: p.id,
+			name: p.id === this.activeProjectId ? this.fileName : p.name,
+			active: p.id === this.activeProjectId,
+		}));
+		if (!projects.some((p) => p.active)) {
+			projects.push({ id: this.activeProjectId, name: this.fileName, active: true });
+		}
+		return projects;
+	}
+
+	get returnToProjectLabel(): string {
+		const previous = this.savedProjects.find((p) => p.id === this.previousProjectId);
+		return this.projectKind === "example" && previous?.kind === "project"
+			? "Volver a mi proyecto"
+			: "Volver al proyecto anterior";
+	}
+
+	get canReturnToProject(): boolean {
+		return this.savedProjects.some((p) => p.id === this.previousProjectId);
+	}
+
+	private snapshotProject(): void {
+		const snapshot: SavedProject = {
+			id: this.activeProjectId,
+			name: this.fileName,
+			xml: writeCirc(this.project),
+			dirty: this.dirty,
+			kind: this.projectKind,
+		};
+		const index = this.savedProjects.findIndex((p) => p.id === snapshot.id);
+		if (index < 0) this.savedProjects.push(snapshot);
+		else this.savedProjects[index] = snapshot;
+	}
+
+	switchProject(id: number): void {
+		if (id === this.activeProjectId) return;
+		const saved = this.savedProjects.find((p) => p.id === id);
+		if (!saved) return;
+		const project = readCirc(saved.xml);
+		this.finishTextEditing();
+		this.snapshotProject();
+		this.previousProjectId = this.activeProjectId;
+		this.activeProjectId = saved.id;
+		this.projectKind = saved.kind;
+		this.loadProject(project, saved.name);
+		this.dirty = saved.dirty;
+		this.flushAutosave();
+	}
+
+	deleteProject(id: number): void {
+		if (id !== this.activeProjectId && !this.savedProjects.some((p) => p.id === id)) return;
+		const remaining = this.savedProjects.filter((p) => p.id !== id);
+		if (id === this.activeProjectId) {
+			const next = remaining.find((p) => p.id === this.previousProjectId) ?? remaining.at(-1);
+			const project = next ? readCirc(next.xml) : Project.createEmpty();
+			this.finishTextEditing();
+			this.savedProjects = remaining;
+			this.activeProjectId = next?.id ?? id + 1;
+			this.projectKind = next?.kind ?? "project";
+			this.previousProjectId = remaining.find((p) => p.id !== this.activeProjectId)?.id ?? null;
+			// Loading directly avoids archiving the project being deleted.
+			this.loadProject(project, next?.name ?? "sin-titulo.circ");
+			this.dirty = next?.dirty ?? false;
+		} else {
+			this.savedProjects = remaining;
+			if (this.previousProjectId === id) {
+				this.previousProjectId = remaining.find((p) => p.id !== this.activeProjectId)?.id ?? null;
+			}
+		}
+		this.flushAutosave();
+	}
+
+	returnToProject(): void {
+		if (this.previousProjectId !== null) this.switchProject(this.previousProjectId);
+	}
 
 	constructor() {
 		this.circuit = this.project.mainCircuit as Circuit;
@@ -105,7 +202,20 @@ export class Workspace {
 		this.simulators.clear();
 	}
 
-	setProject(project: Project, fileName: string): void {
+	setProject(project: Project, fileName: string, kind: ProjectKind = "project"): void {
+		this.finishTextEditing();
+		this.snapshotProject();
+		// Exploring several examples keeps the return button pointing at the user's project.
+		if (this.projectKind !== "example" || kind !== "example") {
+			this.previousProjectId = this.activeProjectId;
+		}
+		this.activeProjectId = Math.max(...this.savedProjects.map((p) => p.id)) + 1;
+		this.projectKind = kind;
+		this.loadProject(project, fileName);
+		this.flushAutosave();
+	}
+
+	private loadProject(project: Project, fileName: string): void {
 		this.finishTextEditing();
 		this.stopPoking();
 		this.stopTicking();
@@ -121,7 +231,6 @@ export class Workspace {
 		this.circuit = project.mainCircuit ?? project.circuits[0];
 		this.resetView();
 		if (this.ticksEnabled) this.startTicking();
-		this.scheduleAutosave();
 		this.changed();
 	}
 
@@ -129,45 +238,73 @@ export class Workspace {
 		this.setProject(Project.createEmpty(), "sin-titulo.circ");
 	}
 
-	openFromText(text: string, fileName: string): void {
-		this.setProject(readCirc(text), fileName);
+	openFromText(text: string, fileName: string, kind: ProjectKind = "project"): void {
+		this.setProject(readCirc(text), fileName, kind);
 	}
 
 	saveToText(): string {
+		this.finishTextEditing();
 		const xml = writeCirc(this.project);
 		this.dirty = false;
+		this.scheduleAutosave();
 		this.changed();
 		return xml;
 	}
 
-	/** Restore the last autosaved project, if any. */
+	/** Restore the project collection, migrating the original single-project autosave. */
 	restoreAutosave(): boolean {
 		try {
 			const raw = localStorage.getItem(AUTOSAVE_KEY);
 			if (!raw) return false;
-			const { name, xml } = JSON.parse(raw) as { name: string; xml: string };
-			this.setProject(readCirc(xml), name);
+			const data = JSON.parse(raw) as ProjectStore | { name: string; xml: string };
+			if (!("version" in data)) {
+				this.loadProject(readCirc(data.xml), data.name);
+				this.dirty = true;
+				this.flushAutosave();
+				return true;
+			}
+			if (data.version !== 2 || !Array.isArray(data.projects)) return false;
+			const active = data.projects.find((p) => p.id === data.activeId);
+			if (!active) return false;
+			const project = readCirc(active.xml);
+			this.savedProjects = data.projects;
+			this.activeProjectId = active.id;
+			this.previousProjectId = data.previousId;
+			this.projectKind = active.kind;
+			this.loadProject(project, active.name);
+			this.dirty = active.dirty;
+			this.autosaveStatus = "saved";
+			this.changed();
 			return true;
 		} catch {
 			return false;
 		}
 	}
 
+	/** Persist immediately when changing projects or leaving the page. */
+	flushAutosave(): void {
+		if (this.autosaveTimer !== null) clearTimeout(this.autosaveTimer);
+		this.autosaveTimer = null;
+		try {
+			this.snapshotProject();
+			const store: ProjectStore = {
+				version: 2,
+				activeId: this.activeProjectId,
+				previousId: this.previousProjectId,
+				projects: this.savedProjects,
+			};
+			localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(store));
+			this.autosaveStatus = "saved";
+		} catch {
+			this.autosaveStatus = "error";
+		}
+		this.changed();
+	}
+
 	private scheduleAutosave(): void {
 		this.autosaveStatus = "pending";
 		if (this.autosaveTimer !== null) clearTimeout(this.autosaveTimer);
-		this.autosaveTimer = setTimeout(() => {
-			try {
-				localStorage.setItem(
-					AUTOSAVE_KEY,
-					JSON.stringify({ name: this.fileName, xml: writeCirc(this.project) }),
-				);
-				this.autosaveStatus = "saved";
-			} catch {
-				this.autosaveStatus = "error";
-			}
-			this.changed();
-		}, 800);
+		this.autosaveTimer = setTimeout(() => this.flushAutosave(), 800);
 	}
 
 	// --- viewing ---------------------------------------------------------

@@ -29,7 +29,9 @@ import { setTextMeasurer } from "@/engine/graphics";
 import { t } from "@/i18n/es";
 import { measureWith } from "@/render/canvas-graphics";
 import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
+import { DeleteProjectDialog } from "./DeleteProjectDialog";
 import { Disclosure, PanelResize } from "./PanelControls";
+import { ProjectMenu } from "./ProjectMenu";
 import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
 import { useMediaQuery, usePreference } from "./preferences";
 import { ShortcutsDialog } from "./ShortcutsDialog";
@@ -138,6 +140,7 @@ export default function App() {
 	const [leftWidth, setLeftWidth] = usePreference<number>("leftWidth", 256);
 	const [rightWidth, setRightWidth] = usePreference<number>("rightWidth", 288);
 	const [shortcutsOpen, setShortcutsOpen] = useState(false);
+	const [projectToDelete, setProjectToDelete] = useState<{ id: number; name: string } | null>(null);
 	const [loadingExample, setLoadingExample] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const autosaveStatus = ws.autosaveStatus;
@@ -177,9 +180,25 @@ export default function App() {
 		if (desktopRight) setRightOpen(false);
 	}, [desktopRight]);
 
-	const openText = (text: string, name: string) => {
+	useEffect(() => {
+		const save = () => {
+			ws.finishTextEditing();
+			ws.flushAutosave();
+		};
+		const onVisibility = () => {
+			if (document.visibilityState === "hidden") save();
+		};
+		window.addEventListener("pagehide", save);
+		document.addEventListener("visibilitychange", onVisibility);
+		return () => {
+			window.removeEventListener("pagehide", save);
+			document.removeEventListener("visibilitychange", onVisibility);
+		};
+	}, [ws]);
+
+	const openText = (text: string, name: string, kind: "project" | "example" = "project") => {
 		try {
-			ws.openFromText(text, name);
+			ws.openFromText(text, name, kind);
 			setError(null);
 			ws.notify(`Se abrió ${name}.`);
 			requestAnimationFrame(() => canvasRef.current?.fit());
@@ -215,7 +234,7 @@ export default function App() {
 		try {
 			const res = await fetch(`/examples/${file}`);
 			if (!res.ok) throw new Error("No se pudo cargar el ejemplo. Intentá de nuevo.");
-			openText(await res.text(), file);
+			openText(await res.text(), file, "example");
 		} catch (e) {
 			setError((e as Error).message);
 		} finally {
@@ -229,7 +248,7 @@ export default function App() {
 			const target = e.target as HTMLElement;
 			if (
 				target.closest("input, select, textarea, [contenteditable=true]") ||
-				document.querySelector("dialog[open]")
+				document.querySelector("dialog[open], [popover]:popover-open")
 			)
 				return;
 			if (e.key === "?" && !ws.pokeCaret && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -308,6 +327,18 @@ export default function App() {
 
 	return (
 		<div className="flex h-dvh flex-col">
+			{projectToDelete && (
+				<DeleteProjectDialog
+					name={projectToDelete.name}
+					onClose={() => setProjectToDelete(null)}
+					onConfirm={() => {
+						ws.deleteProject(projectToDelete.id);
+						setProjectToDelete(null);
+						ws.notify(`Se eliminó ${projectToDelete.name}.`);
+						requestAnimationFrame(() => canvasRef.current?.fit());
+					}}
+				/>
+			)}
 			{/* top bar */}
 			<header className="flex h-12 shrink-0 items-center gap-0.5 overflow-x-auto border-b border-line bg-panel px-2 [scrollbar-width:none]">
 				<IconButton
@@ -324,15 +355,11 @@ export default function App() {
 				>
 					<SlidersHorizontal className="size-[18px]" />
 				</IconButton>
-				<div className="mr-2 hidden items-center gap-2 md:flex">
-					<LogisimIcon name="logisim-icon-24.png" size={24} />
-					<div className="flex flex-col leading-tight">
-						<span className="text-sm font-semibold tracking-tight">
-							LogiHUR{ws.dirty && <span className="text-muted"> •</span>}
-						</span>
-						<span className="max-w-36 truncate font-mono text-[10px] text-muted">{ws.fileName}</span>
-					</div>
-				</div>
+				<ProjectMenu
+					ws={ws}
+					onSelect={() => requestAnimationFrame(() => canvasRef.current?.fit())}
+					onDelete={setProjectToDelete}
+				/>
 
 				<IconButton label={t("menu.new")} onClick={() => ws.newProject()}>
 					<FilePlus2 className="size-[18px]" />
