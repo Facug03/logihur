@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LogiHUR
 
-## Getting Started
+Simulador de circuitos lógicos para estudiantes de la UNAHUR: una versión web, nativa y liviana de
+**Logisim 2.7.1** que abre y guarda archivos `.circ` compatibles con el Logisim que se usa en clase.
 
-First, run the development server:
+## Comandos
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install        # dependencias
+bun run dev        # servidor de desarrollo
+bun run build      # export estático en out/
+bun run test       # tests (Vitest)
+bun run lint       # Biome
+bun run format     # Biome con fixes
+bun run typecheck  # TypeScript
+bun run golden     # regenera los casos contra Logisim real (requiere Java y el jar en .cache/)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Fidelidad
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`tests/golden/` contiene circuitos (fixtures + aleatorios generados con semilla) cuya salida fue
+grabada ejecutando Logisim 2.7.1 real (`-tty table`). `bun run test` verifica que LogiHUR produce
+exactamente la misma tabla, y que Logisim puede abrir los `.circ` que escribe LogiHUR.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estructura
 
-## Learn More
+- `src/engine/` — núcleo sin DOM: valores de 4 estados (`value.ts`), red de cables (`netlist.ts`),
+  propagador y estados de circuito (`simulation.ts`), apariencia de subcircuitos. Portado de
+  `com.cburch.logisim.{data,circuit,instance}`.
+- `src/components/` — librerías de componentes con los mismos nombres, atributos y valores por defecto
+  que Logisim (`wiring/`, `gates/`, `base/`, subcircuitos).
+- `src/format/` — lectura/escritura de `.circ` (port de `XmlReader`/`XmlWriter`).
+- `src/sim/` — simulador headless (incluye el modo `-tty table` de Logisim).
+- `src/render/` — dibujo en Canvas 2D con la misma geometría que Logisim.
+- `src/ui/` — interfaz (Next.js, cliente).
 
-To learn more about Next.js, take a look at the following resources:
+## Licencia
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Portado a partir del código fuente de Logisim 2.7.1 (© Carl Burch), distribuido bajo GPL v2;
+este proyecto se distribuye bajo la misma licencia.

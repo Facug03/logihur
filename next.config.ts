@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+	// Fully static: no backend needed, deployable to any static host.
+	output: "export",
 };
 
 export default nextConfig;

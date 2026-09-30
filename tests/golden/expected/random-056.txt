@@ -1,0 +1,6 @@
+exit 0
+0	E	0	x
+1	E	0	E
+0	E	1	E
+1	E	1	E
+0	E	0	x
