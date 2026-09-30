@@ -17,6 +17,16 @@ bun run golden     # regenera los casos contra Logisim real (requiere Java y el 
 bun run golden:io  # captura estados internos de E/S contra las fábricas Java originales
 ```
 
+## Uso del editor
+
+Los botones de la barra permiten mostrar u ocultar Componentes/Circuitos y Atributos. En escritorio,
+arrastrá los separadores para ajustar el ancho; doble clic restaura el tamaño original. Los paneles,
+secciones y categorías recuerdan su estado al recargar. En móvil se cierran con el fondo o Escape.
+
+**Atajos** en la barra inferior (o **?**) muestra la ayuda de teclado. Esa barra también indica la
+herramienta activa y el autoguardado: es una copia en este navegador; **Guardar** descarga un `.circ`.
+Con trackpad, Ctrl/⌘ + rueda o pellizco hace zoom en el circuito; la rueda desplaza el lienzo.
+
 ## Fidelidad
 
 `tests/golden/` contiene circuitos (fixtures + aleatorios generados con semilla) cuya salida fue

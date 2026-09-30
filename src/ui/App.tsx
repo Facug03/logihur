@@ -6,7 +6,7 @@ import {
 	Clock,
 	FilePlus2,
 	FolderOpen,
-	Info,
+	Keyboard,
 	Maximize,
 	Menu,
 	Minus,
@@ -23,6 +23,7 @@ import {
 	X,
 } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Toaster, toast } from "sonner";
 import { AND_GATE, OR_GATE } from "@/components/gates/gates";
 import { NOT_GATE } from "@/components/gates/simple-gates";
 import { PIN } from "@/components/wiring/pin";
@@ -32,7 +33,10 @@ import { setTextMeasurer } from "@/engine/graphics";
 import { t } from "@/i18n/es";
 import { measureWith } from "@/render/canvas-graphics";
 import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
-import { AttributesPanel, CircuitsPanel, LibraryPanel, LogisimIcon } from "./panels";
+import { Disclosure, PanelResize } from "./PanelControls";
+import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
+import { useMediaQuery, usePreference } from "./preferences";
+import { ShortcutsDialog } from "./ShortcutsDialog";
 import { TICK_FREQUENCIES, Workspace } from "./workspace";
 
 // Text metrics for bounds computed outside painting (tunnels, labels).
@@ -121,15 +125,60 @@ export default function App() {
 	const version = useSyncExternalStore(ws.subscribe, ws.getVersion, ws.getVersion);
 	const canvasRef = useRef<CircuitCanvasHandle>(null);
 	const fileRef = useRef<HTMLInputElement>(null);
+	const desktopLeft = useMediaQuery("(min-width: 768px)");
+	const desktopRight = useMediaQuery("(min-width: 1024px)");
 	const [zoom, setZoom] = useState(1);
 	const [leftOpen, setLeftOpen] = useState(false);
 	const [rightOpen, setRightOpen] = useState(false);
+	const [leftVisible, setLeftVisible] = usePreference<boolean>("leftVisible", true);
+	const [rightVisible, setRightVisible] = usePreference<boolean>("rightVisible", true);
+	const [leftWidth, setLeftWidth] = usePreference<number>("leftWidth", 256);
+	const [rightWidth, setRightWidth] = usePreference<number>("rightWidth", 288);
+	const [shortcutsOpen, setShortcutsOpen] = useState(false);
+	const [loadingExample, setLoadingExample] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const autosaveStatus = ws.autosaveStatus;
+	useEffect(() => {
+		if (autosaveStatus === "error") {
+			toast.error(
+				"No se pudo autoguardar en este navegador. Descargá tu archivo .circ para conservar los cambios.",
+				{
+					id: "autosave-error",
+					duration: 10000,
+				},
+			);
+		}
+	}, [autosaveStatus]);
+
+	useEffect(() => {
+		const showNotice = () => {
+			if (ws.notice) {
+				toast.info(ws.notice, { id: "workspace-notice" });
+				ws.notice = null;
+			}
+		};
+		showNotice();
+		return ws.subscribe(showNotice);
+	}, [ws]);
+	useEffect(() => {
+		if (error) {
+			toast.error(error, { duration: 10000 });
+			setError(null);
+		}
+	}, [error]);
+
+	useEffect(() => {
+		if (desktopLeft) setLeftOpen(false);
+	}, [desktopLeft]);
+	useEffect(() => {
+		if (desktopRight) setRightOpen(false);
+	}, [desktopRight]);
 
 	const openText = (text: string, name: string) => {
 		try {
 			ws.openFromText(text, name);
 			setError(null);
+			ws.notify(`Se abrió ${name}.`);
 			requestAnimationFrame(() => canvasRef.current?.fit());
 		} catch (e) {
 			setError((e as Error).message);
@@ -139,7 +188,13 @@ export default function App() {
 	const onOpenFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		e.target.value = "";
-		if (file) openText(await file.text(), file.name);
+		if (file) {
+			try {
+				openText(await file.text(), file.name);
+			} catch {
+				setError("No se pudo leer el archivo.");
+			}
+		}
 	};
 
 	const onSave = () => {
@@ -149,18 +204,42 @@ export default function App() {
 		a.download = ws.fileName.endsWith(".circ") ? ws.fileName : `${ws.fileName}.circ`;
 		a.click();
 		setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+		ws.notify(`Se inició la descarga de ${a.download}.`);
 	};
 
 	const loadExample = async (file: string) => {
-		const res = await fetch(`/examples/${file}`);
-		openText(await res.text(), file);
+		setLoadingExample(true);
+		try {
+			const res = await fetch(`/examples/${file}`);
+			if (!res.ok) throw new Error("No se pudo cargar el ejemplo. Intentá de nuevo.");
+			openText(await res.text(), file);
+		} catch (e) {
+			setError((e as Error).message);
+		} finally {
+			setLoadingExample(false);
+		}
 	};
 
 	// keyboard shortcuts (Logisim's where they exist)
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
 			const target = e.target as HTMLElement;
-			if (target.closest("input, select, textarea")) return;
+			if (
+				target.closest("input, select, textarea, [contenteditable=true]") ||
+				document.querySelector("dialog[open]")
+			)
+				return;
+			if (e.key === "?" && !ws.pokeCaret && !e.ctrlKey && !e.metaKey && !e.altKey) {
+				setShortcutsOpen(true);
+				e.preventDefault();
+				return;
+			}
+			if (e.key === "Escape" && (leftOpen || rightOpen)) {
+				setLeftOpen(false);
+				setRightOpen(false);
+				e.preventDefault();
+				return;
+			}
 			const mod = e.ctrlKey || e.metaKey;
 			const k = e.key.toLowerCase();
 			if (
@@ -228,10 +307,17 @@ export default function App() {
 			<header className="flex h-12 shrink-0 items-center gap-0.5 overflow-x-auto border-b border-line bg-panel px-2 [scrollbar-width:none]">
 				<IconButton
 					label="Componentes y circuitos"
-					onClick={() => setLeftOpen((v) => !v)}
-					className="md:hidden"
+					active={desktopLeft ? leftVisible : leftOpen}
+					onClick={() => (desktopLeft ? setLeftVisible((v) => !v) : setLeftOpen((v) => !v))}
 				>
 					<Menu className="size-5" />
+				</IconButton>
+				<IconButton
+					label="Atributos"
+					active={desktopRight ? rightVisible : rightOpen}
+					onClick={() => (desktopRight ? setRightVisible((v) => !v) : setRightOpen((v) => !v))}
+				>
+					<SlidersHorizontal className="size-[18px]" />
 				</IconButton>
 				<div className="mr-2 hidden items-center gap-2 md:flex">
 					<LogisimIcon name="logisim-icon-24.png" size={24} />
@@ -356,9 +442,6 @@ export default function App() {
 					<IconButton label="Ajustar a la pantalla" onClick={() => canvasRef.current?.fit()}>
 						<Maximize className="size-[18px]" />
 					</IconButton>
-					<IconButton label="Atributos" onClick={() => setRightOpen((v) => !v)} className="lg:hidden">
-						<SlidersHorizontal className="size-[18px]" />
-					</IconButton>
 				</div>
 				<input
 					ref={fileRef}
@@ -369,15 +452,25 @@ export default function App() {
 				/>
 			</header>
 
-			<div className="relative flex min-h-0 flex-1">
+			<div
+				className="relative flex min-h-0 flex-1 overflow-hidden"
+				style={
+					{
+						"--left-width": `${Math.max(200, Math.min(420, leftWidth))}px`,
+						"--right-width": `${Math.max(240, Math.min(420, rightWidth))}px`,
+					} as React.CSSProperties
+				}
+			>
 				{/* left: circuits + palette */}
 				<aside
-					className={`absolute inset-y-0 left-0 z-20 w-64 shrink-0 overflow-y-auto border-r border-line bg-panel shadow-xl transition-transform md:static md:translate-x-0 md:shadow-none ${
-						leftOpen ? "translate-x-0" : "-translate-x-full"
-					}`}
+					aria-label="Componentes y circuitos"
+					className={`sidebar sidebar-left ${leftOpen ? "mobile-open" : ""} ${leftVisible ? "desktop-open" : ""}`}
 				>
-					<div className="flex justify-end p-1 md:hidden">
-						<IconButton label="Cerrar" onClick={() => setLeftOpen(false)}>
+					<div className="flex justify-end p-1">
+						<IconButton
+							label="Ocultar componentes y circuitos"
+							onClick={() => (desktopLeft ? setLeftVisible(false) : setLeftOpen(false))}
+						>
 							<X className="size-4" />
 						</IconButton>
 					</div>
@@ -386,25 +479,42 @@ export default function App() {
 					<LibraryPanel ws={ws} onPick={() => setLeftOpen(false)} />
 					<div className="mx-3 h-px bg-line" />
 					<section className="flex flex-col gap-1 p-3">
-						<h2 className="px-1 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
-							Ejemplos
-						</h2>
-						{EXAMPLES.map((ex) => (
-							<button
-								key={ex.file}
-								type="button"
-								onClick={() => {
-									loadExample(ex.file);
-									setLeftOpen(false);
-								}}
-								className="rounded-md px-2 py-1.5 text-left text-sm hover:bg-black/5"
-							>
-								{ex.label}
-							</button>
-						))}
+						<Disclosure id="examples" title="Ejemplos">
+							{EXAMPLES.map((ex) => (
+								<button
+									key={ex.file}
+									type="button"
+									disabled={loadingExample}
+									onClick={() => {
+										loadExample(ex.file);
+										setLeftOpen(false);
+									}}
+									className="w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-black/5 disabled:opacity-50"
+								>
+									{ex.label}
+								</button>
+							))}
+							{loadingExample && (
+								<p role="status" className="px-2 py-1 text-xs text-muted">
+									Cargando ejemplo…
+								</p>
+							)}
+						</Disclosure>
 					</section>
 				</aside>
 
+				{leftVisible && <PanelResize side="left" width={leftWidth} onChange={setLeftWidth} />}
+				{(leftOpen || rightOpen) && (
+					<button
+						type="button"
+						aria-label="Cerrar paneles"
+						onClick={() => {
+							setLeftOpen(false);
+							setRightOpen(false);
+						}}
+						className={`absolute inset-0 z-10 bg-black/20 ${leftOpen ? "md:hidden" : "lg:hidden"}`}
+					/>
+				)}
 				{/* canvas */}
 				<main className="relative min-w-0 flex-1">
 					<CircuitCanvas ref={canvasRef} ws={ws} version={version} onZoomChange={setZoom} />
@@ -434,29 +544,6 @@ export default function App() {
 								<AlertTriangle className="size-4" /> {t("sim.oscillation")}
 							</div>
 						)}
-						{ws.notice && (
-							<div className="pointer-events-auto flex items-center gap-2 rounded-lg bg-panel px-3 py-2 text-sm shadow ring-1 ring-line">
-								<Info className="size-4 text-accent" /> {ws.notice}
-								<button
-									type="button"
-									aria-label="Cerrar"
-									onClick={() => {
-										ws.notice = null;
-										ws.changed();
-									}}
-								>
-									<X className="size-4" />
-								</button>
-							</div>
-						)}
-						{error && (
-							<div className="pointer-events-auto flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 shadow ring-1 ring-red-200">
-								<AlertTriangle className="size-4" /> {error}
-								<button type="button" onClick={() => setError(null)} aria-label="Cerrar">
-									<X className="size-4" />
-								</button>
-							</div>
-						)}
 						{ws.messages.length > 0 && (
 							<div className="pointer-events-auto max-w-lg rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow ring-1 ring-amber-200">
 								<div className="mb-1 flex items-center gap-2 font-medium">
@@ -484,20 +571,75 @@ export default function App() {
 				</main>
 
 				{/* right: attributes */}
+				{rightVisible && <PanelResize side="right" width={rightWidth} onChange={setRightWidth} />}
 				<aside
-					className={`absolute inset-y-0 right-0 z-20 w-72 shrink-0 overflow-y-auto border-l border-line bg-panel shadow-xl transition-transform lg:static lg:translate-x-0 lg:shadow-none ${
-						rightOpen ? "translate-x-0" : "translate-x-full"
-					}`}
+					aria-label="Atributos"
+					className={`sidebar sidebar-right ${rightOpen ? "mobile-open" : ""} ${rightVisible ? "desktop-open" : ""}`}
 				>
-					<div className="flex items-center justify-between border-b border-line px-4 py-2 lg:hidden">
+					<div className="flex items-center justify-between border-b border-line px-4 py-2">
 						<span className="text-sm font-medium">Atributos</span>
-						<IconButton label="Cerrar" onClick={() => setRightOpen(false)}>
+						<IconButton
+							label="Ocultar atributos"
+							onClick={() => (desktopRight ? setRightVisible(false) : setRightOpen(false))}
+						>
 							<X className="size-4" />
 						</IconButton>
 					</div>
 					<AttributesPanel ws={ws} />
 				</aside>
 			</div>
+			<footer className="flex min-h-8 shrink-0 items-center gap-3 border-t border-line bg-panel px-3 text-[11px] text-muted">
+				<span className="min-w-0 flex-1 truncate">
+					{tool.kind === "add"
+						? `Colocar ${componentName(tool)} · flechas: orientar · Esc: editar`
+						: tool.kind === "wiring"
+							? "Cablear · clic para iniciar y terminar · Esc: cancelar"
+							: tool.kind === "poke"
+								? "Tocar · clic para cambiar valores y probar controles"
+								: "Editar · arrastrá para seleccionar o mover · Shift: sumar selección"}
+				</span>
+				<span className="hidden shrink-0 sm:inline">
+					{ws.simEnabled ? "Simulación activa" : "Simulación pausada"}
+				</span>
+				<span
+					role="status"
+					title="El autoguardado conserva una copia local. Usá Guardar (Ctrl/⌘+S) para descargar el archivo .circ."
+					className="hidden shrink-0 md:inline"
+				>
+					{ws.autosaveStatus === "pending"
+						? "Guardando en este navegador…"
+						: ws.autosaveStatus === "saved"
+							? "Guardado en este navegador"
+							: ws.autosaveStatus === "error"
+								? "Sin autoguardado · descargá tu .circ"
+								: ws.dirty
+									? "Cambios sin descargar"
+									: "Sin cambios pendientes"}
+				</span>
+				<button
+					type="button"
+					onClick={() => setShortcutsOpen(true)}
+					title="Atajos de teclado (?)"
+					className="flex shrink-0 items-center gap-1 rounded px-2 py-1 hover:bg-black/5"
+				>
+					<Keyboard className="size-3.5" />
+					Atajos
+				</button>
+			</footer>
+			<Toaster
+				containerAriaLabel="Notificaciones"
+				position="bottom-right"
+				closeButton
+				visibleToasts={3}
+				offset={44}
+				mobileOffset={44}
+				theme="light"
+				toastOptions={{
+					closeButtonAriaLabel: "Cerrar notificación",
+					style: { fontFamily: "var(--font-geist-sans), sans-serif", borderColor: "var(--line)" },
+				}}
+			/>
+			{shortcutsOpen && <ShortcutsDialog onClose={() => setShortcutsOpen(false)} />}
 		</div>
 	);
 }

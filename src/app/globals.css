@@ -34,3 +34,65 @@ body {
 canvas {
 	touch-action: none;
 }
+
+/* On small screens panels are drawers; on desktop they reserve adjustable space. */
+.sidebar {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	z-index: 20;
+	display: none;
+	flex-shrink: 0;
+	overflow-y: auto;
+	background: var(--panel);
+	box-shadow: 0 10px 25px #0002;
+}
+.sidebar.mobile-open {
+	display: block;
+}
+.sidebar-left {
+	left: 0;
+	width: min(var(--left-width), 85vw);
+	border-right: 1px solid var(--line);
+}
+.sidebar-right {
+	right: 0;
+	width: min(var(--right-width), 85vw);
+	border-left: 1px solid var(--line);
+}
+.panel-resize {
+	display: none;
+}
+@media (min-width: 768px) {
+	.sidebar-left {
+		position: static;
+		width: var(--left-width);
+		box-shadow: none;
+		display: none;
+	}
+	.sidebar-left.desktop-open {
+		display: block;
+	}
+	.panel-resize-left {
+		display: block;
+	}
+}
+@media (min-width: 1024px) {
+	.sidebar-right {
+		position: static;
+		width: var(--right-width);
+		box-shadow: none;
+		display: none;
+	}
+	.sidebar-right.desktop-open {
+		display: block;
+	}
+	.panel-resize-right {
+		display: block;
+	}
+}
+button:focus-visible,
+summary:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}

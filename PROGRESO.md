@@ -76,6 +76,34 @@ Las fases 0–4 están implementadas y versionadas en git.
   Estado: **238 tests OK**, **177 casos de tablas + 392 estados E/S coinciden con Java**;
   Biome, TypeScript y build estático con Webpack OK.
 
+
+- **UX del editor (sin cambiar la geometría ni los íconos de Logisim)**:
+  - Paneles de componentes/circuitos y atributos ocultables también en escritorio. Separadores
+    ajustables con arrastre, flechas, Inicio/Fin y doble clic para restaurar el ancho original.
+    Anchos y visibilidad se recuerdan en `localStorage`, separados del archivo `.circ`.
+  - Circuitos, Librerías y Ejemplos expandibles/contraíbles. Cada categoría (Cableado, Puertas,
+    etc.) conserva su estado al recargar; ocultar un panel no reinicia sus secciones.
+  - En móvil se abren como paneles superpuestos, con cierre por botón, fondo o Escape; acceso
+    a ambos paneles al inicio de la barra y retorno al diseño de escritorio al ampliar la ventana.
+  - `src/ui/ShortcutsDialog.tsx`: ayuda desde **Atajos** en la barra inferior o **?**. Modal nativo
+    con foco y Escape; los atajos globales se suspenden en diálogos y campos de texto.
+  - `sonner`: notificaciones de apertura, recuperación, descarga y errores; fallo HTTP y estado
+    de carga de ejemplos. Los atributos inválidos explican el rechazo y conservan el valor anterior.
+  - Barra inferior: ayuda de la herramienta activa, estado de simulación y autoguardado real
+    (pendiente/guardado/error). Un guardado local no limpia el estado de cambios sin descargar.
+    Abrir un proyecto reemplaza cualquier autoguardado pendiente y persiste el proyecto abierto.
+    Si falla el almacenamiento se muestra un aviso para descargar el `.circ`, también en móvil.
+  - Trackpad Mac: listener nativo `wheel` no pasivo cancela el zoom del navegador en el canvas
+    con Ctrl/Meta, conservando el zoom del circuito. También cancela los eventos de gesto de Safari;
+    fuera del canvas no se intercepta el zoom del navegador.
+  - Chrome/Playwright: persistencia después de recargar, arrastre y teclado, ocultar/restaurar,
+    ayuda de atajos, notificaciones, atributos inválidos, autoguardado, paneles móviles y resize
+    de ventana. Eventos nativos Ctrl+rueda por CDP cambian el zoom del circuito sin alterar la
+    escala del navegador; cancelación de gestos Safari comprobada con eventos sintéticos.
+    Regresión de Botón/Joystick/Teclado/TTY completa sin errores. Capturas temporales:
+    `/private/tmp/logihur-ux-desktop.png` y `/private/tmp/logihur-ux-mobile.png`.
+  - **241 tests OK**, Biome, TypeScript y export estático con Webpack OK.
+
 ## Siguiente (en este orden)
 
 1. **Fase 5**: análisis combinacional, editor de apariencia, logging, librerías `.circ`.

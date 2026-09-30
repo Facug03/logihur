@@ -11,6 +11,8 @@ import type { ComponentFactory, Instance } from "@/engine/component";
 import { prefs } from "@/engine/prefs";
 import { t } from "@/i18n/es";
 import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
+import { Disclosure } from "./PanelControls";
+import { usePreference } from "./preferences";
 import type { Workspace } from "./workspace";
 
 export function iconFor(factory: ComponentFactory, output?: boolean): string {
@@ -76,91 +78,92 @@ export function CircuitsPanel({ ws }: { ws: Workspace }) {
 	const tool = ws.tool;
 	return (
 		<section className="flex flex-col gap-0.5 p-3">
-			<div className="flex items-center px-1 pb-1">
-				<h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted">Circuitos</h2>
-				<button
-					type="button"
-					title="Agregar circuito"
-					aria-label="Agregar circuito"
-					onClick={() => {
-						setAdding(true);
-						setName(`circuito${ws.project.circuits.length + 1}`);
-					}}
-					className="ml-auto rounded p-1 hover:bg-black/5"
-				>
-					<Plus className="size-3.5" />
-				</button>
-			</div>
-			{adding && (
-				<form
-					className="mb-1 flex gap-1"
-					onSubmit={(e) => {
-						e.preventDefault();
-						ws.addCircuit(name);
-						setAdding(false);
-					}}
-				>
-					<input
-						// biome-ignore lint/a11y/noAutofocus: inline creation field
-						autoFocus
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						onBlur={() => setAdding(false)}
-						onKeyDown={(e) => e.key === "Escape" && setAdding(false)}
-						className="min-w-0 flex-1 rounded-md border border-accent px-2 py-1 text-sm outline-none"
-					/>
-				</form>
-			)}
-			{ws.project.circuits.map((c) => {
-				const active = c === ws.circuit;
-				const isMain = c === ws.project.mainCircuit;
-				const factory = ws.project.getSubcircuitFactory(c);
-				const toolActive = tool.kind === "add" && tool.factory === factory;
-				const canInsert = !ws.project.wouldCreateCycle(ws.viewCircuit, c);
-				return (
-					<div
-						key={c.id}
-						className={`group flex items-center gap-1 rounded-md pr-1 ${active ? "bg-accent/10" : "hover:bg-black/5"}`}
+			<Disclosure id="circuits" title="Circuitos">
+				<div className="flex items-center justify-end px-1 pb-1">
+					<button
+						type="button"
+						title="Agregar circuito"
+						aria-label="Agregar circuito"
+						onClick={() => {
+							setAdding(true);
+							setName(`circuito${ws.project.circuits.length + 1}`);
+						}}
+						className="ml-auto rounded p-1 hover:bg-black/5"
 					>
-						<button
-							type="button"
-							title={
-								canInsert
-									? `Agregar ${c.name} como subcircuito`
-									: "No se puede agregar un circuito dentro de sí mismo"
-							}
-							disabled={!canInsert}
-							onClick={() => ws.selectAddTool(factory)}
-							className={`rounded p-1.5 disabled:opacity-30 ${toolActive ? "bg-accent/20" : "hover:bg-black/10"}`}
+						<Plus className="size-3.5" />
+					</button>
+				</div>
+				{adding && (
+					<form
+						className="mb-1 flex gap-1"
+						onSubmit={(e) => {
+							e.preventDefault();
+							ws.addCircuit(name);
+							setAdding(false);
+						}}
+					>
+						<input
+							// biome-ignore lint/a11y/noAutofocus: inline creation field
+							autoFocus
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							onBlur={() => setAdding(false)}
+							onKeyDown={(e) => e.key === "Escape" && setAdding(false)}
+							className="min-w-0 flex-1 rounded-md border border-accent px-2 py-1 text-sm outline-none"
+						/>
+					</form>
+				)}
+				{ws.project.circuits.map((c) => {
+					const active = c === ws.circuit;
+					const isMain = c === ws.project.mainCircuit;
+					const factory = ws.project.getSubcircuitFactory(c);
+					const toolActive = tool.kind === "add" && tool.factory === factory;
+					const canInsert = !ws.project.wouldCreateCycle(ws.viewCircuit, c);
+					return (
+						<div
+							key={c.id}
+							className={`group flex items-center gap-1 rounded-md pr-1 ${active ? "bg-accent/10" : "hover:bg-black/5"}`}
 						>
-							<LogisimIcon name="subcirc.gif" />
-						</button>
-						<button
-							type="button"
-							onClick={() => ws.setCircuit(c)}
-							className={`min-w-0 flex-1 truncate py-1.5 text-left text-sm ${active ? "font-medium text-accent" : ""}`}
-						>
-							{c.name}
-						</button>
-						<button
-							type="button"
-							title={isMain ? "Circuito principal" : "Usar como circuito principal"}
-							onClick={() => ws.setMainCircuit(c)}
-							className={`rounded p-1 ${isMain ? "text-amber-500" : "text-muted opacity-0 group-hover:opacity-100"}`}
-						>
-							<Star className={`size-3.5 ${isMain ? "fill-current" : ""}`} />
-						</button>
-						<button
-							type="button"
-							title="Borrar circuito"
-							onClick={() => ws.removeCircuit(c)}
-							className="rounded p-1 text-muted opacity-0 hover:text-red-600 group-hover:opacity-100"
-						>
-							<Trash2 className="size-3.5" />
-						</button>
-					</div>
-				);
-			})}
+							<button
+								type="button"
+								title={
+									canInsert
+										? `Agregar ${c.name} como subcircuito`
+										: "No se puede agregar un circuito dentro de sí mismo"
+								}
+								disabled={!canInsert}
+								onClick={() => ws.selectAddTool(factory)}
+								className={`rounded p-1.5 disabled:opacity-30 ${toolActive ? "bg-accent/20" : "hover:bg-black/10"}`}
+							>
+								<LogisimIcon name="subcirc.gif" />
+							</button>
+							<button
+								type="button"
+								onClick={() => ws.setCircuit(c)}
+								className={`min-w-0 flex-1 truncate py-1.5 text-left text-sm ${active ? "font-medium text-accent" : ""}`}
+							>
+								{c.name}
+							</button>
+							<button
+								type="button"
+								title={isMain ? "Circuito principal" : "Usar como circuito principal"}
+								onClick={() => ws.setMainCircuit(c)}
+								className={`rounded p-1 ${isMain ? "text-amber-500" : "text-muted opacity-0 group-hover:opacity-100"}`}
+							>
+								<Star className={`size-3.5 ${isMain ? "fill-current" : ""}`} />
+							</button>
+							<button
+								type="button"
+								title="Borrar circuito"
+								onClick={() => ws.removeCircuit(c)}
+								className="rounded p-1 text-muted opacity-0 hover:text-red-600 group-hover:opacity-100"
+							>
+								<Trash2 className="size-3.5" />
+							</button>
+						</div>
+					);
+				})}
+			</Disclosure>
 		</section>
 	);
 }
@@ -171,40 +174,50 @@ export function LibraryPanel({ ws, onPick }: { ws: Workspace; onPick?: () => voi
 	const tool = ws.tool;
 	return (
 		<section className="flex flex-col gap-0.5 p-3">
-			<h2 className="px-1 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Librerías</h2>
-			{LIBRARIES.map((lib) => (
-				<details key={lib.desc} className="group" open={lib.desc === "#Gates" || lib.desc === "#Wiring"}>
-					<summary className="flex cursor-pointer list-none items-center gap-1 rounded-md px-1 py-1 text-sm hover:bg-black/5">
-						<ChevronRight className="size-3.5 transition-transform group-open:rotate-90" />
-						{t(lib.displayKey)}
-						{lib.factories.length === 0 && <span className="ml-auto text-[10px] text-muted">pronto</span>}
-					</summary>
-					<ul className="ml-3 border-l border-line pl-1">
-						{lib.factories.map((f) => {
-							const active = tool.kind === "add" && tool.id === f.name;
-							return (
-								<li key={f.name}>
-									<button
-										type="button"
-										title={f.name}
-										onClick={() => {
-											ws.selectAddTool(f);
-											onPick?.();
-										}}
-										className={`flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] ${
-											active ? "bg-accent/15 font-medium text-accent" : "hover:bg-black/5"
-										}`}
-									>
-										<LogisimIcon name={iconFor(f)} />
-										{t(f.displayKey)}
-									</button>
-								</li>
-							);
-						})}
-					</ul>
-				</details>
-			))}
+			<Disclosure id="libraries" title="Librerías">
+				{LIBRARIES.map((lib) => (
+					<LibraryDisclosure key={lib.desc} id={lib.desc}>
+						<summary className="flex cursor-pointer list-none items-center gap-1 rounded-md px-1 py-1 text-sm hover:bg-black/5">
+							<ChevronRight className="size-3.5 transition-transform group-open:rotate-90" />
+							{t(lib.displayKey)}
+							{lib.factories.length === 0 && <span className="ml-auto text-[10px] text-muted">pronto</span>}
+						</summary>
+						<ul className="ml-3 border-l border-line pl-1">
+							{lib.factories.map((f) => {
+								const active = tool.kind === "add" && tool.id === f.name;
+								return (
+									<li key={f.name}>
+										<button
+											type="button"
+											title={f.name}
+											onClick={() => {
+												ws.selectAddTool(f);
+												onPick?.();
+											}}
+											className={`flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] ${
+												active ? "bg-accent/15 font-medium text-accent" : "hover:bg-black/5"
+											}`}
+										>
+											<LogisimIcon name={iconFor(f)} />
+											{t(f.displayKey)}
+										</button>
+									</li>
+								);
+							})}
+						</ul>
+					</LibraryDisclosure>
+				))}
+			</Disclosure>
 		</section>
+	);
+}
+
+function LibraryDisclosure({ id, children }: { id: string; children: React.ReactNode }) {
+	const [open, setOpen] = usePreference(`library.${id}`, id === "#Gates" || id === "#Wiring");
+	return (
+		<details className="group" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
+			{children}
+		</details>
 	);
 }
 
@@ -232,6 +245,7 @@ function AttrEditor({
 	onChange: (v: unknown) => void;
 }) {
 	const [draft, setDraft] = useState<string | null>(null);
+	const [validationError, setValidationError] = useState<string | null>(null);
 	const [editingMemory, setEditingMemory] = useState(false);
 
 	if (attr.kind === "memory") {
@@ -380,24 +394,40 @@ function AttrEditor({
 		if (draft === null) return;
 		try {
 			onChange(attr.parse(draft));
+			setValidationError(null);
 		} catch {
-			// invalid: revert
+			setValidationError(`Valor inválido. Se conservó ${attr.format(value)}.`);
 		}
 		setDraft(null);
 	};
 	return (
-		<input
-			className={`${inputClass} ${attr.kind !== "string" ? "font-mono" : ""}`}
-			value={text}
-			inputMode={attr.kind === "int" ? "numeric" : undefined}
-			onChange={(e) => setDraft(e.target.value)}
-			onBlur={commit}
-			onKeyDown={(e) => {
-				if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-				if (e.key === "Escape") setDraft(null);
-				e.stopPropagation();
-			}}
-		/>
+		<div>
+			<input
+				aria-label={attrLabel(attr)}
+				aria-invalid={validationError ? true : undefined}
+				className={`${inputClass} ${attr.kind !== "string" ? "font-mono" : ""}`}
+				value={text}
+				inputMode={attr.kind === "int" ? "numeric" : undefined}
+				onChange={(e) => {
+					setDraft(e.target.value);
+					setValidationError(null);
+				}}
+				onBlur={commit}
+				onKeyDown={(e) => {
+					if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+					if (e.key === "Escape") {
+						setDraft(null);
+						setValidationError(null);
+					}
+					e.stopPropagation();
+				}}
+			/>
+			{validationError && (
+				<p role="alert" className="mt-1 text-xs text-red-700">
+					{validationError}
+				</p>
+			)}
+		</div>
 	);
 }
 

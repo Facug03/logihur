@@ -125,6 +125,25 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 		return () => ro.disconnect();
 	}, []);
 
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		// React's wheel listener is passive. A native listener must cancel the
+		// browser's trackpad pinch default while React still updates the viewport.
+		const preventBrowserZoom = (event: WheelEvent) => {
+			if (event.ctrlKey || event.metaKey) event.preventDefault();
+		};
+		const preventSafariZoom = (event: Event) => event.preventDefault();
+		canvas.addEventListener("wheel", preventBrowserZoom, { passive: false });
+		canvas.addEventListener("gesturestart", preventSafariZoom, { passive: false });
+		canvas.addEventListener("gesturechange", preventSafariZoom, { passive: false });
+		return () => {
+			canvas.removeEventListener("wheel", preventBrowserZoom);
+			canvas.removeEventListener("gesturestart", preventSafariZoom);
+			canvas.removeEventListener("gesturechange", preventSafariZoom);
+		};
+	}, []);
+
 	const gesture = useRef<Gesture>({ mode: "none" });
 	const pointers = useRef(new Map<number, { x: number; y: number }>());
 	const down = useRef({

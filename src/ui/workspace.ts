@@ -60,6 +60,7 @@ export class Workspace {
 	messages: string[] = [];
 	notice: string | null = null;
 	dirty = false;
+	autosaveStatus: "idle" | "pending" | "saved" | "error" = "idle";
 	readonly history = new History();
 	private clipboard: ClipboardData | null = null;
 
@@ -109,9 +110,12 @@ export class Workspace {
 		this.clearSelection();
 		this.history.clear();
 		this.dirty = false;
+		this.autosaveStatus = "idle";
+		if (this.autosaveTimer !== null) clearTimeout(this.autosaveTimer);
 		this.circuit = project.mainCircuit ?? project.circuits[0];
 		this.resetView();
 		if (this.ticksEnabled) this.startTicking();
+		this.scheduleAutosave();
 		this.changed();
 	}
 
@@ -124,9 +128,10 @@ export class Workspace {
 	}
 
 	saveToText(): string {
+		const xml = writeCirc(this.project);
 		this.dirty = false;
 		this.changed();
-		return writeCirc(this.project);
+		return xml;
 	}
 
 	/** Restore the last autosaved project, if any. */
@@ -143,6 +148,7 @@ export class Workspace {
 	}
 
 	private scheduleAutosave(): void {
+		this.autosaveStatus = "pending";
 		if (this.autosaveTimer !== null) clearTimeout(this.autosaveTimer);
 		this.autosaveTimer = setTimeout(() => {
 			try {
@@ -150,9 +156,11 @@ export class Workspace {
 					AUTOSAVE_KEY,
 					JSON.stringify({ name: this.fileName, xml: writeCirc(this.project) }),
 				);
+				this.autosaveStatus = "saved";
 			} catch {
-				// storage unavailable (private mode, quota): nothing to do
+				this.autosaveStatus = "error";
 			}
+			this.changed();
 		}, 800);
 	}
 
