@@ -5,42 +5,34 @@
 // and the anchor (green) can be moved but not deleted, like in Logisim.
 
 import {
-	ArrowDownToLine,
-	ArrowUpToLine,
 	Circle,
 	Minus,
 	MousePointer2,
 	Pentagon,
-	RotateCcw,
 	Spline,
 	Square,
 	Squircle,
-	Trash2,
 	Type,
 	Waypoints,
 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import {
 	createDragged,
 	createPoly,
 	createText,
-	DEFAULT_TOOL_STYLE,
 	type DrawTool,
 	handles,
-	isRemovable,
 	moveHandle,
 	type PaintType,
 	shapesBounds,
 	snap,
-	type ToolStyle,
 	translate,
 } from "@/editor/appearance-edit";
 import type { AppearanceShape } from "@/engine/appearance";
-import type { Direction } from "@/engine/geom";
 import { locX, locY } from "@/engine/geom";
 import type { Workspace } from "./workspace";
 
-const TOOLS: { id: DrawTool; label: string; icon: React.ReactNode }[] = [
+export const APPEARANCE_TOOLS: { id: DrawTool; label: string; icon: React.ReactNode }[] = [
 	{ id: "select", label: "Seleccionar", icon: <MousePointer2 className="size-[18px]" /> },
 	{ id: "text", label: "Texto", icon: <Type className="size-[18px]" /> },
 	{ id: "line", label: "Línea", icon: <Minus className="size-[18px] -rotate-45" /> },
@@ -55,8 +47,6 @@ const TOOLS: { id: DrawTool; label: string; icon: React.ReactNode }[] = [
 	{ id: "oval", label: "Óvalo", icon: <Circle className="size-[18px]" /> },
 	{ id: "polygon", label: "Polígono (doble clic para cerrar)", icon: <Pentagon className="size-[18px]" /> },
 ];
-
-type StyledShape = Extract<AppearanceShape, { paint: PaintType }>;
 
 const PORT_COLOR = "#0000ff";
 const ANCHOR_COLOR = "rgb(0,128,0)";
@@ -166,7 +156,7 @@ function HitArea({ s }: { s: AppearanceShape }) {
 	}
 }
 
-const LABELS: Record<string, string> = {
+export const SHAPE_LABELS: Record<string, string> = {
 	rect: "Rectángulo",
 	oval: "Óvalo",
 	line: "Línea",
@@ -177,21 +167,31 @@ const LABELS: Record<string, string> = {
 	anchor: "Ancla",
 };
 
-function shapeLabel(s: AppearanceShape): string {
+export function shapeLabel(s: AppearanceShape): string {
 	if (s.kind === "rect" && s.rx > 0) return "Rectángulo redondeado";
 	if (s.kind === "poly" && !s.closed) return "Polilínea";
 	if (s.kind === "port") return `Puerto de ${s.pin.attrs.getByName("label") || "pin"}`;
-	return LABELS[s.kind];
+	return SHAPE_LABELS[s.kind];
 }
 
-export function AppearanceEditor({ ws }: { ws: Workspace }) {
+export interface AppearanceEditorHandle {
+	fit(): void;
+	zoomBy(factor: number): void;
+}
+
+export const AppearanceEditor = forwardRef<
+	AppearanceEditorHandle,
+	{ ws: Workspace; onZoomChange?: (zoom: number) => void }
+>(function AppearanceEditor({ ws, onZoomChange }, ref) {
 	const circuit = ws.circuit;
 	const committed = circuit.appearance.getShapes();
 	const [draft, setDraft] = useState<AppearanceShape[] | null>(null);
 	const shapes = draft ?? committed;
-	const [selected, setSelected] = useState<number[]>([]);
-	const [tool, setTool] = useState<DrawTool>("select");
-	const [toolStyle, setToolStyle] = useState<ToolStyle>(DEFAULT_TOOL_STYLE);
+	// tool, style and selection live in the workspace: the toolbar and the attributes panel share them
+	const tool = ws.appearanceTool;
+	const toolStyle = ws.appearanceStyle;
+	const selected = ws.appearanceSelection;
+	const setSelected = (indices: number[]) => ws.setAppearanceSelection(indices);
 	const [poly, setPoly] = useState<[number, number][] | null>(null);
 	const [hover, setHover] = useState<[number, number] | null>(null);
 	const [textAt, setTextAt] = useState<{ x: number; y: number; value: string } | null>(null);
@@ -214,13 +214,32 @@ export function AppearanceEditor({ ws }: { ws: Workspace }) {
 		return () => ro.disconnect();
 	}, []);
 
-	useEffect(() => {
-		if (size.w === 0 || fitted.current === circuit.id) return;
-		fitted.current = circuit.id;
+	const fitView = () => {
 		const b = shapesBounds(committed);
 		const zoom = Math.max(0.5, Math.min(4, Math.min(size.w / (b.w + 80), size.h / (b.h + 80))));
 		setView({ zoom, ox: b.x + b.w / 2 - size.w / zoom / 2, oy: b.y + b.h / 2 - size.h / zoom / 2 });
-	}, [size, circuit.id, committed]);
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: fit once per circuit, when the size is known
+	useEffect(() => {
+		if (size.w === 0 || fitted.current === circuit.id) return;
+		fitted.current = circuit.id;
+		fitView();
+	}, [size, circuit.id]);
+
+	useEffect(() => onZoomChange?.(view.zoom), [view.zoom, onZoomChange]);
+
+	useImperativeHandle(ref, () => ({
+		fit: fitView,
+		zoomBy(factor: number) {
+			setView((v) => {
+				const zoom = Math.max(0.25, Math.min(8, v.zoom * factor));
+				const cx = v.ox + size.w / v.zoom / 2;
+				const cy = v.oy + size.h / v.zoom / 2;
+				return { zoom, ox: cx - size.w / zoom / 2, oy: cy - size.h / zoom / 2 };
+			});
+		},
+	}));
 
 	const toModel = (clientX: number, clientY: number) => {
 		const r = svgRef.current?.getBoundingClientRect();
@@ -235,23 +254,26 @@ export function AppearanceEditor({ ws }: { ws: Workspace }) {
 		ws.editAppearance(label, next);
 	};
 
-	const updateSelected = (label: string, fn: (s: AppearanceShape) => AppearanceShape) => {
-		commit(
-			label,
-			shapes.map((s, i) => (sel.includes(i) ? fn(s) : s)),
-		);
-	};
-
-	const finishPoly = () => {
+	const finishPoly = (polyTool = tool) => {
 		if (poly) {
-			const shape = createPoly(tool === "polygon", toolStyle, poly);
+			const shape = createPoly(polyTool === "polygon", toolStyle, poly);
 			if (shape) {
-				commit(tool === "polygon" ? "Agregar polígono" : "Agregar polilínea", [...shapes, shape]);
+				commit(polyTool === "polygon" ? "Agregar polígono" : "Agregar polilínea", [...shapes, shape]);
 				setSelected([shapes.length]);
 			}
 		}
 		setPoly(null);
 	};
+
+	// choosing another tool in the toolbar finishes a polyline or polygon in progress
+	const lastTool = useRef(tool);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: react to tool changes only
+	useEffect(() => {
+		if (lastTool.current !== tool) {
+			finishPoly(lastTool.current);
+			lastTool.current = tool;
+		}
+	}, [tool]);
 
 	const onBackgroundDown = (e: React.PointerEvent) => {
 		(e.target as Element).setPointerCapture(e.pointerId);
@@ -327,35 +349,17 @@ export function AppearanceEditor({ ws }: { ws: Workspace }) {
 		} else if (g.mode === "draw") {
 			const shape = createDragged(tool, toolStyle, g.x0, g.y0, g.x1, g.y1);
 			if (shape) {
-				commit(`Agregar ${LABELS[shape.kind].toLowerCase()}`, [...committed, shape]);
+				commit(`Agregar ${SHAPE_LABELS[shape.kind].toLowerCase()}`, [...committed, shape]);
 				setSelected([committed.length]);
 			} else setDraft(null);
 		}
-	};
-
-	const remove = () => {
-		const removable = sel.filter((i) => isRemovable(shapes[i]));
-		if (removable.length === 0) return;
-		commit(
-			"Borrar",
-			shapes.filter((_, i) => !removable.includes(i)),
-		);
-		setSelected([]);
-	};
-
-	const reorder = (toTop: boolean) => {
-		const moved = sel.map((i) => shapes[i]);
-		const rest = shapes.filter((_, i) => !sel.includes(i));
-		const next = toTop ? [...rest, ...moved] : [...moved, ...rest];
-		commit(toTop ? "Traer al frente" : "Enviar al fondo", next);
-		setSelected(moved.map((s) => next.indexOf(s)));
 	};
 
 	const onKeyDown = (e: React.KeyboardEvent) => {
 		if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "SELECT")
 			return;
 		e.stopPropagation();
-		if (e.key === "Delete" || e.key === "Backspace") remove();
+		if (e.key === "Delete" || e.key === "Backspace") ws.deleteAppearanceSelection();
 		else if (e.key === "Escape") {
 			if (poly) setPoly(null);
 			else setSelected([]);
@@ -367,76 +371,12 @@ export function AppearanceEditor({ ws }: { ws: Workspace }) {
 		e.preventDefault();
 	};
 
-	const single = sel.length === 1 ? shapes[sel[0]] : null;
-	const styled = sel.map((i) => shapes[i]).filter((s) => "paint" in s);
 	const grid = view.zoom >= 1 ? 10 : 20;
 	const vb = `${view.ox} ${view.oy} ${size.w / view.zoom} ${size.h / view.zoom}`;
 
 	return (
 		// biome-ignore lint/a11y/noStaticElementInteractions: keyboard shortcuts of the editor area
 		<div className="flex h-full min-h-0 flex-col" onKeyDown={onKeyDown}>
-			<div className="flex shrink-0 flex-wrap items-center gap-1 border-b border-line bg-panel px-2 py-1">
-				{TOOLS.map((t) => (
-					<button
-						key={t.id}
-						type="button"
-						title={t.label}
-						aria-label={t.label}
-						aria-pressed={tool === t.id}
-						onClick={() => {
-							finishPoly();
-							setTool(t.id);
-						}}
-						className={`inline-flex size-8 items-center justify-center rounded-md ${tool === t.id ? "bg-accent/15 ring-1 ring-accent/40" : "hover:bg-black/5"}`}
-					>
-						{t.icon}
-					</button>
-				))}
-				<div className="mx-1 h-6 w-px bg-line" />
-				<button
-					type="button"
-					title="Borrar (Supr)"
-					aria-label="Borrar"
-					disabled={!sel.some((i) => isRemovable(shapes[i]))}
-					onClick={remove}
-					className="inline-flex size-8 items-center justify-center rounded-md hover:bg-black/5 disabled:opacity-35"
-				>
-					<Trash2 className="size-[18px]" />
-				</button>
-				<button
-					type="button"
-					title="Traer al frente"
-					aria-label="Traer al frente"
-					disabled={sel.length === 0}
-					onClick={() => reorder(true)}
-					className="inline-flex size-8 items-center justify-center rounded-md hover:bg-black/5 disabled:opacity-35"
-				>
-					<ArrowUpToLine className="size-[18px]" />
-				</button>
-				<button
-					type="button"
-					title="Enviar al fondo"
-					aria-label="Enviar al fondo"
-					disabled={sel.length === 0}
-					onClick={() => reorder(false)}
-					className="inline-flex size-8 items-center justify-center rounded-md hover:bg-black/5 disabled:opacity-35"
-				>
-					<ArrowDownToLine className="size-[18px]" />
-				</button>
-				<button
-					type="button"
-					title="Revertir a la apariencia por defecto"
-					disabled={circuit.appearance.isDefault()}
-					onClick={() => {
-						setSelected([]);
-						ws.editAppearance("Revertir apariencia", null);
-					}}
-					className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-sm hover:bg-black/5 disabled:opacity-35"
-				>
-					<RotateCcw className="size-4" />
-					Revertir apariencia
-				</button>
-			</div>
 			<div ref={wrapRef} className="relative min-h-0 flex-1 overflow-hidden bg-white">
 				<svg
 					ref={svgRef}
@@ -558,229 +498,7 @@ export function AppearanceEditor({ ws }: { ws: Workspace }) {
 						className="absolute w-40 rounded border border-accent bg-white px-1 py-0.5 text-sm outline-none"
 					/>
 				)}
-				<AttributesBox
-					shapes={sel.map((i) => shapes[i]).filter(Boolean)}
-					single={single}
-					styled={styled.length > 0}
-					toolStyle={toolStyle}
-					tool={tool}
-					onToolStyle={setToolStyle}
-					onChange={updateSelected}
-				/>
-				<p className="pointer-events-none absolute bottom-2 left-2 rounded bg-white/90 px-2 py-1 text-xs text-muted">
-					Puertos en azul, ancla en verde. Arrastrar mueve en la grilla (Alt: libre); las manijas cambian la
-					forma.
-				</p>
 			</div>
 		</div>
 	);
-}
-
-function AttributesBox({
-	shapes,
-	single,
-	styled,
-	toolStyle,
-	tool,
-	onToolStyle,
-	onChange,
-}: {
-	shapes: AppearanceShape[];
-	single: AppearanceShape | null;
-	styled: boolean;
-	toolStyle: ToolStyle;
-	tool: DrawTool;
-	onToolStyle: (s: ToolStyle) => void;
-	onChange: (label: string, fn: (s: AppearanceShape) => AppearanceShape) => void;
-}) {
-	const editingTool = shapes.length === 0;
-	if (editingTool && tool === "select") return null;
-	const first = shapes.find((s): s is StyledShape => "paint" in s);
-	const current = editingTool ? toolStyle : first;
-	const text = editingTool ? (tool === "text" ? toolStyle : null) : single?.kind === "text" ? single : null;
-	/** Style attributes apply to drawn shapes; font, alignment and color to texts. */
-	const set = (label: string, patch: Record<string, unknown>) => {
-		if (editingTool) {
-			onToolStyle({ ...toolStyle, ...patch });
-			return;
-		}
-		const forText = "font" in patch || "align" in patch || label === "Color";
-		onChange(label, (s) =>
-			(forText ? s.kind === "text" : "paint" in s) ? ({ ...s, ...patch } as AppearanceShape) : s,
-		);
-	};
-	const field = "flex items-center justify-between gap-2 text-xs";
-	const input = "rounded border border-line bg-white px-1.5 py-1 text-xs";
-	return (
-		<div className="absolute top-2 right-2 flex w-56 flex-col gap-2 rounded-lg border border-line bg-panel/95 p-3 text-sm shadow-md">
-			<p className="text-xs font-semibold text-muted">
-				{editingTool
-					? "Herramienta"
-					: shapes.length === 1
-						? shapeLabel(shapes[0])
-						: `${shapes.length} objetos`}
-			</p>
-			{single?.kind === "anchor" && (
-				<label className={field}>
-					Orientación
-					<select
-						className={input}
-						value={single.facing}
-						onChange={(e) =>
-							onChange("Orientación", (s) =>
-								s.kind === "anchor" ? { ...s, facing: e.target.value as Direction } : s,
-							)
-						}
-					>
-						<option value="east">Este</option>
-						<option value="west">Oeste</option>
-						<option value="north">Norte</option>
-						<option value="south">Sur</option>
-					</select>
-				</label>
-			)}
-			{(styled || (editingTool && tool !== "text")) && current && "paint" in current && (
-				<>
-					{(editingTool || !(first?.kind === "line" || (first?.kind === "poly" && !first.closed))) && (
-						<label className={field}>
-							Tipo de pintura
-							<select
-								className={input}
-								value={current.paint}
-								onChange={(e) => set("Tipo de pintura", { paint: e.target.value })}
-							>
-								<option value="stroke">Sólo borde</option>
-								<option value="fill">Sólo relleno</option>
-								<option value="both">Borde y relleno</option>
-							</select>
-						</label>
-					)}
-					<label className={field}>
-						Ancho del lápiz
-						<input
-							type="number"
-							min={1}
-							max={8}
-							className={`${input} w-14`}
-							value={current.strokeWidth}
-							onChange={(e) => {
-								const v = Number(e.target.value);
-								if (v >= 1 && v <= 8) set("Ancho del lápiz", { strokeWidth: v });
-							}}
-						/>
-					</label>
-					<label className={field}>
-						Color del lápiz
-						<input
-							type="color"
-							value={current.stroke.slice(0, 7)}
-							onChange={(e) => set("Color del lápiz", { stroke: e.target.value })}
-						/>
-					</label>
-					<label className={field}>
-						Color de relleno
-						<input
-							type="color"
-							value={current.fill.slice(0, 7)}
-							onChange={(e) => set("Color de relleno", { fill: e.target.value })}
-						/>
-					</label>
-				</>
-			)}
-			{single?.kind === "rect" && single.rx > 0 && (
-				<label className={field}>
-					Radio de esquina
-					<input
-						type="number"
-						min={1}
-						max={1000}
-						className={`${input} w-16`}
-						value={single.rx}
-						onChange={(e) => {
-							const v = Number(e.target.value);
-							if (v >= 1 && v <= 1000)
-								onChange("Radio de esquina", (s) => (s.kind === "rect" ? { ...s, rx: v } : s));
-						}}
-					/>
-				</label>
-			)}
-			{text && (
-				<>
-					{single?.kind === "text" && (
-						<label className={field}>
-							Texto
-							<input
-								className={`${input} w-32`}
-								value={single.text}
-								onChange={(e) =>
-									onChange("Editar texto", (s) => (s.kind === "text" ? { ...s, text: e.target.value } : s))
-								}
-							/>
-						</label>
-					)}
-					<label className={field}>
-						Fuente
-						<select
-							className={input}
-							value={text.font.family}
-							onChange={(e) => set("Fuente", { font: { ...text.font, family: e.target.value } })}
-						>
-							{["SansSerif", "Serif", "Monospaced"].map((f) => (
-								<option key={f}>{f}</option>
-							))}
-						</select>
-					</label>
-					<label className={field}>
-						Tamaño
-						<input
-							type="number"
-							min={4}
-							max={72}
-							className={`${input} w-14`}
-							value={text.font.size}
-							onChange={(e) => {
-								const v = Number(e.target.value);
-								if (v >= 4 && v <= 72) set("Fuente", { font: { ...text.font, size: v } });
-							}}
-						/>
-					</label>
-					<label className={field}>
-						Estilo
-						<select
-							className={input}
-							value={text.font.style}
-							onChange={(e) => set("Fuente", { font: { ...text.font, style: e.target.value } })}
-						>
-							<option value="plain">Normal</option>
-							<option value="bold">Negrita</option>
-							<option value="italic">Cursiva</option>
-							<option value="bolditalic">Negrita cursiva</option>
-						</select>
-					</label>
-					<label className={field}>
-						Alineación
-						<select
-							className={input}
-							value={text.align}
-							onChange={(e) => set("Alineación", { align: e.target.value })}
-						>
-							<option value="start">Izquierda</option>
-							<option value="middle">Centro</option>
-							<option value="end">Derecha</option>
-						</select>
-					</label>
-					<label className={field}>
-						Color
-						<input
-							type="color"
-							value={("textFill" in text ? text.textFill : text.fill).slice(0, 7)}
-							onChange={(e) =>
-								set("Color", editingTool ? { textFill: e.target.value } : { fill: e.target.value })
-							}
-						/>
-					</label>
-				</>
-			)}
-		</div>
-	);
-}
+});

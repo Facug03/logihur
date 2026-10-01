@@ -10,6 +10,7 @@ import { CIRCUIT_STATIC_ATTRS, type Circuit } from "@/engine/circuit";
 import type { ComponentFactory, Instance } from "@/engine/component";
 import { prefs } from "@/engine/prefs";
 import { t } from "@/i18n/es";
+import { AppearanceAttributes } from "./AppearanceAttributes";
 import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
 import { Disclosure } from "./PanelControls";
 import { usePreference } from "./preferences";
@@ -495,6 +496,7 @@ function withSplitterMax(attr: AnyAttribute, fanout: unknown): AnyAttribute {
 }
 
 export function AttributesPanel({ ws }: { ws: Workspace }) {
+	if (ws.appearanceMode) return <AppearanceAttributes ws={ws} />;
 	const selected = Array.from(ws.selection);
 	const tool = ws.tool;
 

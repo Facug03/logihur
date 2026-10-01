@@ -17,6 +17,7 @@ import {
 	SPLITTER_FANOUT,
 	splitterBitAttr,
 } from "@/components/wiring/splitter";
+import { DEFAULT_TOOL_STYLE, type DrawTool, isRemovable, type ToolStyle } from "@/editor/appearance-edit";
 import { History, Transaction } from "@/editor/history";
 import { repairWires } from "@/editor/wires";
 import type { AppearanceShape } from "@/engine/appearance";
@@ -956,12 +957,33 @@ export class Workspace {
 	/** Whether the viewed circuit shows its appearance editor instead of its layout. */
 	appearanceMode = false;
 
+	/** The appearance editor's tool, the style for new shapes and the selected shapes (z-order indices). */
+	appearanceTool: DrawTool = "select";
+	appearanceStyle: ToolStyle = DEFAULT_TOOL_STYLE;
+	appearanceSelection: number[] = [];
+
 	setAppearanceMode(on: boolean): void {
 		this.finishTextEditing();
 		this.stopPoking();
 		if (on && this.viewStack.length > 1) this.leaveSubcircuit(this.viewStack.length - 1);
 		this.appearanceMode = on;
+		this.appearanceSelection = [];
 		this.clearSelection();
+		this.changed();
+	}
+
+	setAppearanceTool(tool: DrawTool): void {
+		this.appearanceTool = tool;
+		this.changed();
+	}
+
+	setAppearanceStyle(style: ToolStyle): void {
+		this.appearanceStyle = style;
+		this.changed();
+	}
+
+	setAppearanceSelection(indices: number[]): void {
+		this.appearanceSelection = indices;
 		this.changed();
 	}
 
@@ -969,6 +991,49 @@ export class Workspace {
 	editAppearance(label: string, shapes: AppearanceShape[] | null): void {
 		const circuit = this.circuit;
 		this.edit(label, (tx) => tx.setAppearance(circuit, shapes), false);
+	}
+
+	/** The shapes selected in the appearance editor (dropping indices that vanished on undo). */
+	get appearanceSelected(): AppearanceShape[] {
+		const shapes = this.circuit.appearance.getShapes();
+		return this.appearanceSelection.filter((i) => i < shapes.length).map((i) => shapes[i]);
+	}
+
+	updateAppearanceSelected(label: string, fn: (s: AppearanceShape) => AppearanceShape): void {
+		const sel = new Set(this.appearanceSelection);
+		this.editAppearance(
+			label,
+			this.circuit.appearance.getShapes().map((s, i) => (sel.has(i) ? fn(s) : s)),
+		);
+	}
+
+	/** Delete the selected shapes; ports and the anchor stay. */
+	deleteAppearanceSelection(): void {
+		const shapes = this.circuit.appearance.getShapes();
+		const doomed = new Set(this.appearanceSelection.filter((i) => shapes[i] && isRemovable(shapes[i])));
+		if (doomed.size === 0) return;
+		this.appearanceSelection = [];
+		this.editAppearance(
+			"Borrar",
+			shapes.filter((_, i) => !doomed.has(i)),
+		);
+	}
+
+	/** Bring the selection to the front or send it to the back. */
+	reorderAppearanceSelection(toTop: boolean): void {
+		const shapes = this.circuit.appearance.getShapes();
+		const sel = new Set(this.appearanceSelection);
+		if (sel.size === 0) return;
+		const moved = shapes.filter((_, i) => sel.has(i));
+		const rest = shapes.filter((_, i) => !sel.has(i));
+		const next = toTop ? [...rest, ...moved] : [...moved, ...rest];
+		this.appearanceSelection = moved.map((s) => next.indexOf(s));
+		this.editAppearance(toTop ? "Traer al frente" : "Enviar al fondo", next);
+	}
+
+	revertAppearance(): void {
+		this.appearanceSelection = [];
+		this.editAppearance("Revertir apariencia", null);
 	}
 
 	/** The explorer's up/down arrows: reorder circuits in the project. */

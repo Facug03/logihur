@@ -2,6 +2,8 @@
 
 import {
 	AlertTriangle,
+	ArrowDownToLine,
+	ArrowUpToLine,
 	ChevronLeft,
 	FilePlus2,
 	FolderOpen,
@@ -27,6 +29,7 @@ import { NOT_GATE } from "@/components/gates/simple-gates";
 import { loadImage } from "@/components/memory/mem-contents";
 import { SubcircuitFactory } from "@/components/subcircuit";
 import { PIN } from "@/components/wiring/pin";
+import { isRemovable } from "@/editor/appearance-edit";
 import type { Font } from "@/engine/attributes";
 import type { Circuit } from "@/engine/circuit";
 import type { Instance } from "@/engine/component";
@@ -34,7 +37,7 @@ import type { Direction } from "@/engine/geom";
 import { setTextMeasurer } from "@/engine/graphics";
 import { t } from "@/i18n/es";
 import { measureWith } from "@/render/canvas-graphics";
-import { AppearanceEditor } from "./AppearanceEditor";
+import { APPEARANCE_TOOLS, AppearanceEditor, type AppearanceEditorHandle } from "./AppearanceEditor";
 import { AnalyzeMenu } from "./analyzer/AnalyzeMenu";
 import { AnalyzerDialog } from "./analyzer/AnalyzerDialog";
 import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
@@ -79,6 +82,20 @@ const QUICK_TOOLS = [
 	{ id: AND_GATE.name, factory: AND_GATE, preset: {}, icon: "andGate.gif", label: t("gates.and") },
 	{ id: OR_GATE.name, factory: OR_GATE, preset: {}, icon: "orGate.gif", label: t("gates.or") },
 ] as const;
+
+/** Status bar help of each appearance tool. */
+const APPEARANCE_HELP: Record<string, string> = {
+	select:
+		"Apariencia · clic para seleccionar, Shift suma · arrastrar mueve en la grilla (Alt: libre) · manijas cambian la forma · Supr borra",
+	text: "Texto · clic para escribir · Enter confirma · Esc cancela",
+	line: "Línea · arrastrá de un extremo al otro",
+	curve: "Curva · arrastrá entre los extremos y ajustá el punto de control con su manija",
+	polyline: "Polilínea · clic en cada vértice · doble clic o Enter termina · Esc cancela",
+	rect: "Rectángulo · arrastrá de una esquina a la opuesta",
+	roundrect: "Rectángulo redondeado · arrastrá de una esquina a la opuesta",
+	oval: "Óvalo · arrastrá el rectángulo que lo contiene",
+	polygon: "Polígono · clic en cada vértice · doble clic o Enter lo cierra · Esc cancela",
+};
 
 /** Keys delivered to poke carets, as the characters Java's KeyEvent reports. */
 const POKE_KEYS: Record<string, string> = { Backspace: "\b", Delete: "\u007f", Enter: "\n", Tab: "\t" };
@@ -146,6 +163,14 @@ export default function App() {
 	const ws = wsRef.current;
 	const version = useSyncExternalStore(ws.subscribe, ws.getVersion, ws.getVersion);
 	const canvasRef = useRef<CircuitCanvasHandle>(null);
+	const appearanceRef = useRef<AppearanceEditorHandle>(null);
+	/** Zoom buttons act on whichever view is shown. */
+	const viewRef = () =>
+		(ws.appearanceMode ? appearanceRef.current : canvasRef.current) ?? { fit() {}, zoomBy() {} };
+	const fitView = () => {
+		const view = viewRef();
+		view.fit();
+	};
 	const fileRef = useRef<HTMLInputElement>(null);
 	const desktopLeft = useMediaQuery("(min-width: 768px)");
 	const desktopRight = useMediaQuery("(min-width: 1024px)");
@@ -621,138 +646,195 @@ export default function App() {
 					<Save className="size-[18px]" />
 				</IconButton>
 
-				<Divider />
+				{ws.appearanceMode ? (
+					<>
+						<Divider />
+						{APPEARANCE_TOOLS.map((tl) => (
+							<IconButton
+								key={tl.id}
+								label={tl.label}
+								active={ws.appearanceTool === tl.id}
+								onClick={() => ws.setAppearanceTool(tl.id)}
+							>
+								{tl.icon}
+							</IconButton>
+						))}
+						<Divider />
+						<IconButton
+							label={`Deshacer${ws.history.undoLabel() ? `: ${ws.history.undoLabel()}` : ""} (Ctrl+Z)`}
+							disabled={!ws.history.canUndo()}
+							onClick={() => ws.undo()}
+						>
+							<Undo2 className="size-[18px]" />
+						</IconButton>
+						<IconButton label={`Rehacer (Ctrl+Y)`} disabled={!ws.history.canRedo()} onClick={() => ws.redo()}>
+							<Redo2 className="size-[18px]" />
+						</IconButton>
+						<IconButton
+							label="Borrar selección (Supr)"
+							disabled={!ws.appearanceSelected.some(isRemovable)}
+							onClick={() => ws.deleteAppearanceSelection()}
+						>
+							<Trash2 className="size-[18px]" />
+						</IconButton>
+						<IconButton
+							label="Traer al frente"
+							disabled={ws.appearanceSelected.length === 0}
+							onClick={() => ws.reorderAppearanceSelection(true)}
+						>
+							<ArrowUpToLine className="size-[18px]" />
+						</IconButton>
+						<IconButton
+							label="Enviar al fondo"
+							disabled={ws.appearanceSelected.length === 0}
+							onClick={() => ws.reorderAppearanceSelection(false)}
+						>
+							<ArrowDownToLine className="size-[18px]" />
+						</IconButton>
+						<IconButton
+							label="Revertir a la apariencia por defecto"
+							disabled={ws.circuit.appearance.isDefault()}
+							onClick={() => ws.revertAppearance()}
+						>
+							<RotateCcw className="size-[18px]" />
+						</IconButton>
+					</>
+				) : (
+					<>
+						<Divider />
 
-				<IconButton
-					label="Tocar (cambiar valores)"
-					description="Probá el circuito: cambiá pines, pulsá botones, arrastrá el joystick o escribí en el componente tocado."
-					active={tool.kind === "poke"}
-					onClick={() => ws.setTool({ kind: "poke" })}
-				>
-					<LogisimIcon name="poke.gif" size={20} />
-				</IconButton>
-				<IconButton
-					label="Editar (Esc)"
-					description="Seleccioná y mové componentes o cables. Shift suma a la selección; arrastrar desde un puerto permite cablear."
-					active={tool.kind === "edit"}
-					onClick={() => ws.setTool({ kind: "edit" })}
-				>
-					<LogisimIcon name="select.gif" size={20} />
-				</IconButton>
-				<IconButton
-					label="Cablear"
-					description="Arrastrá entre puertos o puntos de la grilla para crear un cable. Escape vuelve a edición."
-					active={tool.kind === "wiring"}
-					onClick={() => ws.setTool({ kind: "wiring" })}
-				>
-					<LogisimIcon name="wiring.gif" size={20} />
-				</IconButton>
-				<IconButton
-					label="Texto"
-					description="Creá una etiqueta con un clic en vacío, o editá el texto de una etiqueta o componente. Enter confirma; Escape cancela."
-					active={tool.kind === "text"}
-					onClick={() => ws.selectTextTool()}
-				>
-					<LogisimIcon name="text.gif" size={20} />
-				</IconButton>
-				<Divider />
+						<IconButton
+							label="Tocar (cambiar valores)"
+							description="Probá el circuito: cambiá pines, pulsá botones, arrastrá el joystick o escribí en el componente tocado."
+							active={tool.kind === "poke"}
+							onClick={() => ws.setTool({ kind: "poke" })}
+						>
+							<LogisimIcon name="poke.gif" size={20} />
+						</IconButton>
+						<IconButton
+							label="Editar (Esc)"
+							description="Seleccioná y mové componentes o cables. Shift suma a la selección; arrastrar desde un puerto permite cablear."
+							active={tool.kind === "edit"}
+							onClick={() => ws.setTool({ kind: "edit" })}
+						>
+							<LogisimIcon name="select.gif" size={20} />
+						</IconButton>
+						<IconButton
+							label="Cablear"
+							description="Arrastrá entre puertos o puntos de la grilla para crear un cable. Escape vuelve a edición."
+							active={tool.kind === "wiring"}
+							onClick={() => ws.setTool({ kind: "wiring" })}
+						>
+							<LogisimIcon name="wiring.gif" size={20} />
+						</IconButton>
+						<IconButton
+							label="Texto"
+							description="Creá una etiqueta con un clic en vacío, o editá el texto de una etiqueta o componente. Enter confirma; Escape cancela."
+							active={tool.kind === "text"}
+							onClick={() => ws.selectTextTool()}
+						>
+							<LogisimIcon name="text.gif" size={20} />
+						</IconButton>
+						<Divider />
 
-				{QUICK_TOOLS.map((q) => (
-					<IconButton
-						key={q.id}
-						label={q.label}
-						active={tool.kind === "add" && tool.id === q.id}
-						onClick={() => ws.selectAddTool(q.factory, q.id, q.preset)}
-					>
-						<LogisimIcon name={q.icon} size={20} />
-					</IconButton>
-				))}
+						{QUICK_TOOLS.map((q) => (
+							<IconButton
+								key={q.id}
+								label={q.label}
+								active={tool.kind === "add" && tool.id === q.id}
+								onClick={() => ws.selectAddTool(q.factory, q.id, q.preset)}
+							>
+								<LogisimIcon name={q.icon} size={20} />
+							</IconButton>
+						))}
 
-				<Divider />
+						<Divider />
 
-				<IconButton
-					label={`Deshacer${ws.history.undoLabel() ? `: ${ws.history.undoLabel()}` : ""} (Ctrl+Z)`}
-					disabled={!ws.history.canUndo()}
-					onClick={() => ws.undo()}
-				>
-					<Undo2 className="size-[18px]" />
-				</IconButton>
-				<IconButton label={`Rehacer (Ctrl+Y)`} disabled={!ws.history.canRedo()} onClick={() => ws.redo()}>
-					<Redo2 className="size-[18px]" />
-				</IconButton>
-				<IconButton
-					label="Borrar selección (Supr)"
-					disabled={!ws.hasSelection()}
-					onClick={() => ws.deleteSelection()}
-				>
-					<Trash2 className="size-[18px]" />
-				</IconButton>
+						<IconButton
+							label={`Deshacer${ws.history.undoLabel() ? `: ${ws.history.undoLabel()}` : ""} (Ctrl+Z)`}
+							disabled={!ws.history.canUndo()}
+							onClick={() => ws.undo()}
+						>
+							<Undo2 className="size-[18px]" />
+						</IconButton>
+						<IconButton label={`Rehacer (Ctrl+Y)`} disabled={!ws.history.canRedo()} onClick={() => ws.redo()}>
+							<Redo2 className="size-[18px]" />
+						</IconButton>
+						<IconButton
+							label="Borrar selección (Supr)"
+							disabled={!ws.hasSelection()}
+							onClick={() => ws.deleteSelection()}
+						>
+							<Trash2 className="size-[18px]" />
+						</IconButton>
 
-				<Divider />
+						<Divider />
 
-				<IconButton
-					label={ws.simEnabled ? "Pausar simulación (Ctrl+E)" : "Reanudar simulación (Ctrl+E)"}
-					description={
-						ws.simEnabled
-							? "Detiene la propagación automática de señales. Podés avanzar con Paso de simulación."
-							: "Vuelve a propagar los cambios de entradas y conexiones hasta estabilizar el circuito."
-					}
-					active={ws.simEnabled}
-					onClick={() => ws.setSimEnabled(!ws.simEnabled)}
-				>
-					<LogisimIcon name={ws.simEnabled ? "simstop.png" : "simplay.png"} size={20} />
-				</IconButton>
-				<IconButton
-					label={`${t("sim.reset")} (Ctrl+R)`}
-					description="Borra el estado de registros, memorias y controles de toda la jerarquía; conserva el circuito."
-					onClick={() => ws.resetSimulation()}
-				>
-					<RotateCcw className="size-[18px]" />
-				</IconButton>
-				<IconButton
-					label="Paso de simulación (Ctrl+I)"
-					description="Pausa y avanza un solo paso de propagación. Los puntos que cambian aparecen marcados en azul. No es un tick de reloj."
-					onClick={() => ws.stepSimulation()}
-				>
-					<LogisimIcon name="simstep.png" size={20} />
-				</IconButton>
-				<IconButton
-					label={`${t("sim.tickOnce")} (Ctrl+T)`}
-					description="Avanza un tick de todos los relojes del circuito. Un ciclo completo requiere al menos dos ticks."
-					onClick={() => ws.tickOnce()}
-				>
-					<LogisimIcon name="simtstep.png" size={20} />
-				</IconButton>
-				<IconButton
-					label={`${ws.ticksEnabled ? "Detener ticks automáticos" : "Activar ticks automáticos"} (Ctrl+K)`}
-					description="Activa o detiene los ticks del reloj a la frecuencia elegida. Mientras la simulación está pausada, los ticks automáticos quedan suspendidos."
-					active={ws.ticksEnabled}
-					onClick={() => ws.setTicksEnabled(!ws.ticksEnabled)}
-				>
-					<LogisimIcon name={ws.ticksEnabled ? "simtstop.png" : "simtplay.png"} size={20} />
-				</IconButton>
-				<select
-					aria-label={t("sim.tickFreq")}
-					title="Frecuencia de ticks por segundo. Un ciclo de reloj necesita al menos dos ticks."
-					value={ws.tickFrequency}
-					onChange={(e) => ws.setTickFrequency(Number(e.target.value))}
-					className="h-8 shrink-0 rounded-md border border-line bg-panel px-1 text-xs"
-				>
-					{TICK_FREQUENCIES.map((f) => (
-						<option key={f} value={f}>
-							{formatFreq(f)}
-						</option>
-					))}
-				</select>
+						<IconButton
+							label={ws.simEnabled ? "Pausar simulación (Ctrl+E)" : "Reanudar simulación (Ctrl+E)"}
+							description={
+								ws.simEnabled
+									? "Detiene la propagación automática de señales. Podés avanzar con Paso de simulación."
+									: "Vuelve a propagar los cambios de entradas y conexiones hasta estabilizar el circuito."
+							}
+							active={ws.simEnabled}
+							onClick={() => ws.setSimEnabled(!ws.simEnabled)}
+						>
+							<LogisimIcon name={ws.simEnabled ? "simstop.png" : "simplay.png"} size={20} />
+						</IconButton>
+						<IconButton
+							label={`${t("sim.reset")} (Ctrl+R)`}
+							description="Borra el estado de registros, memorias y controles de toda la jerarquía; conserva el circuito."
+							onClick={() => ws.resetSimulation()}
+						>
+							<RotateCcw className="size-[18px]" />
+						</IconButton>
+						<IconButton
+							label="Paso de simulación (Ctrl+I)"
+							description="Pausa y avanza un solo paso de propagación. Los puntos que cambian aparecen marcados en azul. No es un tick de reloj."
+							onClick={() => ws.stepSimulation()}
+						>
+							<LogisimIcon name="simstep.png" size={20} />
+						</IconButton>
+						<IconButton
+							label={`${t("sim.tickOnce")} (Ctrl+T)`}
+							description="Avanza un tick de todos los relojes del circuito. Un ciclo completo requiere al menos dos ticks."
+							onClick={() => ws.tickOnce()}
+						>
+							<LogisimIcon name="simtstep.png" size={20} />
+						</IconButton>
+						<IconButton
+							label={`${ws.ticksEnabled ? "Detener ticks automáticos" : "Activar ticks automáticos"} (Ctrl+K)`}
+							description="Activa o detiene los ticks del reloj a la frecuencia elegida. Mientras la simulación está pausada, los ticks automáticos quedan suspendidos."
+							active={ws.ticksEnabled}
+							onClick={() => ws.setTicksEnabled(!ws.ticksEnabled)}
+						>
+							<LogisimIcon name={ws.ticksEnabled ? "simtstop.png" : "simtplay.png"} size={20} />
+						</IconButton>
+						<select
+							aria-label={t("sim.tickFreq")}
+							title="Frecuencia de ticks por segundo. Un ciclo de reloj necesita al menos dos ticks."
+							value={ws.tickFrequency}
+							onChange={(e) => ws.setTickFrequency(Number(e.target.value))}
+							className="h-8 shrink-0 rounded-md border border-line bg-panel px-1 text-xs"
+						>
+							{TICK_FREQUENCIES.map((f) => (
+								<option key={f} value={f}>
+									{formatFreq(f)}
+								</option>
+							))}
+						</select>
 
-				<IconButton
-					label="Registro"
-					description="Registra los valores de pines, sondas, relojes, biestables, registros y memorias en cada cambio, y permite descargarlos."
-					active={logOpen}
-					onClick={() => setLogOpen((v) => !v)}
-				>
-					<ScrollText className="size-[18px]" />
-				</IconButton>
+						<IconButton
+							label="Registro"
+							description="Registra los valores de pines, sondas, relojes, biestables, registros y memorias en cada cambio, y permite descargarlos."
+							active={logOpen}
+							onClick={() => setLogOpen((v) => !v)}
+						>
+							<ScrollText className="size-[18px]" />
+						</IconButton>
+					</>
+				)}
 				<Divider />
 				<AnalyzeMenu
 					circuitName={ws.viewCircuit.name}
@@ -761,16 +843,16 @@ export default function App() {
 				/>
 
 				<div className="ml-auto flex items-center pl-2">
-					<IconButton label="Alejar" onClick={() => canvasRef.current?.zoomBy(1 / 1.25)}>
+					<IconButton label="Alejar" onClick={() => viewRef().zoomBy(1 / 1.25)}>
 						<Minus className="size-[18px]" />
 					</IconButton>
 					<span className="hidden w-12 text-center font-mono text-xs tabular-nums text-muted sm:inline">
 						{Math.round(zoom * 100)}%
 					</span>
-					<IconButton label="Acercar" onClick={() => canvasRef.current?.zoomBy(1.25)}>
+					<IconButton label="Acercar" onClick={() => viewRef().zoomBy(1.25)}>
 						<Plus className="size-[18px]" />
 					</IconButton>
-					<IconButton label="Ajustar a la pantalla" onClick={() => canvasRef.current?.fit()}>
+					<IconButton label="Ajustar a la pantalla" onClick={fitView}>
 						<Maximize className="size-[18px]" />
 					</IconButton>
 				</div>
@@ -855,8 +937,8 @@ export default function App() {
 						<MissingLibrariesNotice ws={ws} onDismiss={() => setLibraryNoticeHidden(true)} />
 					)}
 					{ws.appearanceMode ? (
-						<div className="absolute inset-0 pt-12">
-							<AppearanceEditor key={ws.circuit.id} ws={ws} />
+						<div className="absolute inset-0">
+							<AppearanceEditor key={ws.circuit.id} ref={appearanceRef} ws={ws} onZoomChange={setZoom} />
 						</div>
 					) : (
 						<CircuitCanvas
@@ -959,15 +1041,17 @@ export default function App() {
 			</div>
 			<footer className="flex min-h-8 shrink-0 items-center gap-3 border-t border-line bg-panel px-3 text-[11px] text-muted">
 				<span className="min-w-0 flex-1 truncate">
-					{tool.kind === "add"
-						? `Colocar ${componentName(tool)} · flechas: orientar · Esc: editar`
-						: tool.kind === "text"
-							? "Texto · clic para crear o editar · Enter: confirmar · Esc: cancelar"
-							: tool.kind === "wiring"
-								? "Cablear · clic para iniciar y terminar · Esc: cancelar"
-								: tool.kind === "poke"
-									? "Tocar · clic para cambiar valores y probar controles"
-									: "Editar · arrastrá para seleccionar o mover · Shift: sumar selección"}
+					{ws.appearanceMode
+						? APPEARANCE_HELP[ws.appearanceTool]
+						: tool.kind === "add"
+							? `Colocar ${componentName(tool)} · flechas: orientar · Esc: editar`
+							: tool.kind === "text"
+								? "Texto · clic para crear o editar · Enter: confirmar · Esc: cancelar"
+								: tool.kind === "wiring"
+									? "Cablear · clic para iniciar y terminar · Esc: cancelar"
+									: tool.kind === "poke"
+										? "Tocar · clic para cambiar valores y probar controles"
+										: "Editar · arrastrá para seleccionar o mover · Shift: sumar selección"}
 				</span>
 				<span className="hidden shrink-0 sm:inline">
 					{ws.simEnabled ? "Simulación activa" : "Simulación pausada"}
