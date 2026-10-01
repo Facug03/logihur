@@ -9579,5 +9579,4137 @@
 			"(80,80)-(80,90)",
 			"(80,90)-(180,90)"
 		]
+	},
+	{
+		"counts": [
+			["half", 2, 2, 2],
+			["Pin", 5, 9, 13],
+			["AND Gate", 0, 1, 2],
+			["OR Gate", 1, 1, 1],
+			["XOR Gate", 0, 1, 2]
+		],
+		"without": [6, 12, 18],
+		"with": [8, 14, 20]
+	},
+	{
+		"counts": [["Pin", 4, 4, 4], ["AND Gate", 1, 1, 1], ["XOR Gate", 1, 1, 1]],
+		"without": [6, 6, 6],
+		"with": [6, 6, 6]
+	},
+	{
+		"counts": [["Pin", 4, 4, 4], ["AND Gate", 1, 1, 1], ["XOR Gate", 1, 1, 1]],
+		"without": [6, 6, 6],
+		"with": [6, 6, 6]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 15, 15, 15], ["Adder", 1, 1, 1]],
+		"without": [23, 23, 23],
+		"with": [23, 23, 23]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 15, 15],
+			["Clock", 6, 6, 6],
+			["Adder", 0, 1, 1]
+		],
+		"without": [13, 36, 36],
+		"with": [14, 37, 37]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 8, 8, 8], ["Tunnel", 21, 21, 21], ["Adder", 1, 1, 1]],
+		"without": [32, 32, 32],
+		"with": [32, 32, 32]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 21, 21],
+			["Clock", 8, 8, 8],
+			["Adder", 0, 1, 1]
+		],
+		"without": [17, 49, 49],
+		"with": [18, 50, 50]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 11, 11, 11], ["Tunnel", 26, 26, 26], ["Adder", 1, 1, 1]],
+		"without": [40, 40, 40],
+		"with": [40, 40, 40]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 12, 23, 23],
+			["Tunnel", 0, 26, 26],
+			["Clock", 11, 11, 11],
+			["Adder", 0, 1, 1]
+		],
+		"without": [23, 63, 63],
+		"with": [24, 64, 64]
+	},
+	{
+		"counts": [["Pin", 6, 6, 6], ["Tunnel", 12, 12, 12], ["BitAdder", 1, 1, 1]],
+		"without": [19, 19, 19],
+		"with": [19, 19, 19]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 12, 12],
+			["Clock", 6, 6, 6],
+			["BitAdder", 0, 1, 1]
+		],
+		"without": [13, 32, 32],
+		"with": [14, 33, 33]
+	},
+	{
+		"counts": [["Splitter", 3, 3, 3], ["Pin", 7, 7, 7], ["Tunnel", 20, 20, 20], ["BitAdder", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 3, 3],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 20, 20],
+			["Clock", 7, 7, 7],
+			["BitAdder", 0, 1, 1]
+		],
+		"without": [15, 46, 46],
+		"with": [16, 47, 47]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["BitFinder", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["BitFinder", 0, 1, 1]
+		],
+		"without": [16, 44, 44],
+		"with": [17, 45, 45]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["BitFinder", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["BitFinder", 0, 1, 1]
+		],
+		"without": [16, 44, 44],
+		"with": [17, 45, 45]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["BitFinder", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["BitFinder", 0, 1, 1]
+		],
+		"without": [16, 44, 44],
+		"with": [17, 45, 45]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["BitFinder", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["BitFinder", 0, 1, 1]
+		],
+		"without": [16, 44, 44],
+		"with": [17, 45, 45]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 8, 8, 8], ["Tunnel", 20, 20, 20], ["BitSelector", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["BitSelector", 0, 1, 1]
+		],
+		"without": [17, 48, 48],
+		"with": [18, 49, 49]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 8, 8, 8], ["Tunnel", 20, 20, 20], ["BitSelector", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["BitSelector", 0, 1, 1]
+		],
+		"without": [17, 48, 48],
+		"with": [18, 49, 49]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 8, 8, 8], ["Tunnel", 20, 20, 20], ["BitSelector", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["BitSelector", 0, 1, 1]
+		],
+		"without": [17, 48, 48],
+		"with": [18, 49, 49]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["BitSelector", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 9, 9, 9],
+			["BitSelector", 0, 1, 1]
+		],
+		"without": [19, 53, 53],
+		"with": [20, 54, 54]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 15, 15, 15], ["BitSelector", 1, 1, 1]],
+		"without": [23, 23, 23],
+		"with": [23, 23, 23]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 15, 15],
+			["Clock", 6, 6, 6],
+			["BitSelector", 0, 1, 1]
+		],
+		"without": [13, 36, 36],
+		"with": [14, 37, 37]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["BitSelector", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 9, 9, 9],
+			["BitSelector", 0, 1, 1]
+		],
+		"without": [19, 53, 53],
+		"with": [20, 54, 54]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 8, 8, 8], ["Tunnel", 20, 20, 20], ["BitSelector", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["BitSelector", 0, 1, 1]
+		],
+		"without": [17, 48, 48],
+		"with": [18, 49, 49]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 11, 11, 11], ["Tunnel", 26, 26, 26], ["Comparator", 1, 1, 1]],
+		"without": [40, 40, 40],
+		"with": [40, 40, 40]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 12, 23, 23],
+			["Tunnel", 0, 26, 26],
+			["Clock", 9, 9, 9],
+			["Comparator", 0, 1, 1]
+		],
+		"without": [21, 61, 61],
+		"with": [22, 62, 62]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 11, 11, 11], ["Tunnel", 26, 26, 26], ["Comparator", 1, 1, 1]],
+		"without": [40, 40, 40],
+		"with": [40, 40, 40]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 12, 23, 23],
+			["Tunnel", 0, 26, 26],
+			["Clock", 9, 9, 9],
+			["Comparator", 0, 1, 1]
+		],
+		"without": [21, 61, 61],
+		"with": [22, 62, 62]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 9, 9, 9], ["Tunnel", 20, 20, 20], ["Counter", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["Counter", 0, 1, 1]
+		],
+		"without": [18, 49, 49],
+		"with": [19, 50, 50]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 9, 9, 9], ["Tunnel", 20, 20, 20], ["Counter", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["Counter", 0, 1, 1]
+		],
+		"without": [18, 49, 49],
+		"with": [19, 50, 50]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 9, 9, 9], ["Tunnel", 20, 20, 20], ["Counter", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["Counter", 0, 1, 1]
+		],
+		"without": [18, 49, 49],
+		"with": [19, 50, 50]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 9, 9, 9], ["Tunnel", 20, 20, 20], ["Counter", 1, 1, 1]],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 20, 20],
+			["Clock", 8, 8, 8],
+			["Counter", 0, 1, 1]
+		],
+		"without": [18, 49, 49],
+		"with": [19, 50, 50]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Pin", 4, 4, 4], ["Tunnel", 8, 8, 8], ["Decoder", 1, 1, 1]],
+		"without": [13, 13, 13],
+		"with": [13, 13, 13]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 8, 8],
+			["Clock", 3, 3, 3],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [8, 21, 21],
+		"with": [9, 22, 22]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 14, 14, 14], ["Decoder", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 14, 14],
+			["Clock", 3, 3, 3],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [10, 32, 32],
+		"with": [11, 33, 33]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 12, 12, 12], ["Tunnel", 26, 26, 26], ["Decoder", 1, 1, 1]],
+		"without": [40, 40, 40],
+		"with": [40, 40, 40]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 13, 25, 25],
+			["Tunnel", 0, 26, 26],
+			["Clock", 5, 5, 5],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [18, 58, 58],
+		"with": [19, 59, 59]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 7, 7, 7], ["Tunnel", 16, 16, 16], ["Decoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 16, 16],
+			["Clock", 4, 4, 4],
+			["Decoder", 0, 1, 1]
+		],
+		"without": [12, 37, 37],
+		"with": [13, 38, 38]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Pin", 5, 5, 5], ["Tunnel", 10, 10, 10], ["Demultiplexer", 1, 1, 1]],
+		"without": [16, 16, 16],
+		"with": [16, 16, 16]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 10, 10],
+			["Clock", 4, 4, 4],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [10, 26, 26],
+		"with": [11, 27, 27]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Demultiplexer", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Demultiplexer", 0, 1, 1]
+		],
+		"without": [16, 50, 50],
+		"with": [17, 51, 51]
+	},
+	{
+		"counts": [["Pin", 7, 7, 7], ["Tunnel", 14, 14, 14], ["D Flip-Flop", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["D Flip-Flop", 0, 1, 1]
+		],
+		"without": [14, 36, 36],
+		"with": [15, 37, 37]
+	},
+	{
+		"counts": [["Pin", 7, 7, 7], ["Tunnel", 14, 14, 14], ["D Flip-Flop", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["D Flip-Flop", 0, 1, 1]
+		],
+		"without": [14, 36, 36],
+		"with": [15, 37, 37]
+	},
+	{
+		"counts": [["Pin", 7, 7, 7], ["Tunnel", 14, 14, 14], ["D Flip-Flop", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["D Flip-Flop", 0, 1, 1]
+		],
+		"without": [14, 36, 36],
+		"with": [15, 37, 37]
+	},
+	{
+		"counts": [["Pin", 7, 7, 7], ["Tunnel", 14, 14, 14], ["D Flip-Flop", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["D Flip-Flop", 0, 1, 1]
+		],
+		"without": [14, 36, 36],
+		"with": [15, 37, 37]
+	},
+	{
+		"counts": [["Splitter", 3, 3, 3], ["Pin", 11, 11, 11], ["Tunnel", 28, 28, 28], ["Divider", 1, 1, 1]],
+		"without": [43, 43, 43],
+		"with": [43, 43, 43]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 3, 3],
+			["Pin", 12, 23, 23],
+			["Tunnel", 0, 28, 28],
+			["Clock", 10, 10, 10],
+			["Divider", 0, 1, 1]
+		],
+		"without": [22, 65, 65],
+		"with": [23, 66, 66]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 10, 10, 10], ["Tunnel", 25, 25, 25], ["Divider", 1, 1, 1]],
+		"without": [38, 38, 38],
+		"with": [38, 38, 38]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 11, 21, 21],
+			["Tunnel", 0, 25, 25],
+			["Clock", 9, 9, 9],
+			["Divider", 0, 1, 1]
+		],
+		"without": [20, 58, 58],
+		"with": [21, 59, 59]
+	},
+	{
+		"counts": [["Pin", 8, 8, 8], ["Tunnel", 16, 16, 16], ["J-K Flip-Flop", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 16, 16],
+			["Clock", 7, 7, 7],
+			["J-K Flip-Flop", 0, 1, 1]
+		],
+		"without": [16, 41, 41],
+		"with": [17, 42, 42]
+	},
+	{
+		"counts": [["Splitter", 3, 3, 3], ["Pin", 11, 11, 11], ["Tunnel", 28, 28, 28], ["Multiplier", 1, 1, 1]],
+		"without": [43, 43, 43],
+		"with": [43, 43, 43]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 3, 3],
+			["Pin", 12, 23, 23],
+			["Tunnel", 0, 28, 28],
+			["Clock", 10, 10, 10],
+			["Multiplier", 0, 1, 1]
+		],
+		"without": [22, 65, 65],
+		"with": [23, 66, 66]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 10, 10, 10], ["Tunnel", 25, 25, 25], ["Multiplier", 1, 1, 1]],
+		"without": [38, 38, 38],
+		"with": [38, 38, 38]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 11, 21, 21],
+			["Tunnel", 0, 25, 25],
+			["Clock", 9, 9, 9],
+			["Multiplier", 0, 1, 1]
+		],
+		"without": [20, 58, 58],
+		"with": [21, 59, 59]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 8, 8, 8], ["Tunnel", 21, 21, 21], ["Multiplexer", 1, 1, 1]],
+		"without": [32, 32, 32],
+		"with": [32, 32, 32]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 21, 21],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 49, 49],
+		"with": [18, 50, 50]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 7, 7, 7], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [15, 43, 43],
+		"with": [16, 44, 44]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 12, 12, 12], ["Tunnel", 26, 26, 26], ["Multiplexer", 1, 1, 1]],
+		"without": [40, 40, 40],
+		"with": [40, 40, 40]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 13, 25, 25],
+			["Tunnel", 0, 26, 26],
+			["Clock", 12, 12, 12],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [25, 65, 65],
+		"with": [26, 66, 66]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 8, 8, 8], ["Tunnel", 18, 18, 18], ["Multiplexer", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 18, 18],
+			["Clock", 8, 8, 8],
+			["Multiplexer", 0, 1, 1]
+		],
+		"without": [17, 45, 45],
+		"with": [18, 46, 46]
+	},
+	{
+		"counts": [["Pin", 1, 1, 1], ["Tunnel", 3, 3, 3], ["Negator", 1, 1, 1]],
+		"without": [5, 5, 5],
+		"with": [5, 5, 5]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 2, 3, 3],
+			["Tunnel", 0, 3, 3],
+			["Clock", 1, 1, 1],
+			["Negator", 0, 1, 1]
+		],
+		"without": [3, 8, 8],
+		"with": [4, 9, 9]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 14, 14, 14], ["Negator", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["Negator", 0, 1, 1]
+		],
+		"without": [13, 35, 35],
+		"with": [14, 36, 36]
+	},
+	{
+		"counts": [["Pin", 8, 8, 8], ["Tunnel", 16, 16, 16], ["Priority Encoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 16, 16],
+			["Clock", 6, 6, 6],
+			["Priority Encoder", 0, 1, 1]
+		],
+		"without": [15, 40, 40],
+		"with": [16, 41, 41]
+	},
+	{
+		"counts": [["Pin", 8, 8, 8], ["Tunnel", 16, 16, 16], ["Priority Encoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 16, 16],
+			["Clock", 6, 6, 6],
+			["Priority Encoder", 0, 1, 1]
+		],
+		"without": [15, 40, 40],
+		"with": [16, 41, 41]
+	},
+	{
+		"counts": [["Pin", 8, 8, 8], ["Tunnel", 16, 16, 16], ["Priority Encoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 16, 16],
+			["Clock", 6, 6, 6],
+			["Priority Encoder", 0, 1, 1]
+		],
+		"without": [15, 40, 40],
+		"with": [16, 41, 41]
+	},
+	{
+		"counts": [["Pin", 12, 12, 12], ["Tunnel", 24, 24, 24], ["Priority Encoder", 1, 1, 1]],
+		"without": [37, 37, 37],
+		"with": [37, 37, 37]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 13, 25, 25],
+			["Tunnel", 0, 24, 24],
+			["Clock", 10, 10, 10],
+			["Priority Encoder", 0, 1, 1]
+		],
+		"without": [23, 60, 60],
+		"with": [24, 61, 61]
+	},
+	{
+		"counts": [["Pin", 8, 8, 8], ["Tunnel", 16, 16, 16], ["Priority Encoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 16, 16],
+			["Clock", 6, 6, 6],
+			["Priority Encoder", 0, 1, 1]
+		],
+		"without": [15, 40, 40],
+		"with": [16, 41, 41]
+	},
+	{
+		"counts": [["Pin", 8, 8, 8], ["Tunnel", 16, 16, 16], ["Priority Encoder", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 16, 16],
+			["Clock", 6, 6, 6],
+			["Priority Encoder", 0, 1, 1]
+		],
+		"without": [15, 40, 40],
+		"with": [16, 41, 41]
+	},
+	{
+		"counts": [
+			["Splitter", 2, 2, 2],
+			["Pin", 8, 8, 8],
+			["Tunnel", 24, 24, 24],
+			["NOT Gate", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1],
+			["RAM", 1, 1, 1]
+		],
+		"without": [37, 37, 37],
+		"with": [37, 37, 37]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 24, 24],
+			["Clock", 8, 8, 8],
+			["NOT Gate", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1],
+			["RAM", 0, 1, 1]
+		],
+		"without": [17, 54, 54],
+		"with": [18, 55, 55]
+	},
+	{
+		"counts": [
+			["Splitter", 2, 2, 2],
+			["Pin", 6, 6, 6],
+			["Tunnel", 22, 22, 22],
+			["Constant", 2, 2, 2],
+			["NOT Gate", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1],
+			["RAM", 1, 1, 1]
+		],
+		"without": [35, 35, 35],
+		"with": [35, 35, 35]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 22, 22],
+			["Clock", 6, 6, 6],
+			["Constant", 0, 2, 2],
+			["NOT Gate", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1],
+			["RAM", 0, 1, 1]
+		],
+		"without": [13, 48, 48],
+		"with": [14, 49, 49]
+	},
+	{
+		"counts": [
+			["Splitter", 2, 2, 2],
+			["Pin", 9, 9, 9],
+			["Tunnel", 26, 26, 26],
+			["NOT Gate", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1],
+			["RAM", 1, 1, 1]
+		],
+		"without": [40, 40, 40],
+		"with": [40, 40, 40]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 26, 26],
+			["Clock", 9, 9, 9],
+			["NOT Gate", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1],
+			["RAM", 0, 1, 1]
+		],
+		"without": [19, 59, 59],
+		"with": [20, 60, 60]
+	},
+	{
+		"counts": [
+			["Splitter", 2, 2, 2],
+			["Pin", 7, 7, 7],
+			["Tunnel", 24, 24, 24],
+			["Constant", 2, 2, 2],
+			["NOT Gate", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1],
+			["RAM", 1, 1, 1]
+		],
+		"without": [38, 38, 38],
+		"with": [38, 38, 38]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 24, 24],
+			["Clock", 7, 7, 7],
+			["Constant", 0, 2, 2],
+			["NOT Gate", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1],
+			["RAM", 0, 1, 1]
+		],
+		"without": [15, 53, 53],
+		"with": [16, 54, 54]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 10, 10, 10], ["Tunnel", 24, 24, 24], ["RAM", 1, 1, 1]],
+		"without": [37, 37, 37],
+		"with": [37, 37, 37]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 11, 21, 21],
+			["Tunnel", 0, 24, 24],
+			["Clock", 10, 10, 10],
+			["RAM", 0, 1, 1]
+		],
+		"without": [21, 58, 58],
+		"with": [22, 59, 59]
+	},
+	{
+		"counts": [["Pin", 4, 4, 4], ["Tunnel", 8, 8, 8], ["Random", 1, 1, 1]],
+		"without": [13, 13, 13],
+		"with": [13, 13, 13]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 8, 8],
+			["Clock", 4, 4, 4],
+			["Random", 0, 1, 1]
+		],
+		"without": [9, 22, 22],
+		"with": [10, 23, 23]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 14, 14, 14], ["Register", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["Register", 0, 1, 1]
+		],
+		"without": [13, 35, 35],
+		"with": [14, 36, 36]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 15, 15, 15], ["Register", 1, 1, 1]],
+		"without": [23, 23, 23],
+		"with": [23, 23, 23]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 15, 15],
+			["Clock", 6, 6, 6],
+			["Register", 0, 1, 1]
+		],
+		"without": [13, 36, 36],
+		"with": [14, 37, 37]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 5, 5, 5], ["Tunnel", 12, 12, 12], ["ROM", 1, 1, 1]],
+		"without": [19, 19, 19],
+		"with": [19, 19, 19]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 12, 12],
+			["Clock", 5, 5, 5],
+			["ROM", 0, 1, 1]
+		],
+		"without": [11, 30, 30],
+		"with": [12, 31, 31]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 14, 14, 14], ["ROM", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["ROM", 0, 1, 1]
+		],
+		"without": [13, 35, 35],
+		"with": [14, 36, 36]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 7, 7, 7], ["Tunnel", 18, 18, 18], ["Shifter", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [15, 43, 43],
+		"with": [16, 44, 44]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 7, 7, 7], ["Tunnel", 18, 18, 18], ["Shifter", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [15, 43, 43],
+		"with": [16, 44, 44]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 7, 7, 7], ["Tunnel", 18, 18, 18], ["Shifter", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [15, 43, 43],
+		"with": [16, 44, 44]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 7, 7, 7], ["Tunnel", 18, 18, 18], ["Shifter", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [15, 43, 43],
+		"with": [16, 44, 44]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 7, 7, 7], ["Tunnel", 18, 18, 18], ["Shifter", 1, 1, 1]],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 18, 18],
+			["Clock", 7, 7, 7],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [15, 43, 43],
+		"with": [16, 44, 44]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Shifter", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 9, 9, 9],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [19, 53, 53],
+		"with": [20, 54, 54]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Shifter", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 9, 9, 9],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [19, 53, 53],
+		"with": [20, 54, 54]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Shifter", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 9, 9, 9],
+			["Shifter", 0, 1, 1]
+		],
+		"without": [19, 53, 53],
+		"with": [20, 54, 54]
+	},
+	{
+		"counts": [["Pin", 12, 12, 12], ["Tunnel", 24, 24, 24], ["Shift Register", 1, 1, 1]],
+		"without": [37, 37, 37],
+		"with": [37, 37, 37]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 13, 25, 25],
+			["Tunnel", 0, 24, 24],
+			["Clock", 9, 9, 9],
+			["Shift Register", 0, 1, 1]
+		],
+		"without": [22, 59, 59],
+		"with": [23, 60, 60]
+	},
+	{
+		"counts": [["Splitter", 1, 1, 1], ["Pin", 6, 6, 6], ["Tunnel", 14, 14, 14], ["Shift Register", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["Shift Register", 0, 1, 1]
+		],
+		"without": [13, 35, 35],
+		"with": [14, 36, 36]
+	},
+	{
+		"counts": [["Pin", 8, 8, 8], ["Tunnel", 16, 16, 16], ["S-R Flip-Flop", 1, 1, 1]],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 9, 17, 17],
+			["Tunnel", 0, 16, 16],
+			["Clock", 7, 7, 7],
+			["S-R Flip-Flop", 0, 1, 1]
+		],
+		"without": [16, 41, 41],
+		"with": [17, 42, 42]
+	},
+	{
+		"counts": [["Splitter", 2, 2, 2], ["Pin", 9, 9, 9], ["Tunnel", 22, 22, 22], ["Subtractor", 1, 1, 1]],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Splitter", 0, 2, 2],
+			["Pin", 10, 19, 19],
+			["Tunnel", 0, 22, 22],
+			["Clock", 8, 8, 8],
+			["Subtractor", 0, 1, 1]
+		],
+		"without": [18, 52, 52],
+		"with": [19, 53, 53]
+	},
+	{
+		"counts": [["Pin", 7, 7, 7], ["Tunnel", 14, 14, 14], ["T Flip-Flop", 1, 1, 1]],
+		"without": [22, 22, 22],
+		"with": [22, 22, 22]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 14, 14],
+			["Clock", 6, 6, 6],
+			["T Flip-Flop", 0, 1, 1]
+		],
+		"without": [14, 36, 36],
+		"with": [15, 37, 37]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 25, 25, 25],
+			["NOT Gate", 3, 3, 3],
+			["AND Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [35, 35, 35],
+		"with": [35, 35, 35]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 25, 25],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 3, 3],
+			["AND Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [8, 43, 43],
+		"with": [9, 44, 44]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 43, 43, 43],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 2, 2, 2],
+			["OR Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XOR Gate", 3, 3, 3],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [59, 59, 59],
+		"with": [59, 59, 59]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 43, 43],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 2, 2],
+			["OR Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XOR Gate", 0, 3, 3],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [11, 70, 70],
+		"with": [12, 71, 71]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 32, 32, 32],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [43, 43, 43],
+		"with": [43, 43, 43]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 32, 32],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [9, 52, 52],
+		"with": [10, 53, 53]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 30, 30, 30],
+			["NOT Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XNOR Gate", 2, 2, 2]
+		],
+		"without": [41, 41, 41],
+		"with": [41, 41, 41]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 30, 30],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XNOR Gate", 0, 2, 2]
+		],
+		"without": [9, 50, 50],
+		"with": [10, 51, 51]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 41, 41, 41],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [56, 56, 56],
+		"with": [56, 56, 56]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 41, 41],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [10, 66, 66],
+		"with": [11, 67, 67]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 35, 35, 35],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [45, 45, 45],
+		"with": [45, 45, 45]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 35, 35],
+			["Clock", 4, 4, 4],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [9, 54, 54],
+		"with": [10, 55, 55]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 26, 26, 26],
+			["NOT Gate", 3, 3, 3],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [38, 38, 38],
+		"with": [38, 38, 38]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 26, 26],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 3, 3],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [12, 50, 50],
+		"with": [13, 51, 51]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 50, 50, 50],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 3, 3, 3],
+			["Odd Parity", 2, 2, 2]
+		],
+		"without": [66, 66, 66],
+		"with": [66, 66, 66]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 50, 50],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 3, 3],
+			["Odd Parity", 0, 2, 2]
+		],
+		"without": [11, 77, 77],
+		"with": [12, 78, 78]
+	},
+	{
+		"counts": [
+			["Pin", 7, 7, 7],
+			["Tunnel", 49, 49, 49],
+			["Buffer", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 3, 3, 3],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2]
+		],
+		"without": [66, 66, 66],
+		"with": [66, 66, 66]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 49, 49],
+			["Clock", 5, 5, 5],
+			["Buffer", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 3, 3],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2]
+		],
+		"without": [13, 79, 79],
+		"with": [14, 80, 80]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 46, 46, 46],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 3, 3, 3],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2],
+			["Even Parity", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [62, 62, 62],
+		"with": [62, 62, 62]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 46, 46],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 3, 3],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2],
+			["Even Parity", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [9, 71, 71],
+		"with": [10, 72, 72]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 45, 45, 45],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2],
+			["Even Parity", 1, 1, 1],
+			["Controlled Buffer", 2, 2, 2]
+		],
+		"without": [62, 62, 62],
+		"with": [62, 62, 62]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 45, 45],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2],
+			["Even Parity", 0, 1, 1],
+			["Controlled Buffer", 0, 2, 2]
+		],
+		"without": [12, 74, 74],
+		"with": [13, 75, 75]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 43, 43, 43],
+			["NOT Gate", 2, 2, 2],
+			["AND Gate", 3, 3, 3],
+			["NAND Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [57, 57, 57],
+		"with": [57, 57, 57]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 43, 43],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 2, 2],
+			["AND Gate", 0, 3, 3],
+			["NAND Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [9, 66, 66],
+		"with": [10, 67, 67]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 23, 23, 23],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["Odd Parity", 2, 2, 2]
+		],
+		"without": [34, 34, 34],
+		"with": [34, 34, 34]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 23, 23],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["Odd Parity", 0, 2, 2]
+		],
+		"without": [9, 43, 43],
+		"with": [10, 44, 44]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 53, 53, 53],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NOR Gate", 3, 3, 3],
+			["Odd Parity", 2, 2, 2],
+			["Even Parity", 2, 2, 2],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [70, 70, 70],
+		"with": [70, 70, 70]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 53, 53],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NOR Gate", 0, 3, 3],
+			["Odd Parity", 0, 2, 2],
+			["Even Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [9, 79, 79],
+		"with": [10, 80, 80]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 52, 52, 52],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 3, 3, 3],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [69, 69, 69],
+		"with": [69, 69, 69]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 52, 52],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 3, 3],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [8, 77, 77],
+		"with": [9, 78, 78]
+	},
+	{
+		"counts": [
+			["Pin", 7, 7, 7],
+			["Tunnel", 65, 65, 65],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 3, 3, 3],
+			["XNOR Gate", 2, 2, 2],
+			["Odd Parity", 3, 3, 3],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [85, 85, 85],
+		"with": [85, 85, 85]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 65, 65],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 3, 3],
+			["XNOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 3, 3],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [13, 98, 98],
+		"with": [14, 99, 99]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 21, 21, 21],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [29, 29, 29],
+		"with": [29, 29, 29]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 21, 21],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [7, 36, 36],
+		"with": [8, 37, 37]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 65, 65, 65],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 3, 3, 3],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 3, 3, 3],
+			["XNOR Gate", 1, 1, 1]
+		],
+		"without": [83, 83, 83],
+		"with": [83, 83, 83]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 65, 65],
+			["Clock", 5, 5, 5],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 3, 3],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 3, 3],
+			["XNOR Gate", 0, 1, 1]
+		],
+		"without": [12, 95, 95],
+		"with": [13, 96, 96]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 46, 46, 46],
+			["NOT Gate", 4, 4, 4],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 4, 4, 4],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [64, 64, 64],
+		"with": [64, 64, 64]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 46, 46],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 4, 4],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 4, 4],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [9, 73, 73],
+		"with": [10, 74, 74]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 61, 61, 61],
+			["Pull Resistor", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 3, 3, 3],
+			["NOR Gate", 3, 3, 3],
+			["XOR Gate", 3, 3, 3],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [79, 79, 79],
+		"with": [79, 79, 79]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 61, 61],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 3, 3, 3],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 3, 3],
+			["NOR Gate", 0, 3, 3],
+			["XOR Gate", 0, 3, 3],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [8, 87, 87],
+		"with": [9, 88, 88]
+	},
+	{
+		"counts": [
+			["half", 2, 2, 2],
+			["Pin", 5, 9, 13],
+			["AND Gate", 0, 1, 2],
+			["OR Gate", 1, 1, 1],
+			["XOR Gate", 0, 1, 2]
+		],
+		"without": [6, 12, 18],
+		"with": [8, 14, 20]
+	},
+	{
+		"counts": [["Pin", 4, 4, 4], ["AND Gate", 1, 1, 1], ["XOR Gate", 1, 1, 1]],
+		"without": [6, 6, 6],
+		"with": [6, 6, 6]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["half", 0, 2, 2],
+			["Pin", 6, 15, 19],
+			["Clock", 4, 4, 4],
+			["AND Gate", 0, 1, 2],
+			["OR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 2]
+		],
+		"without": [10, 22, 28],
+		"with": [11, 25, 31]
+	},
+	{
+		"counts": [["Pin", 4, 4, 4], ["AND Gate", 1, 1, 1], ["XOR Gate", 1, 1, 1]],
+		"without": [6, 6, 6],
+		"with": [6, 6, 6]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Clock", 3, 3, 3],
+			["AND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1]
+		],
+		"without": [8, 14, 14],
+		"with": [9, 15, 15]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 19, 19, 19],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [28, 28, 28],
+		"with": [28, 28, 28]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 19, 19],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [9, 37, 37],
+		"with": [10, 38, 38]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 40, 40, 40],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [53, 53, 53],
+		"with": [53, 53, 53]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 40, 40],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [12, 65, 65],
+		"with": [13, 66, 66]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 21, 21, 21],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1]
+		],
+		"without": [30, 30, 30],
+		"with": [30, 30, 30]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 21, 21],
+			["Clock", 5, 5, 5],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1]
+		],
+		"without": [11, 41, 41],
+		"with": [12, 42, 42]
+	},
+	{
+		"counts": [
+			["Pin", 7, 7, 7],
+			["Tunnel", 29, 29, 29],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [44, 44, 44],
+		"with": [44, 44, 44]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 29, 29],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [13, 57, 57],
+		"with": [14, 58, 58]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 51, 51, 51],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 2, 2, 2],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 2, 2, 2],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [68, 68, 68],
+		"with": [68, 68, 68]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 51, 51],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 2, 2],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [11, 79, 79],
+		"with": [12, 80, 80]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 25, 25, 25],
+			["Pull Resistor", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [35, 35, 35],
+		"with": [35, 35, 35]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 25, 25],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 4, 4, 4],
+			["OR Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [10, 45, 45],
+		"with": [11, 46, 46]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 22, 22, 22],
+			["NOT Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2]
+		],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 22, 22],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2]
+		],
+		"without": [9, 40, 40],
+		"with": [10, 41, 41]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 50, 50, 50],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 4, 4, 4],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [63, 63, 63],
+		"with": [63, 63, 63]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 50, 50],
+			["Clock", 3, 3, 3],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 4, 4],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [7, 70, 70],
+		"with": [8, 71, 71]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 48, 48, 48],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 2, 2, 2],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 3, 3, 3],
+			["NOR Gate", 2, 2, 2],
+			["XNOR Gate", 2, 2, 2],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [66, 66, 66],
+		"with": [66, 66, 66]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 48, 48],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 2, 2],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 3, 3],
+			["NOR Gate", 0, 2, 2],
+			["XNOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [9, 75, 75],
+		"with": [10, 76, 76]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 56, 56, 56],
+			["NOT Gate", 4, 4, 4],
+			["Buffer", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 2, 2, 2],
+			["Odd Parity", 3, 3, 3]
+		],
+		"without": [74, 74, 74],
+		"with": [74, 74, 74]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 56, 56],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 4, 4],
+			["Buffer", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 3, 3]
+		],
+		"without": [10, 84, 84],
+		"with": [11, 85, 85]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 40, 40, 40],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1]
+		],
+		"without": [54, 54, 54],
+		"with": [54, 54, 54]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 40, 40],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 1, 1],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1]
+		],
+		"without": [10, 64, 64],
+		"with": [11, 65, 65]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 18, 18, 18],
+			["NAND Gate", 2, 2, 2],
+			["Even Parity", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 18, 18],
+			["Clock", 3, 3, 3],
+			["NAND Gate", 0, 2, 2],
+			["Even Parity", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [7, 32, 32],
+		"with": [8, 33, 33]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 28, 28, 28],
+			["NOT Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [41, 41, 41],
+		"with": [41, 41, 41]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 28, 28],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [11, 52, 52],
+		"with": [12, 53, 53]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 29, 29, 29],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [42, 42, 42],
+		"with": [42, 42, 42]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 29, 29],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [10, 52, 52],
+		"with": [11, 53, 53]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 42, 42, 42],
+			["AND Gate", 2, 2, 2],
+			["OR Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 2, 2, 2],
+			["XNOR Gate", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [53, 53, 53],
+		"with": [53, 53, 53]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 42, 42],
+			["Clock", 3, 3, 3],
+			["AND Gate", 0, 2, 2],
+			["OR Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 2, 2],
+			["XNOR Gate", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [7, 60, 60],
+		"with": [8, 61, 61]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 25, 25, 25],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 2, 2, 2],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [35, 35, 35],
+		"with": [35, 35, 35]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 25, 25],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 2, 2],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [9, 44, 44],
+		"with": [10, 45, 45]
+	},
+	{
+		"counts": [
+			["Pin", 7, 7, 7],
+			["Tunnel", 25, 25, 25],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [37, 37, 37],
+		"with": [37, 37, 37]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 25, 25],
+			["Clock", 5, 5, 5],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [13, 50, 50],
+		"with": [14, 51, 51]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 42, 42, 42],
+			["NOT Gate", 2, 2, 2],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2],
+			["Even Parity", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [57, 57, 57],
+		"with": [57, 57, 57]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 42, 42],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 2, 2],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2],
+			["Even Parity", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [10, 67, 67],
+		"with": [11, 68, 68]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 30, 30, 30],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 3, 3, 3],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [41, 41, 41],
+		"with": [41, 41, 41]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 30, 30],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 3, 3],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [8, 49, 49],
+		"with": [9, 50, 50]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 39, 39, 39],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [51, 51, 51],
+		"with": [51, 51, 51]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 39, 39],
+			["Clock", 5, 5, 5],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [11, 62, 62],
+		"with": [12, 63, 63]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 37, 37, 37],
+			["AND Gate", 2, 2, 2],
+			["NOR Gate", 2, 2, 2],
+			["XOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [50, 50, 50],
+		"with": [50, 50, 50]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 37, 37],
+			["Clock", 4, 4, 4],
+			["AND Gate", 0, 2, 2],
+			["NOR Gate", 0, 2, 2],
+			["XOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [10, 60, 60],
+		"with": [11, 61, 61]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 22, 22, 22],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [32, 32, 32],
+		"with": [32, 32, 32]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 22, 22],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [9, 41, 41],
+		"with": [10, 42, 42]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 23, 23, 23],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 23, 23],
+			["Clock", 3, 3, 3],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [8, 39, 39],
+		"with": [9, 40, 40]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 55, 55, 55],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2],
+			["Even Parity", 1, 1, 1],
+			["Controlled Buffer", 2, 2, 2],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [71, 71, 71],
+		"with": [71, 71, 71]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 55, 55],
+			["Clock", 3, 3, 3],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2],
+			["Even Parity", 0, 1, 1],
+			["Controlled Buffer", 0, 2, 2],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [7, 78, 78],
+		"with": [8, 79, 79]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 53, 53, 53],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 4, 4, 4],
+			["NOR Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [69, 69, 69],
+		"with": [69, 69, 69]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 53, 53],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 4, 4],
+			["NOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [9, 78, 78],
+		"with": [10, 79, 79]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 54, 54, 54],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 3, 3, 3],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [69, 69, 69],
+		"with": [69, 69, 69]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 54, 54],
+			["Clock", 4, 4, 4],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 3, 3],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [9, 78, 78],
+		"with": [10, 79, 79]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 17, 17, 17],
+			["NOT Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["Even Parity", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 17, 17],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["Even Parity", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [9, 34, 34],
+		"with": [10, 35, 35]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 50, 50, 50],
+			["Buffer", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 3, 3, 3],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [67, 67, 67],
+		"with": [67, 67, 67]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 50, 50],
+			["Clock", 4, 4, 4],
+			["Buffer", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 3, 3],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [11, 78, 78],
+		"with": [12, 79, 79]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 23, 23, 23],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [33, 33, 33],
+		"with": [33, 33, 33]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 23, 23],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [8, 41, 41],
+		"with": [9, 42, 42]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 56, 56, 56],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [74, 74, 74],
+		"with": [74, 74, 74]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 56, 56],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [12, 86, 86],
+		"with": [13, 87, 87]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 58, 58, 58],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 4, 4, 4],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 2, 2, 2],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [76, 76, 76],
+		"with": [76, 76, 76]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 58, 58],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 4, 4],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 2, 2],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [12, 88, 88],
+		"with": [13, 89, 89]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 45, 45, 45],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2],
+			["Odd Parity", 2, 2, 2],
+			["Even Parity", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [61, 61, 61],
+		"with": [61, 61, 61]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 45, 45],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 2, 2],
+			["Even Parity", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [10, 71, 71],
+		"with": [11, 72, 72]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 52, 52, 52],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 3, 3, 3],
+			["NOR Gate", 1, 1, 1],
+			["Odd Parity", 5, 5, 5],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [68, 68, 68],
+		"with": [68, 68, 68]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 52, 52],
+			["Clock", 4, 4, 4],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 3, 3],
+			["NOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 5, 5],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [10, 78, 78],
+		"with": [11, 79, 79]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 48, 48, 48],
+			["NOT Gate", 4, 4, 4],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XOR Gate", 2, 2, 2],
+			["Odd Parity", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [66, 66, 66],
+		"with": [66, 66, 66]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 48, 48],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 4, 4],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [11, 77, 77],
+		"with": [12, 78, 78]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 35, 35, 35],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 2, 2, 2],
+			["Even Parity", 2, 2, 2],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [49, 49, 49],
+		"with": [49, 49, 49]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 35, 35],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 2, 2],
+			["Even Parity", 0, 2, 2],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [9, 58, 58],
+		"with": [10, 59, 59]
+	},
+	{
+		"counts": [
+			["Pin", 7, 7, 7],
+			["Tunnel", 65, 65, 65],
+			["NOT Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 4, 4, 4],
+			["Even Parity", 2, 2, 2],
+			["Controlled Buffer", 2, 2, 2]
+		],
+		"without": [85, 85, 85],
+		"with": [85, 85, 85]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 65, 65],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 4, 4],
+			["Even Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 2, 2]
+		],
+		"without": [13, 98, 98],
+		"with": [14, 99, 99]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 55, 55, 55],
+			["NOT Gate", 3, 3, 3],
+			["AND Gate", 2, 2, 2],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2],
+			["Even Parity", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [73, 73, 73],
+		"with": [73, 73, 73]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 55, 55],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 3, 3],
+			["AND Gate", 0, 2, 2],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2],
+			["Even Parity", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [10, 83, 83],
+		"with": [11, 84, 84]
+	},
+	{
+		"counts": [
+			["Pin", 7, 7, 7],
+			["Tunnel", 48, 48, 48],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 3, 3, 3],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [68, 68, 68],
+		"with": [68, 68, 68]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 48, 48],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 3, 3],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [13, 81, 81],
+		"with": [14, 82, 82]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 49, 49, 49],
+			["NOT Gate", 3, 3, 3],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 2, 2, 2],
+			["Even Parity", 2, 2, 2],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [64, 64, 64],
+		"with": [64, 64, 64]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 49, 49],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 3, 3],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 2, 2],
+			["Even Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [8, 72, 72],
+		"with": [9, 73, 73]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 55, 55, 55],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 3, 3, 3],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XNOR Gate", 2, 2, 2],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [71, 71, 71],
+		"with": [71, 71, 71]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 55, 55],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 3, 3],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XNOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [9, 80, 80],
+		"with": [10, 81, 81]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 42, 42, 42],
+			["Pull Resistor", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 3, 3, 3],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [57, 57, 57],
+		"with": [57, 57, 57]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 42, 42],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 5, 5, 5],
+			["Buffer", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 3, 3],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [11, 68, 68],
+		"with": [12, 69, 69]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 31, 31, 31],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [43, 43, 43],
+		"with": [43, 43, 43]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 31, 31],
+			["Clock", 4, 4, 4],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [9, 52, 52],
+		"with": [10, 53, 53]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 32, 32, 32],
+			["AND Gate", 3, 3, 3],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [44, 44, 44],
+		"with": [44, 44, 44]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 32, 32],
+			["Clock", 5, 5, 5],
+			["AND Gate", 0, 3, 3],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [12, 56, 56],
+		"with": [13, 57, 57]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 22, 22, 22],
+			["NOT Gate", 2, 2, 2],
+			["XOR Gate", 2, 2, 2],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [33, 33, 33],
+		"with": [33, 33, 33]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 22, 22],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 2, 2],
+			["XOR Gate", 0, 2, 2],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [12, 45, 45],
+		"with": [13, 46, 46]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 52, 52, 52],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 3, 3, 3],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [68, 68, 68],
+		"with": [68, 68, 68]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 52, 52],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 3, 3],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [7, 75, 75],
+		"with": [8, 76, 76]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 60, 60, 60],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 2, 2, 2],
+			["Even Parity", 2, 2, 2],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [77, 77, 77],
+		"with": [77, 77, 77]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 60, 60],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 2, 2],
+			["Even Parity", 0, 2, 2],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [8, 85, 85],
+		"with": [9, 86, 86]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 22, 22, 22],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1]
+		],
+		"without": [30, 30, 30],
+		"with": [30, 30, 30]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 22, 22],
+			["Clock", 4, 4, 4],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1]
+		],
+		"without": [9, 39, 39],
+		"with": [10, 40, 40]
+	},
+	{
+		"counts": [
+			["Pin", 7, 7, 7],
+			["Tunnel", 46, 46, 46],
+			["Pull Resistor", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 3, 3, 3],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 2, 2, 2]
+		],
+		"without": [63, 63, 63],
+		"with": [63, 63, 63]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 8, 15, 15],
+			["Tunnel", 0, 46, 46],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 5, 5, 5],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 3, 3],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 2, 2]
+		],
+		"without": [13, 76, 76],
+		"with": [14, 77, 77]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 51, 51, 51],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["OR Gate", 2, 2, 2],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [67, 67, 67],
+		"with": [67, 67, 67]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 51, 51],
+			["Clock", 4, 4, 4],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["OR Gate", 0, 2, 2],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [11, 78, 78],
+		"with": [12, 79, 79]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 26, 26, 26],
+			["Pull Resistor", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [36, 36, 36],
+		"with": [36, 36, 36]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 26, 26],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 4, 4, 4],
+			["AND Gate", 0, 2, 2],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [9, 45, 45],
+		"with": [10, 46, 46]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 18, 18, 18],
+			["NOT Gate", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2]
+		],
+		"without": [25, 25, 25],
+		"with": [25, 25, 25]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 18, 18],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2]
+		],
+		"without": [7, 32, 32],
+		"with": [8, 33, 33]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 21, 21, 21],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 21, 21],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [9, 40, 40],
+		"with": [10, 41, 41]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 52, 52, 52],
+			["NOT Gate", 2, 2, 2],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 1, 1, 1],
+			["Even Parity", 2, 2, 2],
+			["Controlled Buffer", 3, 3, 3]
+		],
+		"without": [68, 68, 68],
+		"with": [68, 68, 68]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 52, 52],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 2, 2],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 1, 1],
+			["Even Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 3, 3]
+		],
+		"without": [8, 76, 76],
+		"with": [9, 77, 77]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 42, 42, 42],
+			["NOT Gate", 3, 3, 3],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [57, 57, 57],
+		"with": [57, 57, 57]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 42, 42],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 3, 3],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [9, 66, 66],
+		"with": [10, 67, 67]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 53, 53, 53],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 2, 2, 2],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 2, 2, 2],
+			["NOR Gate", 1, 1, 1],
+			["XNOR Gate", 4, 4, 4],
+			["Even Parity", 1, 1, 1]
+		],
+		"without": [71, 71, 71],
+		"with": [71, 71, 71]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 53, 53],
+			["Clock", 4, 4, 4],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 2, 2],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 2, 2],
+			["NOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 4, 4],
+			["Even Parity", 0, 1, 1]
+		],
+		"without": [11, 82, 82],
+		"with": [12, 83, 83]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 31, 31, 31],
+			["NOT Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [43, 43, 43],
+		"with": [43, 43, 43]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 31, 31],
+			["Clock", 3, 3, 3],
+			["NOT Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [8, 51, 51],
+		"with": [9, 52, 52]
+	},
+	{
+		"counts": [
+			["Pin", 6, 6, 6],
+			["Tunnel", 28, 28, 28],
+			["Pull Resistor", 1, 1, 1],
+			["NOT Gate", 1, 1, 1],
+			["Buffer", 1, 1, 1],
+			["OR Gate", 2, 2, 2],
+			["XOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1]
+		],
+		"without": [41, 41, 41],
+		"with": [41, 41, 41]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 7, 13, 13],
+			["Tunnel", 0, 28, 28],
+			["Pull Resistor", 0, 1, 1],
+			["Clock", 5, 5, 5],
+			["NOT Gate", 0, 1, 1],
+			["Buffer", 0, 1, 1],
+			["OR Gate", 0, 2, 2],
+			["XOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1]
+		],
+		"without": [12, 53, 53],
+		"with": [13, 54, 54]
+	},
+	{
+		"counts": [
+			["Pin", 4, 4, 4],
+			["Tunnel", 52, 52, 52],
+			["Buffer", 1, 1, 1],
+			["AND Gate", 1, 1, 1],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 2, 2, 2],
+			["XOR Gate", 1, 1, 1],
+			["Odd Parity", 1, 1, 1],
+			["Even Parity", 2, 2, 2]
+		],
+		"without": [66, 66, 66],
+		"with": [66, 66, 66]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 5, 9, 9],
+			["Tunnel", 0, 52, 52],
+			["Clock", 4, 4, 4],
+			["Buffer", 0, 1, 1],
+			["AND Gate", 0, 1, 1],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 2, 2],
+			["XOR Gate", 0, 1, 1],
+			["Odd Parity", 0, 1, 1],
+			["Even Parity", 0, 2, 2]
+		],
+		"without": [9, 75, 75],
+		"with": [10, 76, 76]
+	},
+	{
+		"counts": [
+			["Pin", 5, 5, 5],
+			["Tunnel", 50, 50, 50],
+			["OR Gate", 1, 1, 1],
+			["NAND Gate", 1, 1, 1],
+			["NOR Gate", 3, 3, 3],
+			["XNOR Gate", 2, 2, 2],
+			["Odd Parity", 2, 2, 2],
+			["Controlled Buffer", 1, 1, 1]
+		],
+		"without": [65, 65, 65],
+		"with": [65, 65, 65]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 6, 11, 11],
+			["Tunnel", 0, 50, 50],
+			["Clock", 4, 4, 4],
+			["OR Gate", 0, 1, 1],
+			["NAND Gate", 0, 1, 1],
+			["NOR Gate", 0, 3, 3],
+			["XNOR Gate", 0, 2, 2],
+			["Odd Parity", 0, 2, 2],
+			["Controlled Buffer", 0, 1, 1]
+		],
+		"without": [10, 75, 75],
+		"with": [11, 76, 76]
+	},
+	{
+		"counts": [
+			["Pin", 3, 3, 3],
+			["Tunnel", 23, 23, 23],
+			["Buffer", 1, 1, 1],
+			["XOR Gate", 1, 1, 1],
+			["XNOR Gate", 1, 1, 1],
+			["Even Parity", 1, 1, 1],
+			["Controlled Inverter", 1, 1, 1]
+		],
+		"without": [31, 31, 31],
+		"with": [31, 31, 31]
+	},
+	{
+		"counts": [
+			["main", 1, 1, 1],
+			["Pin", 4, 7, 7],
+			["Tunnel", 0, 23, 23],
+			["Clock", 3, 3, 3],
+			["Buffer", 0, 1, 1],
+			["XOR Gate", 0, 1, 1],
+			["XNOR Gate", 0, 1, 1],
+			["Even Parity", 0, 1, 1],
+			["Controlled Inverter", 0, 1, 1]
+		],
+		"without": [7, 38, 38],
+		"with": [8, 39, 39]
 	}
 ]

@@ -18,6 +18,7 @@ import { Circuit } from "@/engine/circuit";
 import { formatLoc } from "@/engine/geom";
 import { readCirc } from "@/format/circ-reader";
 import { t } from "@/i18n/es";
+import { computeStatistics } from "@/project/statistics";
 import { getPinLabels } from "@/sim/pin-labels";
 import { type AnalyzeCase, analyzeCases } from "./golden/analyze-cases";
 import reference from "./golden/analyze-reference.json";
@@ -86,6 +87,20 @@ function run(c: AnalyzeCase): unknown {
 			);
 			return { ...ret, inputs, outputs, notice, table: columns };
 		}
+		case "stats": {
+			const project = readCirc(readFileSync(path.join(root, c.file), "utf8"));
+			const st = computeStatistics(project, project.getCircuit(c.circuit) as Circuit, "file");
+			const row = (x: { simple: number; unique: number; recursive: number }) => [
+				x.simple,
+				x.unique,
+				x.recursive,
+			];
+			return {
+				counts: st.counts.map((x) => [x.factory?.name, ...row(x)]),
+				without: row(st.totalWithoutSubcircuits),
+				with: row(st.totalWithSubcircuits),
+			};
+		}
 		case "build": {
 			const model = new AnalyzerModel();
 			model.setVariables(c.inputs, c.outputs);
@@ -145,7 +160,7 @@ describe("combinational analysis matches Logisim 2.7.1", () => {
 		expect(reference.length).toBe(cases.length);
 	});
 
-	for (const kind of ["min", "parse", "circ", "build"] as const) {
+	for (const kind of ["min", "parse", "circ", "build", "stats"] as const) {
 		it(`${kind} cases`, () => {
 			const mismatches: string[] = [];
 			cases.forEach((c, i) => {

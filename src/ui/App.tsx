@@ -46,6 +46,7 @@ import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIco
 import { useMediaQuery, usePreference } from "./preferences";
 import { onLaunchFiles, pwa } from "./pwa";
 import { ShortcutsDialog } from "./ShortcutsDialog";
+import { StatisticsDialog } from "./StatisticsDialog";
 import { Tooltip } from "./Tooltip";
 import { TICK_FREQUENCIES, Workspace } from "./workspace";
 
@@ -227,6 +228,7 @@ export default function App() {
 
 	const [menu, setMenu] = useState<MenuRequest | null>(null);
 	const [libraryNoticeHidden, setLibraryNoticeHidden] = useState(false);
+	const [statsCircuit, setStatsCircuit] = useState<Circuit | null>(null);
 	const [memoryEditing, setMemoryEditing] = useState<Instance | null>(null);
 	const memoryFileRef = useRef<HTMLInputElement>(null);
 	const memoryTarget = useRef<Instance | null>(null);
@@ -325,6 +327,7 @@ export default function App() {
 						analyze();
 					},
 				},
+				{ label: "Obtener Estadísticas del Circuito", onSelect: () => setStatsCircuit(c) },
 				"separator",
 				{ label: "Mover Arriba", disabled: index <= 0, onSelect: () => ws.moveCircuit(c, -1) },
 				{
@@ -506,6 +509,9 @@ export default function App() {
 				/>
 			)}
 			{menu && <ContextMenu menu={menu} onClose={() => setMenu(null)} />}
+			{statsCircuit && (
+				<StatisticsDialog ws={ws} circuit={statsCircuit} onClose={() => setStatsCircuit(null)} />
+			)}
 			{memoryEditing && ws.memoryContents(memoryEditing) && (
 				<HexEditor
 					contents={ws.memoryContents(memoryEditing) as NonNullable<ReturnType<typeof ws.memoryContents>>}

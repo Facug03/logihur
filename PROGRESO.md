@@ -180,9 +180,12 @@ Las fases 0–4 están implementadas y versionadas en git.
   autoguardado, edición bloqueada dentro de circuitos de librería. `bun run golden:libs` graba
   `-tty table` de Logisim para principal → compuertas → base: coincide. `tests/libraries.test.ts`.
 
+- **Estadísticas del circuito** (`src/project/statistics.ts`, `StatisticsDialog.tsx`): port de
+  `FileStatistics` con el mismo orden; caso `stats` del arnés Java: 358 circuitos coinciden.
+
 ## Siguiente (en este orden)
 
-1. **Fase 5 (resto)**: editor de apariencia, logging, estadísticas de circuito; copiar/pegar en la tabla.
+1. **Fase 5 (resto)**: editor de apariencia, logging; copiar/pegar en la tabla.
 2. **Fase 6 (resto)**: pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles

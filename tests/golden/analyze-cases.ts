@@ -30,6 +30,7 @@ export type AnalyzeCase =
 	| { kind: "min"; inputs: string[]; column: string }
 	| { kind: "parse"; inputs: string[]; text: string }
 	| { kind: "circ"; file: string; circuit: string }
+	| { kind: "stats"; file: string; circuit: string }
 	| {
 			kind: "build";
 			inputs: string[];
@@ -290,8 +291,23 @@ function buildCases(): AnalyzeCase[] {
 	return cases;
 }
 
+/** Circuit statistics: every circuit of the fixtures and golden cases (harnesses use subcircuits). */
+function statsCases(): AnalyzeCase[] {
+	const cases: AnalyzeCase[] = [];
+	const files = [
+		...readdirSync(path.join(root, "tests/fixtures")).map((f) => `tests/fixtures/${f}`),
+		...readdirSync(path.join(root, "tests/golden/cases")).map((f) => `tests/golden/cases/${f}`),
+	].filter((f) => f.endsWith(".circ"));
+	for (const file of files.sort()) {
+		const text = readFileSync(path.join(root, file), "utf8");
+		for (const m of text.matchAll(/<circuit name="([^"]*)">/g))
+			cases.push({ kind: "stats", file, circuit: m[1] });
+	}
+	return cases;
+}
+
 export function analyzeCases(): AnalyzeCase[] {
-	return [...minCases(), ...parseCases(), ...circCases(), ...buildCases()];
+	return [...minCases(), ...parseCases(), ...circCases(), ...buildCases(), ...statsCases()];
 }
 
 export function caseLine(c: AnalyzeCase): string {
@@ -301,7 +317,8 @@ export function caseLine(c: AnalyzeCase): string {
 		case "parse":
 			return ["parse", c.inputs.join(","), c.text].join("\t");
 		case "circ":
-			return ["circ", path.join(root, c.file), c.circuit].join("\t");
+		case "stats":
+			return [c.kind, path.join(root, c.file), c.circuit].join("\t");
 		case "build":
 			return [
 				"build",

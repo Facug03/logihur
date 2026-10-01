@@ -6,6 +6,7 @@
 //   parse  <inputs>  <text>                         parsed expression or error range
 //   circ   <file>    <circuit>                      analyzer contents for a circuit
 //   build  <inputs>  <outputs>  <exprs ; separated> <twoInputs> <nands>
+//   stats  <file>    <circuit>                      FileStatistics counts
 import java.io.File;
 import java.nio.file.*;
 import java.util.*;
@@ -134,6 +135,17 @@ class AnalyzeReference {
         return "{\"components\":[" + String.join(",", comps) + "],\"wires\":" + list(wires) + "}";
     }
 
+    static String stats(String[] f) throws Exception {
+        LogisimFile file = new Loader(null).openLogisimFile(new File(f[1]));
+        FileStatistics st = FileStatistics.compute(file, file.getCircuit(f[2]));
+        ArrayList<String> rows = new ArrayList<>();
+        for (FileStatistics.Count c : st.getCounts())
+            rows.add("[" + q(c.getFactory().getName()) + "," + c.getSimpleCount() + "," + c.getUniqueCount() + "," + c.getRecursiveCount() + "]");
+        FileStatistics.Count a = st.getTotalWithoutSubcircuits(), b = st.getTotalWithSubcircuits();
+        return "{\"counts\":[" + String.join(",", rows) + "],\"without\":[" + a.getSimpleCount() + "," + a.getUniqueCount() + ","
+            + a.getRecursiveCount() + "],\"with\":[" + b.getSimpleCount() + "," + b.getUniqueCount() + "," + b.getRecursiveCount() + "]}";
+    }
+
     public static void main(String[] args) throws Exception {
         for (String line : Files.readAllLines(Paths.get(args[0]))) {
             String[] f = line.split("\t", -1);
@@ -142,6 +154,7 @@ class AnalyzeReference {
                 case "parse": System.out.println(parse(f)); break;
                 case "circ": System.out.println(circ(f)); break;
                 case "build": System.out.println(build(f)); break;
+                case "stats": System.out.println(stats(f)); break;
                 default: throw new IllegalArgumentException(f[0]);
             }
         }
