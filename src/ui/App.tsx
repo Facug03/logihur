@@ -66,6 +66,7 @@ const EXAMPLES = [
 	{ file: "half-adder.circ", label: "Semisumador" },
 	{ file: "full-adder.circ", label: "Sumador completo (con subcircuitos)" },
 	{ file: "io-demo.circ", label: "Entrada/salida: teclado, TTY y controles" },
+	{ file: "marquee.circ", label: "Marquesina LED: ROM, registros de desplazamiento y matriz" },
 ];
 
 /** Logisim's default toolbar: two pin presets and three gates. */

@@ -262,6 +262,39 @@ describe(".circ I/O compatibility", () => {
 		expect((ws.viewState.getData(tty) as TtyData).lines).toEqual(["Hola"]);
 		expect((ws.viewState.getData(keyboard) as KeyboardData).buffer).toEqual([]);
 	});
+	it("the marquee example scrolls the message in from the right", () => {
+		const ws = new Workspace();
+		ws.openFromText(
+			readFileSync(path.join(import.meta.dirname, "../public/examples/marquee.circ"), "utf8"),
+			"marquee.circ",
+		);
+		expect(ws.messages).toEqual([]);
+		const matrix = Array.from(ws.viewCircuit.components).find((i) => i.factory === DOT_MATRIX);
+		if (!matrix) throw new Error("missing demo component");
+		const screen = () => {
+			const data = ws.viewState.getData(matrix) as MatrixData;
+			return Array.from({ length: 8 }, (_, r) =>
+				Array.from({ length: 32 }, (_, c) => (data.get(r, c, Infinity) === Value.TRUE ? "#" : ".")).join(""),
+			);
+		};
+		// one column per clock cycle (two ticks)
+		for (let tick = 0; tick < 40; tick++) ws.tickOnce();
+		expect(screen()).toEqual([
+			"................................",
+			"............#...#.#...#..###..#.",
+			"............#...#.#...#.#...#.#.",
+			"............#...#.##..#.#...#.#.",
+			"............#...#.#.#.#.#####.##",
+			"............#...#.#..##.#...#.#.",
+			"............#...#.#...#.#...#.#.",
+			".............###..#...#.#...#.#.",
+		]);
+		// the 104-column message loops forever
+		for (let tick = 0; tick < 2 * 104; tick++) ws.tickOnce();
+		const looped = screen();
+		for (let tick = 0; tick < 2 * 104; tick++) ws.tickOnce();
+		expect(screen()).toEqual(looped);
+	});
 	it("round-trips all eight factories and RGBA backgrounds without placeholders", () => {
 		const project = new Project(),
 			c = new Circuit("main");
