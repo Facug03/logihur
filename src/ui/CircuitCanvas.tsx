@@ -314,6 +314,7 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 				selected: ws.selection,
 				selectedWires: ws.selectedWires,
 				hovered: ws.tool.kind === "add" ? null : hovered,
+				clip: Bounds.create(view.originX, view.originY, size.w / view.zoom, size.h / view.zoom),
 			});
 			drawOverlay(g);
 		});

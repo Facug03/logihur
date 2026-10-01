@@ -256,6 +256,15 @@ export class Bounds {
 		return this.addRect(b.x, b.y, b.width, b.height);
 	}
 
+	intersects(o: Bounds): boolean {
+		return (
+			this.x <= o.x + o.width &&
+			o.x <= this.x + this.width &&
+			this.y <= o.y + o.height &&
+			o.y <= this.y + this.height
+		);
+	}
+
 	expand(d: number): Bounds {
 		if (this === Bounds.EMPTY || d === 0) return this;
 		return Bounds.create(this.x - d, this.y - d, this.width + 2 * d, this.height + 2 * d);

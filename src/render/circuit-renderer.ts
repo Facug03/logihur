@@ -4,7 +4,7 @@
 import { DEFAULT_LABEL_FONT } from "@/engine/attributes";
 import type { Circuit } from "@/engine/circuit";
 import type { GateShape, Instance } from "@/engine/component";
-import { locX, locY } from "@/engine/geom";
+import { type Bounds, locX, locY } from "@/engine/geom";
 import type { CircuitState } from "@/engine/simulation";
 import { Value } from "@/engine/value";
 import { WIRE_WIDTH, type Wire } from "@/engine/wire";
@@ -25,7 +25,12 @@ export interface RenderOptions {
 	selected: ReadonlySet<Instance>;
 	selectedWires?: ReadonlySet<Wire>;
 	hovered?: Instance | null;
+	/** The visible area: what lies outside is not drawn. */
+	clip?: Bounds;
 }
+
+/** Labels and pokers may draw a little outside a component's bounds. */
+const CLIP_MARGIN = 60;
 
 const GRID_COLOR = "#c0c0c0";
 const SELECT_COLOR = "#2563eb";
@@ -60,8 +65,11 @@ export function drawCircuit(
 	const netlist = circuit.getNetlist();
 	const showState = state !== null;
 
+	const clip = opts.clip?.expand(CLIP_MARGIN) ?? null;
+
 	// wires
 	for (const w of circuit.wires.values()) {
+		if (clip && !clip.intersects(w.bounds)) continue;
 		const bundle = netlist.getBundleAt(w.e0);
 		let color: string;
 		if (bundle && !bundle.isValid()) color = Value.WIDTH_ERROR_COLOR;
@@ -82,6 +90,7 @@ export function drawCircuit(
 	// junction dots where more than two things meet
 	for (const [p, data] of netlist.points.map) {
 		if (data.components.length <= 2) continue;
+		if (clip && !clip.contains(locX(p), locY(p))) continue;
 		const bundle = netlist.getBundleAt(p);
 		if (!bundle) continue;
 		let color: string;
@@ -103,6 +112,7 @@ export function drawCircuit(
 		gateShape: opts.gateShape,
 	});
 	for (const comp of circuit.components) {
+		if (clip && !clip.intersects(comp.bounds)) continue;
 		g.save();
 		g.setColor("#000000");
 		g.setLineWidth(1);

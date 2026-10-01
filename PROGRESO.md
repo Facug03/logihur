@@ -206,6 +206,12 @@ Las fases 0–4 están implementadas y versionadas en git.
   atajos globales sólo se suspenden con diálogos modales (la ventana de Registro los bloqueaba).
   Playwright con emulación táctil: "Hola", retroceso y "a!" llegan al Teclado.
 
+- **Rendimiento**: circuito de prueba de 1.668 componentes (sumador de 64 bits con túneles):
+  lectura 19 ms, primera propagación 14 ms, acarreo a través de 64 bits 0,9 ms (Bun). En Chrome
+  con CPU 4× más lenta y emulación móvil: abrir y dibujar 0,6 s; arrastrar el circuito completo a
+  60 fps de mediana (p90 30 fps). El renderer ahora omite lo que está fuera de pantalla: con zoom,
+  60 fps estables (p90 16,7 ms).
+
 ## Siguiente (en este orden)
 
 1. **Pruebas en dispositivos reales**: Android (Chrome) e iOS (Safari): instalación PWA, gestos,
