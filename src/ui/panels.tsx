@@ -23,6 +23,12 @@ export function iconFor(factory: ComponentFactory, output?: boolean): string {
 	if (prefs.gateShape === "rectangular") {
 		const rect = icon.replace(/Gate\.gif$/, "GateRect.gif");
 		if (rect !== icon && RECT_ICONS.has(rect)) return rect;
+	} else if (prefs.gateShape === "din40700") {
+		const din = icon.replace(
+			/^(\w+)Gate\.gif$/,
+			(_, g: string) => `din${g[0].toUpperCase()}${g.slice(1)}Gate.gif`,
+		);
+		if (din !== icon && DIN_ICONS.has(din)) return din;
 	}
 	return icon;
 }
@@ -35,6 +41,16 @@ const RECT_ICONS = new Set([
 	"orGateRect.gif",
 	"xnorGateRect.gif",
 	"xorGateRect.gif",
+]);
+
+const DIN_ICONS = new Set([
+	"dinAndGate.gif",
+	"dinNandGate.gif",
+	"dinNorGate.gif",
+	"dinNotGate.gif",
+	"dinOrGate.gif",
+	"dinXnorGate.gif",
+	"dinXorGate.gif",
 ]);
 
 /** A 16×16 Logisim icon, scaled without smoothing like the original. */

@@ -16,6 +16,7 @@ import { prefs } from "@/engine/prefs";
 import { Value } from "@/engine/value";
 import { FACING, LABEL, LABEL_FONT, WIDTH } from "../std-attrs";
 import { GATE_DELAY, GATE_OUTPUT, pullOutput } from "./abstract-gate";
+import { paintDin } from "./painter-din";
 import { paintNot } from "./painter-shaped";
 
 export const NOT_SIZE = optionAttr("size", "gate.size", [
@@ -138,6 +139,8 @@ class NotGate extends ComponentFactory {
 		if (facing !== "east") g.rotate(-dirRadians(facing));
 		if (painter.gateShape === "shaped") {
 			paintNot(painter, narrow);
+		} else if (painter.gateShape === "din40700") {
+			paintDin(painter, narrow ? 20 : 30, 18, true, "and");
 		} else {
 			g.setLineWidth(2);
 			if (narrow) {

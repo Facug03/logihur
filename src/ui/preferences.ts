@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { GateShape } from "@/engine/component";
 
 /** UI preferences are separate from circuit files and tolerate unavailable storage. */
 export function usePreference<T extends boolean | number>(key: string, fallback: T) {
@@ -34,4 +35,25 @@ export function useMediaQuery(query: string): boolean {
 		return () => media.removeEventListener("change", update);
 	}, [query]);
 	return matches;
+}
+
+const GATE_SHAPES: readonly GateShape[] = ["shaped", "rectangular", "din40700"];
+
+/** AppPreferences.GATE_SHAPE, kept in this browser. */
+export function loadGateShape(): GateShape {
+	try {
+		const raw = localStorage.getItem("logihur.ui.gateShape");
+		if (GATE_SHAPES.includes(raw as GateShape)) return raw as GateShape;
+	} catch {
+		/* Use the default when storage is unavailable. */
+	}
+	return "shaped";
+}
+
+export function saveGateShape(shape: GateShape): void {
+	try {
+		localStorage.setItem("logihur.ui.gateShape", shape);
+	} catch {
+		/* Optional persistence. */
+	}
 }

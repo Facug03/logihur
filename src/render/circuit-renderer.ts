@@ -27,6 +27,8 @@ export interface RenderOptions {
 	hovered?: Instance | null;
 	/** The visible area: what lies outside is not drawn. */
 	clip?: Bounds;
+	/** Printer view: no value colours and no unconnected ports, as when printing or exporting. */
+	printView?: boolean;
 }
 
 /** Labels and pokers may draw a little outside a component's bounds. */
@@ -63,7 +65,7 @@ export function drawCircuit(
 	opts: RenderOptions,
 ): void {
 	const netlist = circuit.getNetlist();
-	const showState = state !== null;
+	const showState = state !== null && !opts.printView;
 
 	const clip = opts.clip?.expand(CLIP_MARGIN) ?? null;
 
@@ -108,7 +110,7 @@ export function drawCircuit(
 		circuit,
 		state,
 		showState,
-		printView: false,
+		printView: opts.printView ?? false,
 		gateShape: opts.gateShape,
 	});
 	for (const comp of circuit.components) {

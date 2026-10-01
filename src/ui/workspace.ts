@@ -405,6 +405,11 @@ export class Workspace {
 		return model;
 	}
 
+	/** Project.getCircuitState(circuit): the shown state, else that circuit's own simulation. */
+	circuitStateFor(circuit: Circuit): CircuitState {
+		return circuit === this.viewCircuit ? this.viewState : this.simulatorFor(circuit).root;
+	}
+
 	get rootSimulator(): Simulator {
 		return this.simulatorFor(this.circuit);
 	}

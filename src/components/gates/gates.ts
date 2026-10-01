@@ -4,7 +4,8 @@
 import type { AttributeSet } from "@/engine/attributes";
 import type { InstancePainter, InstanceState } from "@/engine/component";
 import { Value } from "@/engine/value";
-import { AbstractGate, GATE_INPUTS, GATE_XOR } from "./abstract-gate";
+import { AbstractGate, GATE_INPUTS, GATE_XOR, type GateConfig } from "./abstract-gate";
+import { paintDin } from "./painter-din";
 import { paintAnd, paintOr, paintXor } from "./painter-shaped";
 
 export function computeOr(inputs: Value[], n: number): Value {
@@ -56,6 +57,9 @@ class AndGate extends AbstractGate {
 	protected paintShape(p: InstancePainter, w: number, h: number): void {
 		paintAnd(p, w, h);
 	}
+	protected override paintDinShape(p: InstancePainter, w: number, h: number): void {
+		paintDin(p, w, h, false, "and");
+	}
 	protected computeOutput(inputs: Value[], n: number): Value {
 		return computeAnd(inputs, n);
 	}
@@ -75,6 +79,9 @@ class OrGate extends AbstractGate {
 	}
 	protected paintShape(p: InstancePainter, w: number, h: number): void {
 		paintOr(p, w, h);
+	}
+	protected override paintDinShape(p: InstancePainter, w: number, h: number, cfg: GateConfig): void {
+		paintDin(p, w, h, false, "or", { factory: this, cfg });
 	}
 	protected computeOutput(inputs: Value[], n: number): Value {
 		return computeOr(inputs, n);
@@ -96,6 +103,9 @@ class NandGate extends AbstractGate {
 	protected paintShape(p: InstancePainter, w: number, h: number): void {
 		paintAnd(p, w, h);
 	}
+	protected override paintDinShape(p: InstancePainter, w: number, h: number): void {
+		paintDin(p, w, h, true, "and");
+	}
 	protected computeOutput(inputs: Value[], n: number): Value {
 		return computeAnd(inputs, n).not();
 	}
@@ -116,6 +126,9 @@ class NorGate extends AbstractGate {
 	}
 	protected paintShape(p: InstancePainter, w: number, h: number): void {
 		paintOr(p, w, h);
+	}
+	protected override paintDinShape(p: InstancePainter, w: number, h: number, cfg: GateConfig): void {
+		paintDin(p, w, h, true, "or", { factory: this, cfg });
 	}
 	protected computeOutput(inputs: Value[], n: number): Value {
 		return computeOr(inputs, n).not();
@@ -146,6 +159,9 @@ class XorGate extends AbstractGate {
 	protected paintShape(p: InstancePainter, w: number, h: number): void {
 		paintXor(p, w, h);
 	}
+	protected override paintDinShape(p: InstancePainter, w: number, h: number): void {
+		paintDin(p, w, h, false, "xor");
+	}
 	protected computeOutput(inputs: Value[], n: number, state: InstanceState): Value {
 		if (state.getAttr(GATE_XOR) === "odd") return computeOddParity(inputs, n);
 		return computeExactlyOne(inputs, n);
@@ -170,6 +186,9 @@ class XnorGate extends AbstractGate {
 	}
 	protected paintShape(p: InstancePainter, w: number, h: number): void {
 		paintXor(p, w, h);
+	}
+	protected override paintDinShape(p: InstancePainter, w: number, h: number): void {
+		paintDin(p, w, h, false, "xnor");
 	}
 	protected computeOutput(inputs: Value[], n: number, state: InstanceState): Value {
 		if (state.getAttr(GATE_XOR) === "odd") return computeOddParity(inputs, n).not();

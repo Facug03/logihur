@@ -266,6 +266,10 @@ export abstract class AbstractGate extends ComponentFactory {
 
 	protected abstract computeOutput(inputs: Value[], numInputs: number, state: InstanceState): Value;
 	protected abstract paintShape(painter: InstancePainter, width: number, height: number): void;
+	/** Gates without a DIN 40700 symbol (the parity gates) keep the rectangle. */
+	protected paintDinShape(painter: InstancePainter, width: number, height: number, _cfg: GateConfig): void {
+		this.paintRectangular(painter, width, height);
+	}
 	abstract getIdentity(): Value;
 
 	/** Boolean expression for combinational analysis (null if unsupported). */
@@ -346,8 +350,10 @@ export abstract class AbstractGate extends ComponentFactory {
 		g.save();
 		g.translate(locX(l), locY(l));
 		if (facing !== "east") g.rotate(-dirRadians(facing));
-		if (shape === "rectangular" || shape === "din40700") {
+		if (shape === "rectangular") {
 			this.paintRectangular(painter, width, height);
+		} else if (shape === "din40700") {
+			this.paintDinShape(painter, width, height, cfg);
 		} else if (this.negateOutput) {
 			g.translate(-10, 0);
 			this.paintShape(painter, width - 10, height);

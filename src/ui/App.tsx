@@ -7,6 +7,7 @@ import {
 	ChevronLeft,
 	FilePlus2,
 	FolderOpen,
+	ImageDown,
 	Keyboard,
 	Maximize,
 	Menu,
@@ -16,6 +17,7 @@ import {
 	RotateCcw,
 	Save,
 	ScrollText,
+	Settings,
 	SlidersHorizontal,
 	Trash2,
 	Undo2,
@@ -43,13 +45,15 @@ import { AnalyzerDialog } from "./analyzer/AnalyzerDialog";
 import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
 import { ContextMenu, type MenuEntry, type MenuRequest } from "./ContextMenu";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";
+import { ExportImageDialog } from "./ExportImageDialog";
 import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
 import { LogDialog } from "./LogDialog";
 import { LogisimLibrariesSection, MissingLibrariesNotice, pickMainFile, readFiles } from "./LogisimLibraries";
 import { Disclosure, PanelResize } from "./PanelControls";
+import { PreferencesDialog } from "./PreferencesDialog";
 import { ProjectMenu } from "./ProjectMenu";
 import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
-import { useMediaQuery, usePreference } from "./preferences";
+import { loadGateShape, useMediaQuery, usePreference } from "./preferences";
 import { onLaunchFiles, pwa } from "./pwa";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { SimulationTree } from "./SimulationTree";
@@ -158,6 +162,7 @@ export default function App() {
 	const wsRef = useRef<Workspace | null>(null);
 	if (wsRef.current === null) {
 		const ws = new Workspace();
+		ws.setGateShape(loadGateShape());
 		if (ws.restoreAutosave()) ws.notice = "Se recuperó tu último trabajo.";
 		wsRef.current = ws;
 	}
@@ -184,6 +189,8 @@ export default function App() {
 	const [leftWidth, setLeftWidth] = usePreference<number>("leftWidth", 256);
 	const [rightWidth, setRightWidth] = usePreference<number>("rightWidth", 288);
 	const [shortcutsOpen, setShortcutsOpen] = useState(false);
+	const [preferencesOpen, setPreferencesOpen] = useState(false);
+	const [exportOpen, setExportOpen] = useState(false);
 	const [projectToDelete, setProjectToDelete] = useState<{ id: number; name: string } | null>(null);
 	const [analyzer, setAnalyzer] = useState<{ tab: AnalyzerTab; notice: string | null } | null>(null);
 	const [loadingExample, setLoadingExample] = useState(false);
@@ -646,6 +653,13 @@ export default function App() {
 				<IconButton label={`${t("menu.save")} (Ctrl+S)`} onClick={onSave}>
 					<Save className="size-[18px]" />
 				</IconButton>
+				<IconButton
+					label={"Exportar imagen"}
+					description={"Descarga uno o más circuitos como PNG o JPEG."}
+					onClick={() => setExportOpen(true)}
+				>
+					<ImageDown className="size-[18px]" />
+				</IconButton>
 
 				{ws.appearanceMode ? (
 					<>
@@ -855,6 +869,13 @@ export default function App() {
 					</IconButton>
 					<IconButton label="Ajustar a la pantalla" onClick={fitView}>
 						<Maximize className="size-[18px]" />
+					</IconButton>
+					<IconButton
+						label={"Preferencias"}
+						description={"Forma de las puertas."}
+						onClick={() => setPreferencesOpen(true)}
+					>
+						<Settings className="size-[18px]" />
 					</IconButton>
 				</div>
 				<input
@@ -1096,6 +1117,8 @@ export default function App() {
 				}}
 			/>
 			{shortcutsOpen && <ShortcutsDialog onClose={() => setShortcutsOpen(false)} />}
+			{exportOpen && <ExportImageDialog ws={ws} onClose={() => setExportOpen(false)} />}
+			{preferencesOpen && <PreferencesDialog ws={ws} onClose={() => setPreferencesOpen(false)} />}
 		</div>
 	);
 }
