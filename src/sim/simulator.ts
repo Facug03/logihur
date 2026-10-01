@@ -11,6 +11,8 @@ import { getPinLabels } from "./pin-labels";
 
 export class Simulator {
 	readonly root: CircuitState;
+	/** SimulatorListener.propagationCompleted (used by the log). */
+	readonly propagationListeners = new Set<() => void>();
 
 	constructor(
 		readonly project: Project,
@@ -31,6 +33,7 @@ export class Simulator {
 
 	propagate(): void {
 		this.propagator.propagate();
+		for (const l of Array.from(this.propagationListeners)) l();
 	}
 
 	isOscillating(): boolean {

@@ -26,7 +26,7 @@ Se contrastó la documentación oficial y las fuentes del jar 2.7.1 extraídas e
 | Barra configurable y mapeo de botones del mouse | Pendiente: la barra web es fija; no aplica la configuración de `<toolbar>` / `<mappings>` del archivo al editor. |
 | Análisis combinacional | Implementado (botón Σ): Analizar Circuito y ventana con Entradas, Salidas, Tabla, Expresión y Minimizado, mapa de Karnaugh y Crear Circuito (dos entradas / sólo NAND, reemplazo con confirmación y deshacer). 511 casos verificados contra Logisim 2.7.1. Pendiente: copiar/pegar regiones de la tabla (TableTabClip). |
 | Cargar librerías `.circ` | Implementado (`file#`): carga recursiva con detección de ciclos, circuitos de sólo lectura, Quitar si no se usa, referencias por nombre de archivo; simulación de librerías anidadas verificada contra Logisim 2.7.1. Librerías JAR fuera de alcance. |
-| Logging | Pendiente de fase 5. |
+| Registro (logging) | Implementado (botón Registro): ventana no modal con Selección (árbol con subcircuitos y opciones de RAM/registro de desplazamiento, Cambiar Base 2/10/16, mover, eliminar), Tabla (últimos 400 cambios) y Archivo (habilitar, cabecera; se descarga como texto en vez de escribir a disco). Mismos componentes registrables y nombres que Logisim. |
 
 La edición de texto usa un campo web de una línea sobre el lienzo. Conserva la regla original:
 si un componente aún no tiene etiqueta, un clic en su cuerpo la edita; si ya tiene etiqueta, se edita

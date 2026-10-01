@@ -28,6 +28,7 @@ import { type CircuitState, InstanceStateImpl } from "@/engine/simulation";
 import { Wire } from "@/engine/wire";
 import { readCirc } from "@/format/circ-reader";
 import { writeCirc } from "@/format/circ-writer";
+import { LogModel } from "@/log/log-model";
 import { Project } from "@/project/project";
 import { Simulator } from "@/sim/simulator";
 import { editableAttribute, type TextEditing } from "./text-editing";
@@ -219,6 +220,7 @@ export class Workspace {
 	private disposeSimulators(): void {
 		for (const s of this.simulators.values()) s.dispose();
 		this.simulators.clear();
+		this.logModels.clear();
 	}
 
 	setProject(project: Project, fileName: string, kind: ProjectKind = "project"): void {
@@ -384,6 +386,21 @@ export class Workspace {
 			this.simulators.set(circuit, sim);
 		}
 		return sim;
+	}
+
+	private readonly logModels = new Map<Simulator, LogModel>();
+
+	/** Simular > Registro: one log per top-level circuit simulation, like Logisim's per circuit state. */
+	get logModel(): LogModel {
+		const sim = this.rootSimulator;
+		let model = this.logModels.get(sim);
+		if (!model) {
+			const created = new LogModel(sim.root);
+			sim.propagationListeners.add(() => created.propagationCompleted());
+			this.logModels.set(sim, created);
+			model = created;
+		}
+		return model;
 	}
 
 	get rootSimulator(): Simulator {
@@ -608,6 +625,7 @@ export class Workspace {
 
 	private afterEdit(): void {
 		this.dirty = true;
+		for (const log of this.logModels.values()) log.prune();
 		// keep only selected items that still exist
 		const circuit = this.viewCircuit;
 		for (const c of Array.from(this.selection)) if (!circuit.components.has(c)) this.selection.delete(c);

@@ -13,6 +13,7 @@ import {
 	Redo2,
 	RotateCcw,
 	Save,
+	ScrollText,
 	SlidersHorizontal,
 	Trash2,
 	Undo2,
@@ -39,6 +40,7 @@ import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
 import { ContextMenu, type MenuEntry, type MenuRequest } from "./ContextMenu";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";
 import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
+import { LogDialog } from "./LogDialog";
 import { LogisimLibrariesSection, MissingLibrariesNotice, pickMainFile, readFiles } from "./LogisimLibraries";
 import { Disclosure, PanelResize } from "./PanelControls";
 import { ProjectMenu } from "./ProjectMenu";
@@ -229,6 +231,7 @@ export default function App() {
 	const [menu, setMenu] = useState<MenuRequest | null>(null);
 	const [libraryNoticeHidden, setLibraryNoticeHidden] = useState(false);
 	const [statsCircuit, setStatsCircuit] = useState<Circuit | null>(null);
+	const [logOpen, setLogOpen] = useState(false);
 	const [memoryEditing, setMemoryEditing] = useState<Instance | null>(null);
 	const memoryFileRef = useRef<HTMLInputElement>(null);
 	const memoryTarget = useRef<Instance | null>(null);
@@ -509,6 +512,15 @@ export default function App() {
 				/>
 			)}
 			{menu && <ContextMenu menu={menu} onClose={() => setMenu(null)} />}
+			{logOpen && (
+				<LogDialog
+					key={ws.circuit.id}
+					model={ws.logModel}
+					circuitName={ws.circuit.name}
+					fileName={ws.fileName}
+					onClose={() => setLogOpen(false)}
+				/>
+			)}
 			{statsCircuit && (
 				<StatisticsDialog ws={ws} circuit={statsCircuit} onClose={() => setStatsCircuit(null)} />
 			)}
@@ -714,6 +726,14 @@ export default function App() {
 					))}
 				</select>
 
+				<IconButton
+					label="Registro"
+					description="Registra los valores de pines, sondas, relojes, biestables, registros y memorias en cada cambio, y permite descargarlos."
+					active={logOpen}
+					onClick={() => setLogOpen((v) => !v)}
+				>
+					<ScrollText className="size-[18px]" />
+				</IconButton>
 				<Divider />
 				<AnalyzeMenu
 					circuitName={ws.viewCircuit.name}

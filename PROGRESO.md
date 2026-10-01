@@ -183,9 +183,16 @@ Las fases 0–4 están implementadas y versionadas en git.
 - **Estadísticas del circuito** (`src/project/statistics.ts`, `StatisticsDialog.tsx`): port de
   `FileStatistics` con el mismo orden; caso `stats` del arnés Java: 358 circuitos coinciden.
 
+- **Registro** (`src/log/`, `src/ui/LogDialog.tsx`): loggers de Pin, Sonda, Reloj, Botón, LED,
+  biestables, Registro, Contador, Aleatorio, Registro de desplazamiento (por etapa) y RAM (por
+  palabra, hasta 256); `LogModel` por simulación raíz, enganchado a `Simulator.propagate`, agrega
+  filas sólo si cambia algún valor (400 como `ValueLog`), nombres largos con la ruta de
+  subcircuitos y archivo con cabecera. `tests/log.test.ts`; Playwright tocando pines con la
+  ventana abierta y descargando el archivo.
+
 ## Siguiente (en este orden)
 
-1. **Fase 5 (resto)**: editor de apariencia, logging; copiar/pegar en la tabla.
+1. **Fase 5 (resto)**: editor de apariencia; copiar/pegar en la tabla.
 2. **Fase 6 (resto)**: pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles
