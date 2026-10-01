@@ -444,6 +444,20 @@ export class Workspace {
 		this.changed();
 	}
 
+	/** Simulation tree: view the state reached through the subcircuit instances of `path`. */
+	viewPath(path: readonly Instance[]): void {
+		this.finishTextEditing();
+		this.stopPoking();
+		this.appearanceMode = false;
+		this.viewStack = this.viewStack.slice(0, 1);
+		for (const inst of path) {
+			if (!(inst.factory instanceof SubcircuitFactory)) break;
+			this.viewStack.push({ state: inst.factory.getSubstate(this.viewState, inst), via: inst });
+		}
+		this.clearSelection();
+		this.changed();
+	}
+
 	leaveSubcircuit(levels = 1): void {
 		this.finishTextEditing();
 		this.stopPoking();

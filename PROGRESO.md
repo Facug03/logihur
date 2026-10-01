@@ -212,6 +212,9 @@ Las fases 0–4 están implementadas y versionadas en git.
   60 fps de mediana (p90 30 fps). El renderer ahora omite lo que está fuera de pantalla: con zoom,
   60 fps estables (p90 16,7 ms).
 
+- **Árbol de simulación** (`src/ui/SimulationTree.tsx`, `Workspace.viewPath`): jerarquía de
+  instancias como `SimulationTreeModel`; elegir un nodo muestra el estado de esa instancia.
+
 ## Siguiente (en este orden)
 
 1. **Pruebas en dispositivos reales**: Android (Chrome) e iOS (Safari): instalación PWA, gestos,

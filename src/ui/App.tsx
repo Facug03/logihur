@@ -49,6 +49,7 @@ import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIco
 import { useMediaQuery, usePreference } from "./preferences";
 import { onLaunchFiles, pwa } from "./pwa";
 import { ShortcutsDialog } from "./ShortcutsDialog";
+import { SimulationTree } from "./SimulationTree";
 import { StatisticsDialog } from "./StatisticsDialog";
 import { Tooltip } from "./Tooltip";
 import { TouchKeyInput } from "./TouchKeyInput";
@@ -806,6 +807,7 @@ export default function App() {
 						</IconButton>
 					</div>
 					<CircuitsPanel ws={ws} onCircuitMenu={openCircuitMenu} />
+					<SimulationTree key={ws.circuit.id} ws={ws} />
 					<div className="mx-3 h-px bg-line" />
 					<LibraryPanel ws={ws} onPick={() => setLeftOpen(false)}>
 						<LogisimLibrariesSection ws={ws} onPick={() => setLeftOpen(false)} />
