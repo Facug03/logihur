@@ -200,9 +200,16 @@ Las fases 0–4 están implementadas y versionadas en git.
 - **Portapapeles de la tabla de verdad** (`src/analyze/table-clip.ts`): región con Shift, copia con
   encabezados, pegado al cursor o en una región del mismo tamaño, errores de Logisim.
 
+- **Teclado en pantalla** (`src/ui/TouchKeyInput.tsx`): en pantallas táctiles, tocar un componente
+  que recibe teclas enfoca un campo oculto (y ofrece "Escribir en…") cuyos eventos `input`
+  (incluida composición del IME) se convierten en las mismas teclas que en escritorio. Además los
+  atajos globales sólo se suspenden con diálogos modales (la ventana de Registro los bloqueaba).
+  Playwright con emulación táctil: "Hola", retroceso y "a!" llegan al Teclado.
+
 ## Siguiente (en este orden)
 
-2. **Fase 6 (resto)**: pulido móvil (incluido teclado virtual para el componente Teclado).
+1. **Pruebas en dispositivos reales**: Android (Chrome) e iOS (Safari): instalación PWA, gestos,
+   teclado en pantalla y rendimiento con circuitos de ~200 componentes.
 
 ## Notas útiles
 

@@ -51,6 +51,7 @@ import { onLaunchFiles, pwa } from "./pwa";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { StatisticsDialog } from "./StatisticsDialog";
 import { Tooltip } from "./Tooltip";
+import { TouchKeyInput } from "./TouchKeyInput";
 import { TICK_FREQUENCIES, Workspace } from "./workspace";
 
 // Text metrics for bounds computed outside painting (tunnels, labels).
@@ -147,6 +148,7 @@ export default function App() {
 	const fileRef = useRef<HTMLInputElement>(null);
 	const desktopLeft = useMediaQuery("(min-width: 768px)");
 	const desktopRight = useMediaQuery("(min-width: 1024px)");
+	const coarsePointer = useMediaQuery("(pointer: coarse)");
 	const [zoom, setZoom] = useState(1);
 	const [leftOpen, setLeftOpen] = useState(false);
 	const [rightOpen, setRightOpen] = useState(false);
@@ -434,7 +436,8 @@ export default function App() {
 			const target = e.target as HTMLElement;
 			if (
 				target.closest("input, select, textarea, [contenteditable=true]") ||
-				document.querySelector("dialog[open], [popover]:popover-open")
+				// modal dialogs and menus own the keyboard; the non-modal log window does not
+				document.querySelector("dialog:modal, [popover]:popover-open")
 			)
 				return;
 			if (e.key === "?" && !ws.pokeCaret && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -526,6 +529,7 @@ export default function App() {
 				/>
 			)}
 			{menu && <ContextMenu menu={menu} onClose={() => setMenu(null)} />}
+			{coarsePointer && <TouchKeyInput ws={ws} />}
 			{logOpen && (
 				<LogDialog
 					key={ws.circuit.id}
