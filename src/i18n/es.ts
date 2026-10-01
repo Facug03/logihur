@@ -296,6 +296,9 @@ export const es: Record<string, string> = {
 	"analyze.lparenMissingError": "Falta apertura de paréntesis.",
 	"analyze.rparenMissingError": "Falta cierre de paréntesis.",
 	"analyze.badVariableName": "{0} no es una variable de entrada.",
+	"analyze.clipPasteSizeError": "La región para pegar debe ser del mismo tamaño que el sujetapapeles.",
+	"analyze.clipPasteEndError": "El portapapeles sobrepasa el final de la tabla.",
+	"analyze.clipPasteSupportedError": "El contenido del portapapeles no se puede pegar en la tabla.",
 	"analyze.unexpectedApostrophe": 'Apóstrofo inesperado ("\'")',
 	// circuit.properties / menu.properties
 	"analyze.circularError": "Detectada referencia circular; calculando tabla de verdad en su lugar.",

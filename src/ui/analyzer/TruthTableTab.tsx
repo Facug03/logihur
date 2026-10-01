@@ -1,13 +1,16 @@
-// Port of analyze.gui.TableTab + TableTabCaret: the truth table with a
-// keyboard caret. Output cells cycle on click; 0, 1 and x type values and
-// advance; space cycles; arrows, Home/End and Page Up/Down move.
+// Port of analyze.gui.TableTab + TableTabCaret + TableTabClip: the truth
+// table with a keyboard caret. Output cells cycle on click; 0, 1 and x type
+// values and advance; space cycles; arrows, Home/End and Page Up/Down move,
+// with Shift extending a region that can be copied and pasted.
 
 import { useRef, useState } from "react";
 import { errorMessage, isError } from "@/analyze/entry";
 import type { AnalyzerModel } from "@/analyze/model";
+import { copyRegion, parsePaste, pasteRegion, type Region } from "@/analyze/table-clip";
 import { t } from "@/i18n/es";
 import { entryForKey, nextEntry } from "./entries";
 import { ERROR_COLOR } from "./KarnaughMap";
+import { buttonClass } from "./VariablesTab";
 
 const ROW_HEIGHT = 26;
 const VIEW_HEIGHT = 380;
@@ -20,6 +23,9 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 	const rows = table.rowCount;
 	const cols = inputs.length + outputs.length;
 	const [cursor, setCursorState] = useState<{ row: number; col: number } | null>(null);
+	// the other corner of the selected region (TableTabCaret's mark)
+	const [mark, setMark] = useState<{ row: number; col: number } | null>(null);
+	const [clipError, setClipError] = useState<string | null>(null);
 	const [scrollTop, setScrollTop] = useState(0);
 	const viewportRef = useRef<HTMLDivElement>(null);
 
@@ -33,9 +39,28 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 	const gridTemplate = `repeat(${inputs.length}, ${COL_WIDTH}px) 12px repeat(${outputs.length}, ${COL_WIDTH}px)`;
 	const width = cols * COL_WIDTH + 12;
 
-	function setCursor(row: number, col: number): void {
+	const anchor = mark && current && mark.row < rows && mark.col < cols ? mark : current;
+	const region: Region | null =
+		current && anchor ? { r0: current.row, c0: current.col, r1: anchor.row, c1: anchor.col } : null;
+	const inRegion = (row: number, col: number) =>
+		region !== null &&
+		row >= Math.min(region.r0, region.r1) &&
+		row <= Math.max(region.r0, region.r1) &&
+		col >= Math.min(region.c0, region.c1) &&
+		col <= Math.max(region.c0, region.c1);
+
+	const copy = () => (region ? copyRegion(model, region) : null);
+	const paste = (text: string) => {
+		if (!region) return;
+		const error = pasteRegion(model, region, parsePaste(text));
+		setClipError(error ? t(error) : null);
+	};
+
+	function setCursor(row: number, col: number, extend = false): void {
 		const r = Math.max(0, Math.min(rows - 1, row));
 		const c = Math.max(0, Math.min(cols - 1, col));
+		if (!extend) setMark({ row: r, col: c });
+		else if (!mark && current) setMark(current);
 		setCursorState({ row: r, col: c });
 		const viewport = viewportRef.current;
 		if (viewport) {
@@ -50,6 +75,7 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 	function onKeyDown(e: React.KeyboardEvent): void {
 		if (e.ctrlKey || e.metaKey || e.altKey) return;
 		const at = current ?? { row: 0, col: inputs.length };
+		const shift = e.shiftKey;
 		const page = Math.max(1, Math.floor((viewportRef.current?.clientHeight ?? VIEW_HEIGHT) / ROW_HEIGHT) - 1);
 		const typed = entryForKey(e.key);
 		if (typed !== null) {
@@ -66,14 +92,14 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 			setCursor(at.row, at.col);
 		} else if (e.key === "Enter") setCursor(at.row + 1, inputs.length);
 		else if (e.key === "Backspace") setCursor(at.row, at.col - 1);
-		else if (e.key === "ArrowUp") setCursor(at.row - 1, at.col);
-		else if (e.key === "ArrowDown") setCursor(at.row + 1, at.col);
-		else if (e.key === "ArrowLeft") setCursor(at.row, at.col - 1);
-		else if (e.key === "ArrowRight") setCursor(at.row, at.col + 1);
-		else if (e.key === "Home") setCursor(at.col === 0 ? 0 : at.row, 0);
-		else if (e.key === "End") setCursor(at.col === cols - 1 ? rows - 1 : at.row, cols - 1);
-		else if (e.key === "PageDown") setCursor(at.row + page, at.col);
-		else if (e.key === "PageUp") setCursor(at.row - page, at.col);
+		else if (e.key === "ArrowUp") setCursor(at.row - 1, at.col, shift);
+		else if (e.key === "ArrowDown") setCursor(at.row + 1, at.col, shift);
+		else if (e.key === "ArrowLeft") setCursor(at.row, at.col - 1, shift);
+		else if (e.key === "ArrowRight") setCursor(at.row, at.col + 1, shift);
+		else if (e.key === "Home") setCursor(at.col === 0 ? 0 : at.row, 0, shift);
+		else if (e.key === "End") setCursor(at.col === cols - 1 ? rows - 1 : at.row, cols - 1, shift);
+		else if (e.key === "PageDown") setCursor(at.row + page, at.col, shift);
+		else if (e.key === "PageUp") setCursor(at.row - page, at.col, shift);
 		else return;
 		e.preventDefault();
 	}
@@ -112,6 +138,16 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 						// biome-ignore lint/a11y/noNoninteractiveTabindex: the table takes focus to own its keyboard caret, as in Logisim
 						tabIndex={0}
 						onKeyDown={onKeyDown}
+						onCopy={(e) => {
+							const text = copy();
+							if (text === null) return;
+							e.preventDefault();
+							e.clipboardData.setData("text/plain", text);
+						}}
+						onPaste={(e) => {
+							e.preventDefault();
+							paste(e.clipboardData.getData("text/plain"));
+						}}
 						onFocus={() => {
 							if (current === null) setCursorState({ row: 0, col: inputs.length < cols ? inputs.length : 0 });
 						}}
@@ -134,7 +170,12 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 									{inputs.map((name, col) => (
 										<span
 											key={name}
-											className={`text-center text-muted ${current?.row === row && current.col === col ? "rounded ring-2 ring-accent" : ""}`}
+											onPointerDown={(e) => {
+												e.preventDefault();
+												viewportRef.current?.focus();
+												setCursor(row, col, e.shiftKey);
+											}}
+											className={`text-center text-muted ${inRegion(row, col) ? "bg-accent/10" : ""} ${current?.row === row && current.col === col ? "rounded ring-2 ring-accent" : ""}`}
 										>
 											{table.getInputEntry(row, col).description}
 										</span>
@@ -151,11 +192,16 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 												onPointerDown={(e) => {
 													e.preventDefault();
 													viewportRef.current?.focus();
-													setCursorState({ row, col });
+													// Shift+click extends the region instead of changing the value
+													if (e.shiftKey) {
+														setCursor(row, col, true);
+														return;
+													}
+													setCursor(row, col);
 													table.setOutputEntry(row, j, nextEntry(entry));
 												}}
 												style={isError(entry) ? { background: ERROR_COLOR } : undefined}
-												className={`mx-1 cursor-pointer rounded text-center font-semibold hover:bg-accent/10 ${selected ? "ring-2 ring-accent" : ""}`}
+												className={`mx-1 cursor-pointer rounded text-center font-semibold hover:bg-accent/10 ${inRegion(row, col) ? "bg-accent/10" : ""} ${selected ? "ring-2 ring-accent" : ""}`}
 											>
 												{entry.description}
 											</span>
@@ -175,9 +221,38 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 							: table.getOutputEntry(current.row, current.col - inputs.length).description
 					}`}
 			</p>
+			<div className="flex flex-wrap items-center gap-2">
+				<button
+					type="button"
+					className={buttonClass}
+					disabled={!region}
+					onClick={async () => {
+						const text = copy();
+						if (text !== null) await navigator.clipboard?.writeText(text).catch(() => {});
+					}}
+				>
+					Copiar
+				</button>
+				<button
+					type="button"
+					className={buttonClass}
+					disabled={!region}
+					onClick={async () => {
+						const text = await navigator.clipboard?.readText().catch(() => null);
+						if (text) paste(text);
+						else setClipError(t("analyze.clipPasteSupportedError"));
+					}}
+				>
+					Pegar
+				</button>
+				<p role="alert" className="text-sm text-red-600">
+					{clipError}
+				</p>
+			</div>
 			<p className="text-xs text-muted">
 				Clic en una salida para alternar 0 → 1 → x. Con el teclado: 0, 1 o x escriben y avanzan; espacio
-				alterna; flechas, Inicio/Fin y RePág/AvPág mueven.
+				alterna; flechas, Inicio/Fin y RePág/AvPág mueven; con Shift se marca una región para copiar o pegar
+				(Ctrl/⌘+C, Ctrl/⌘+V).
 			</p>
 		</div>
 	);

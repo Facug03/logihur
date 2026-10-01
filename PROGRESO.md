@@ -197,9 +197,11 @@ Las fases 0–4 están implementadas y versionadas en git.
   apariencia editada. Además, toda edición repropaga todas las simulaciones abiertas (antes un
   circuito que usaba el subcircuito editado quedaba con valores viejos).
 
+- **Portapapeles de la tabla de verdad** (`src/analyze/table-clip.ts`): región con Shift, copia con
+  encabezados, pegado al cursor o en una región del mismo tamaño, errores de Logisim.
+
 ## Siguiente (en este orden)
 
-1. **Fase 5 (resto)**: copiar/pegar regiones en la tabla de verdad.
 2. **Fase 6 (resto)**: pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles
