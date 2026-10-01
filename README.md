@@ -16,6 +16,7 @@ bun run typecheck  # TypeScript
 bun run golden     # regenera los casos contra Logisim real (requiere Java y el jar en .cache/)
 bun run golden:io  # captura estados internos de E/S contra las fábricas Java originales
 bun run golden:analyze  # graba el análisis combinacional de Logisim real (requiere Java)
+bun run golden:libs     # graba la simulación de un proyecto con librerías .circ anidadas
 ```
 
 ## Uso del editor
@@ -36,6 +37,15 @@ expresiones del circuito visible; la ventana también permite definir entradas/s
 tabla (clic o teclas 0/1/x), escribir expresiones, ver el mapa de Karnaugh y la expresión minimizada, y
 **Crear circuito** (opcionalmente sólo con puertas de dos entradas o sólo NAND).
 La revisión de funciones presentes y pendientes está en [COMPATIBILIDAD.md](COMPATIBILIDAD.md).
+
+## Librerías `.circ`
+
+Como en Logisim (*Proyecto → Cargar librería → Librería Logisim*), otro `.circ` puede usarse como
+librería: sus circuitos se agregan como subcircuitos y se pueden ver por dentro pero no editar. En el
+panel de componentes, **Cargar librería .circ…** la agrega; el archivo guardado conserva la referencia
+`file#nombre.circ`, así que Logisim la encuentra si los archivos están en la misma carpeta. Al abrir un
+proyecto que usa librerías podés elegir todos los archivos juntos; si falta alguno, un aviso permite
+elegirlo después (mientras tanto sus componentes se conservan sin pérdida).
 
 ## Instalación y uso sin conexión
 

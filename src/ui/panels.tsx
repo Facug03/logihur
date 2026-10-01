@@ -196,7 +196,16 @@ export function CircuitsPanel({
 
 // --- component palette --------------------------------------------------------
 
-export function LibraryPanel({ ws, onPick }: { ws: Workspace; onPick?: () => void }) {
+export function LibraryPanel({
+	ws,
+	onPick,
+	children,
+}: {
+	ws: Workspace;
+	onPick?: () => void;
+	/** Extra entries after the built-in libraries (loaded .circ libraries). */
+	children?: React.ReactNode;
+}) {
 	const tool = ws.tool;
 	return (
 		<section className="flex flex-col gap-0.5 p-3">
@@ -233,12 +242,13 @@ export function LibraryPanel({ ws, onPick }: { ws: Workspace; onPick?: () => voi
 						</ul>
 					</LibraryDisclosure>
 				))}
+				{children}
 			</Disclosure>
 		</section>
 	);
 }
 
-function LibraryDisclosure({ id, children }: { id: string; children: React.ReactNode }) {
+export function LibraryDisclosure({ id, children }: { id: string; children: React.ReactNode }) {
 	const [open, setOpen] = usePreference(`library.${id}`, id === "#Gates" || id === "#Wiring");
 	return (
 		<details className="disclosure-motion group" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>

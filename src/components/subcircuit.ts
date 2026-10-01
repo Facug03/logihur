@@ -37,12 +37,15 @@ export const SUBCIRCUIT_LABEL_LOC = directionAttr("labelloc", "circuit.labelLoc"
 const STATIC_NAMES = new Set(CIRCUIT_STATIC_ATTRS.map((a) => a.name));
 
 export class SubcircuitFactory extends ComponentFactory {
-	readonly library = "";
 	readonly displayKey = "";
 	override readonly role = "subcircuit" as const;
 	override readonly facingAttr = FACING;
 
-	constructor(readonly source: Circuit) {
+	/** `library` is "" for the project's own circuits, or the "file#..." descriptor. */
+	constructor(
+		readonly source: Circuit,
+		readonly library = "",
+	) {
 		super();
 	}
 

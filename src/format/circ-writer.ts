@@ -60,7 +60,7 @@ function circuitElement(project: Project, circuit: Circuit): XmlElement {
 	for (const comp of circuit.components) {
 		const factory = comp.factory;
 		const attrs: Record<string, string> = {};
-		if (factory instanceof SubcircuitFactory) {
+		if (factory instanceof SubcircuitFactory && factory.library === "") {
 			// component from the file itself: no lib attribute
 		} else {
 			attrs.lib = ensureLibrary(project, factory.library).name;
@@ -80,8 +80,9 @@ export function projectToXml(project: Project): XmlElement {
 	// make sure every library used by a component is declared
 	for (const c of project.circuits) {
 		for (const comp of c.components) {
-			if (!(comp.factory instanceof SubcircuitFactory) && findLibrary(comp.factory.library)) {
-				ensureLibrary(project, comp.factory.library);
+			const desc = comp.factory.library;
+			if (desc.startsWith("file#") || (!(comp.factory instanceof SubcircuitFactory) && findLibrary(desc))) {
+				ensureLibrary(project, desc);
 			}
 		}
 	}

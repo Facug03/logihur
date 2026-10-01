@@ -68,6 +68,43 @@ function defaultToolbar(): XmlElement {
 	]);
 }
 
+/** File name of a "file#path/to/lib.circ" descriptor (libraries are matched by name). */
+export function libraryFileName(desc: string): string {
+	return desc.slice("file#".length).split(/[\\/]/).pop() ?? "";
+}
+
+/** A Logisim library loaded from another .circ file (Loader.loadLogisimLibrary). */
+export class LoadedLibrary {
+	private readonly factories = new Map<Circuit, SubcircuitFactory>();
+
+	constructor(
+		readonly desc: string,
+		readonly project: Project,
+	) {}
+
+	get fileName(): string {
+		return libraryFileName(this.desc);
+	}
+
+	get circuits(): readonly Circuit[] {
+		return this.project.circuits;
+	}
+
+	getFactory(circuit: Circuit): SubcircuitFactory {
+		let f = this.factories.get(circuit);
+		if (!f) {
+			f = new SubcircuitFactory(circuit, this.desc);
+			this.factories.set(circuit, f);
+		}
+		return f;
+	}
+
+	findFactory(name: string): SubcircuitFactory | null {
+		const circuit = this.project.getCircuit(name);
+		return circuit ? this.getFactory(circuit) : null;
+	}
+}
+
 export class Project {
 	readonly circuits: Circuit[] = [];
 	mainCircuit: Circuit | null = null;
@@ -78,6 +115,12 @@ export class Project {
 	/** Warnings produced while loading. */
 	messages: string[] = [];
 	sourceVersion = "2.7.1";
+	/** Contents of library files by name, shared with nested libraries. */
+	librarySources = new Map<string, string>();
+	/** "file#..." libraries that could be loaded, by descriptor. */
+	readonly loadedLibraries = new Map<string, LoadedLibrary>();
+	/** Library files referenced by the project but not provided yet. */
+	missingLibraries: string[] = [];
 
 	private readonly factories = new Map<Circuit, SubcircuitFactory>();
 	private readonly revisions = new Map<Circuit, number>();
@@ -129,6 +172,19 @@ export class Project {
 		if (from < 0 || from === index) return;
 		this.circuits.splice(from, 1);
 		this.circuits.splice(index, 0, c);
+	}
+
+	/** Whether `c` comes from a loaded library (directly or nested): read-only here. */
+	isLibraryCircuit(c: Circuit): boolean {
+		for (const lib of this.loadedLibraries.values()) {
+			if (lib.circuits.includes(c) || lib.project.isLibraryCircuit(c)) return true;
+		}
+		return false;
+	}
+
+	/** Whether any circuit uses a component of the library `desc`. */
+	usesLibrary(desc: string): boolean {
+		return this.circuits.some((c) => Array.from(c.components).some((comp) => comp.factory.library === desc));
 	}
 
 	/** Circuits (other than c) that contain c as a subcircuit. */

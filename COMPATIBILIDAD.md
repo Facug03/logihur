@@ -25,7 +25,8 @@ Se contrastó la documentación oficial y las fuentes del jar 2.7.1 extraídas e
 | Menu Tool / menú contextual de componentes | Implementado: clic derecho o Ctrl+clic (como Button3 / Ctrl Button1 de Logisim) y pulsación larga en táctil. Componente: Borrar, Mostrar Atributos y extensiones (Vista de subcircuito; Editar/Borrar Contenidos, Cargar/Salvar Imagen en RAM/ROM; Distribuir ascendente/descendente en separadores). Selección múltiple: Eliminar, Cortar y Copiar Selección. Menú de circuito: Editar, Analizar, Mover, Seleccionar como principal y Eliminar. Pendientes: Editar Apariencia y Estadísticas del circuito. |
 | Barra configurable y mapeo de botones del mouse | Pendiente: la barra web es fija; no aplica la configuración de `<toolbar>` / `<mappings>` del archivo al editor. |
 | Análisis combinacional | Implementado (botón Σ): Analizar Circuito y ventana con Entradas, Salidas, Tabla, Expresión y Minimizado, mapa de Karnaugh y Crear Circuito (dos entradas / sólo NAND, reemplazo con confirmación y deshacer). 511 casos verificados contra Logisim 2.7.1. Pendiente: copiar/pegar regiones de la tabla (TableTabClip). |
-| Logging y cargar librerías `.circ` | Pendientes de fase 5. |
+| Cargar librerías `.circ` | Implementado (`file#`): carga recursiva con detección de ciclos, circuitos de sólo lectura, Quitar si no se usa, referencias por nombre de archivo; simulación de librerías anidadas verificada contra Logisim 2.7.1. Librerías JAR fuera de alcance. |
+| Logging | Pendiente de fase 5. |
 
 La edición de texto usa un campo web de una línea sobre el lienzo. Conserva la regla original:
 si un componente aún no tiene etiqueta, un clic en su cuerpo la edita; si ya tiene etiqueta, se edita

@@ -39,6 +39,7 @@ import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
 import { ContextMenu, type MenuEntry, type MenuRequest } from "./ContextMenu";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";
 import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
+import { LogisimLibrariesSection, MissingLibrariesNotice, pickMainFile, readFiles } from "./LogisimLibraries";
 import { Disclosure, PanelResize } from "./PanelControls";
 import { ProjectMenu } from "./ProjectMenu";
 import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
@@ -207,9 +208,15 @@ export default function App() {
 		};
 	}, [ws]);
 
-	const openText = (text: string, name: string, kind: "project" | "example" = "project") => {
+	const openText = (
+		text: string,
+		name: string,
+		kind: "project" | "example" = "project",
+		libraries: ReadonlyMap<string, string> = new Map(),
+	) => {
 		try {
-			ws.openFromText(text, name, kind);
+			ws.openFromText(text, name, kind, libraries);
+			setLibraryNoticeHidden(false);
 			setError(null);
 			ws.notify(`Se abrió ${name}.`);
 			requestAnimationFrame(() => canvasRef.current?.fit());
@@ -219,6 +226,7 @@ export default function App() {
 	};
 
 	const [menu, setMenu] = useState<MenuRequest | null>(null);
+	const [libraryNoticeHidden, setLibraryNoticeHidden] = useState(false);
 	const [memoryEditing, setMemoryEditing] = useState<Instance | null>(null);
 	const memoryFileRef = useRef<HTMLInputElement>(null);
 	const memoryTarget = useRef<Instance | null>(null);
@@ -358,16 +366,23 @@ export default function App() {
 		});
 	}, [pwaState.updateReady, ws]);
 
+	/** Several .circ files at once: one project plus the libraries it uses. */
 	const onOpenFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		e.target.value = "";
-		if (file) {
-			try {
-				openText(await file.text(), file.name);
-			} catch {
-				setError("No se pudo leer el archivo.");
-			}
+		const files = e.target.files;
+		if (!files || files.length === 0) return;
+		let sources: Map<string, string>;
+		try {
+			sources = await readFiles(files);
+		} catch {
+			setError("No se pudo leer el archivo.");
+			return;
+		} finally {
+			e.target.value = "";
 		}
+		const main = pickMainFile(sources);
+		const text = sources.get(main) as string;
+		sources.delete(main);
+		openText(text, main, "project", sources);
 	};
 
 	const onSave = () => {
@@ -718,6 +733,7 @@ export default function App() {
 					ref={fileRef}
 					type="file"
 					accept=".circ,application/xml,text/xml"
+					multiple
 					hidden
 					onChange={onOpenFile}
 				/>
@@ -747,7 +763,9 @@ export default function App() {
 					</div>
 					<CircuitsPanel ws={ws} onCircuitMenu={openCircuitMenu} />
 					<div className="mx-3 h-px bg-line" />
-					<LibraryPanel ws={ws} onPick={() => setLeftOpen(false)} />
+					<LibraryPanel ws={ws} onPick={() => setLeftOpen(false)}>
+						<LogisimLibrariesSection ws={ws} onPick={() => setLeftOpen(false)} />
+					</LibraryPanel>
 					<div className="mx-3 h-px bg-line" />
 					<section className="flex flex-col gap-1 p-3">
 						<Disclosure id="examples" title="Ejemplos">
@@ -787,6 +805,9 @@ export default function App() {
 				/>
 				{/* canvas */}
 				<main className="relative min-w-0 flex-1">
+					{!libraryNoticeHidden && (
+						<MissingLibrariesNotice ws={ws} onDismiss={() => setLibraryNoticeHidden(true)} />
+					)}
 					<CircuitCanvas
 						ref={canvasRef}
 						ws={ws}

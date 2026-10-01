@@ -8,7 +8,7 @@ import { type ComponentFactory, Instance } from "@/engine/component";
 import { type Loc, parseLoc } from "@/engine/geom";
 import { compareVersion } from "@/engine/version";
 import { Wire } from "@/engine/wire";
-import { type LibraryRef, Project } from "@/project/project";
+import { type LibraryRef, LoadedLibrary, libraryFileName, Project } from "@/project/project";
 import { childElements, getAttr, hasAttr, parseXml, setAttr, textContent, type XmlElement } from "./xml";
 
 export class CircReadError extends Error {}
@@ -208,7 +208,16 @@ export interface ReadResult {
 	messages: string[];
 }
 
-export function readCirc(source: string): Project {
+/**
+ * Read a project. `libraries` holds the contents of library files by name
+ * (for `file#...` libraries); those not provided stay as placeholders and are
+ * listed in `project.missingLibraries`.
+ */
+export function readCirc(
+	source: string,
+	libraries: ReadonlyMap<string, string> = new Map(),
+	loading: ReadonlySet<string> = new Set(),
+): Project {
 	let root: XmlElement;
 	try {
 		root = parseXml(source);
@@ -219,6 +228,7 @@ export function readCirc(source: string): Project {
 	considerRepairs(root);
 
 	const project = new Project();
+	project.librarySources = new Map(libraries);
 	const messages = project.messages;
 	const sourceVersion = getAttr(root, "source") || "2.7.1";
 	project.sourceVersion = sourceVersion;
@@ -236,8 +246,27 @@ export function readCirc(source: string): Project {
 			desc: getAttr(libElt, "desc"),
 			tools: childElements(libElt, "tool"),
 		};
-		if (!ref.desc.startsWith("#")) {
-			messages.push(`Librería externa no soportada todavía: ${ref.desc}`);
+		if (ref.desc.startsWith("file#")) {
+			const fileName = libraryFileName(ref.desc);
+			const text = libraries.get(fileName);
+			if (text === undefined) {
+				project.missingLibraries.push(fileName);
+				messages.push(`Falta la librería ${fileName}`);
+			} else if (loading.has(fileName)) {
+				messages.push(`La librería ${fileName} se incluye a sí misma`);
+			} else {
+				try {
+					const lib = readCirc(text, libraries, new Set([...loading, fileName]));
+					project.loadedLibraries.set(ref.desc, new LoadedLibrary(ref.desc, lib));
+					for (const missing of lib.missingLibraries) {
+						if (!project.missingLibraries.includes(missing)) project.missingLibraries.push(missing);
+					}
+				} catch (e) {
+					messages.push(`No se pudo leer la librería ${fileName}: ${(e as Error).message}`);
+				}
+			}
+		} else if (!ref.desc.startsWith("#")) {
+			messages.push(`Librería externa no soportada: ${ref.desc}`);
 		} else if (!findLibrary(ref.desc)) {
 			messages.push(`Librería desconocida: ${ref.desc}`);
 		}
@@ -312,6 +341,8 @@ function resolveFactory(
 	}
 	const lib = libsByName.get(libName);
 	if (!lib) return null;
+	const loaded = project.loadedLibraries.get(lib.desc);
+	if (loaded) return loaded.findFactory(name) ?? new PlaceholderFactory(name, lib.desc);
 	return findFactory(lib.desc, name) ?? new PlaceholderFactory(name, lib.desc);
 }
 

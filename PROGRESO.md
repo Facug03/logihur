@@ -172,9 +172,17 @@ Las fases 0–4 están implementadas y versionadas en git.
   light dismiss cerraba el menú al soltar la presión que lo abrió). Tests en
   `tests/context-menu.test.ts`; Playwright en escritorio y táctil.
 
+- **Librerías `.circ`** (`file#`): `readCirc(text, libraries)` carga recursivamente las librerías
+  provistas (`LoadedLibrary`, ciclos detectados); las faltantes quedan como sustitutos y en
+  `project.missingLibraries`. `SubcircuitFactory` recuerda su librería y el escritor la referencia
+  con `lib=`. Workspace: abrir varios archivos a la vez (el principal es el que nadie referencia),
+  aviso para elegir los faltantes, Cargar/Quitar librería en el panel, contenidos guardados en el
+  autoguardado, edición bloqueada dentro de circuitos de librería. `bun run golden:libs` graba
+  `-tty table` de Logisim para principal → compuertas → base: coincide. `tests/libraries.test.ts`.
+
 ## Siguiente (en este orden)
 
-1. **Fase 5 (resto)**: editor de apariencia, logging, librerías `.circ`; copiar/pegar en la tabla.
+1. **Fase 5 (resto)**: editor de apariencia, logging, estadísticas de circuito; copiar/pegar en la tabla.
 2. **Fase 6 (resto)**: pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles

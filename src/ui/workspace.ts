@@ -58,6 +58,12 @@ interface SavedProject {
 	xml: string;
 	dirty: boolean;
 	kind: ProjectKind;
+	/** Library files (`file#` libraries) by name. */
+	libraries?: Record<string, string>;
+}
+
+function readSaved(saved: { xml: string; libraries?: Record<string, string> }): Project {
+	return readCirc(saved.xml, new Map(Object.entries(saved.libraries ?? {})));
 }
 interface ProjectStore {
 	version: 2;
@@ -137,6 +143,7 @@ export class Workspace {
 			xml: writeCirc(this.project),
 			dirty: this.dirty,
 			kind: this.projectKind,
+			libraries: Object.fromEntries(this.project.librarySources),
 		};
 		const index = this.savedProjects.findIndex((p) => p.id === snapshot.id);
 		if (index < 0) this.savedProjects.push(snapshot);
@@ -147,7 +154,7 @@ export class Workspace {
 		if (id === this.activeProjectId) return;
 		const saved = this.savedProjects.find((p) => p.id === id);
 		if (!saved) return;
-		const project = readCirc(saved.xml);
+		const project = readSaved(saved);
 		this.finishTextEditing();
 		this.snapshotProject();
 		this.previousProjectId = this.activeProjectId;
@@ -163,7 +170,7 @@ export class Workspace {
 		const remaining = this.savedProjects.filter((p) => p.id !== id);
 		if (id === this.activeProjectId) {
 			const next = remaining.find((p) => p.id === this.previousProjectId) ?? remaining.at(-1);
-			const project = next ? readCirc(next.xml) : Project.createEmpty();
+			const project = next ? readSaved(next) : Project.createEmpty();
 			this.finishTextEditing();
 			this.savedProjects = remaining;
 			this.activeProjectId = next?.id ?? id + 1;
@@ -250,8 +257,57 @@ export class Workspace {
 		this.setProject(Project.createEmpty(), "sin-titulo.circ");
 	}
 
-	openFromText(text: string, fileName: string, kind: ProjectKind = "project"): void {
-		this.setProject(readCirc(text), fileName, kind);
+	openFromText(
+		text: string,
+		fileName: string,
+		kind: ProjectKind = "project",
+		libraries: ReadonlyMap<string, string> = new Map(),
+	): void {
+		this.setProject(readCirc(text, libraries), fileName, kind);
+	}
+
+	// --- Logisim libraries (Proyecto > Cargar Librería > Librería Logisim) ---
+
+	/** Re-read the project with more library files, e.g. the ones it was missing. */
+	provideLibraries(files: ReadonlyMap<string, string>): void {
+		const sources = new Map([...this.project.librarySources, ...files]);
+		const dirty = this.dirty;
+		const viewed = this.circuit.name;
+		this.loadProject(readCirc(writeCirc(this.project), sources), this.fileName);
+		const again = this.project.getCircuit(viewed);
+		if (again) this.setCircuit(again);
+		this.dirty = dirty;
+		this.flushAutosave();
+	}
+
+	/** Add a .circ file as a library whose circuits can be placed but not edited. */
+	loadLibrary(fileName: string, text: string): void {
+		const desc = `file#${fileName}`;
+		if (this.project.libraries.some((l) => l.desc === desc)) {
+			this.notify(`La librería ${fileName} ya está cargada.`);
+			return;
+		}
+		let n = this.project.libraries.length;
+		while (this.project.libraries.some((l) => l.name === `${n}`)) n++;
+		this.project.libraries.push({ name: `${n}`, desc, tools: [] });
+		this.dirty = true;
+		this.provideLibraries(new Map([[fileName, text]]));
+		this.dirty = true;
+		this.notify(`Se cargó la librería ${fileName}.`);
+	}
+
+	/** Proyecto > Descargar Librería: only when nothing uses it. */
+	unloadLibrary(desc: string): void {
+		if (this.project.usesLibrary(desc)) {
+			this.notify("La librería se usa en algún circuito; quitá esos componentes primero.");
+			return;
+		}
+		this.project.libraries = this.project.libraries.filter((l) => l.desc !== desc);
+		this.project.loadedLibraries.delete(desc);
+		if (this.tool.kind === "add" && this.tool.factory.library === desc) this.setTool({ kind: "edit" });
+		this.dirty = true;
+		this.scheduleAutosave();
+		this.changed();
 	}
 
 	saveToText(): string {
@@ -270,7 +326,7 @@ export class Workspace {
 			if (!raw) return false;
 			const data = JSON.parse(raw) as ProjectStore | { name: string; xml: string };
 			if (!("version" in data)) {
-				this.loadProject(readCirc(data.xml), data.name);
+				this.loadProject(readSaved(data), data.name);
 				this.dirty = true;
 				this.flushAutosave();
 				return true;
@@ -278,7 +334,7 @@ export class Workspace {
 			if (data.version !== 2 || !Array.isArray(data.projects)) return false;
 			const active = data.projects.find((p) => p.id === data.activeId);
 			if (!active) return false;
-			const project = readCirc(active.xml);
+			const project = readSaved(active);
 			this.savedProjects = data.projects;
 			this.activeProjectId = active.id;
 			this.previousProjectId = data.previousId;
@@ -536,6 +592,12 @@ export class Workspace {
 		const tx = new Transaction(label);
 		const circuit = this.viewCircuit;
 		fn(tx, circuit);
+		// like Logisim, a library's circuits can be viewed but not changed
+		if (Array.from(tx.circuits()).some((c) => this.project.isLibraryCircuit(c))) {
+			tx.undo();
+			this.notify("Este circuito pertenece a una librería y no se puede modificar acá.");
+			return;
+		}
 		if (repair) {
 			for (const c of tx.circuits()) repairWires(tx, c);
 		}
