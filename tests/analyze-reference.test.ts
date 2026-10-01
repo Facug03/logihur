@@ -19,7 +19,7 @@ import { Circuit } from "@/engine/circuit";
 import { compareLoc, formatLoc } from "@/engine/geom";
 import { readCirc } from "@/format/circ-reader";
 import type { XmlElement } from "@/format/xml";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import { computeStatistics } from "@/project/statistics";
 import { getPinLabels } from "@/sim/pin-labels";
 import { type AnalyzeCase, analyzeCases } from "./golden/analyze-cases";

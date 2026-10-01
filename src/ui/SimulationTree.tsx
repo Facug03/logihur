@@ -10,6 +10,7 @@ import { SubcircuitFactory } from "@/components/subcircuit";
 import type { Instance } from "@/engine/component";
 import { formatLoc } from "@/engine/geom";
 import type { CircuitState } from "@/engine/simulation";
+import { t } from "@/i18n/i18n";
 import { Disclosure } from "./PanelControls";
 import { LogisimIcon } from "./panels";
 import type { Workspace } from "./workspace";
@@ -98,8 +99,8 @@ export function SimulationTree({ ws }: { ws: Workspace }) {
 	if (!root || subcircuits(root).length === 0) return null;
 	return (
 		<section className="flex flex-col gap-0.5 p-3">
-			<Disclosure id="simulation" title="Simulación">
-				<ul aria-label="Árbol de simulación">
+			<Disclosure id="simulation" title={t("Simulación")}>
+				<ul aria-label={t("Árbol de simulación")}>
 					<Node ws={ws} state={root} path={[]} depth={0} />
 				</ul>
 			</Disclosure>

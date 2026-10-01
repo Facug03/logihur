@@ -8,6 +8,7 @@ import type { Instance } from "@/engine/component";
 import { Bounds, type Loc, loc, locX, locY } from "@/engine/geom";
 import { prefs } from "@/engine/prefs";
 import { WIRE_WIDTH, type Wire } from "@/engine/wire";
+import { t } from "@/i18n/i18n";
 import { CanvasGraphics, cssFont } from "@/render/canvas-graphics";
 import { drawCircuit, drawGrid, type Viewport } from "@/render/circuit-renderer";
 import { CanvasInstancePainter } from "@/render/painter";
@@ -609,7 +610,7 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 			{textEditing && textGeometry && (
 				<input
 					ref={textInputRef}
-					aria-label="Editar texto en el circuito"
+					aria-label={t("Editar texto en el circuito")}
 					value={textEditing.draft}
 					className="absolute rounded-sm border border-accent bg-white px-1 text-black outline-none"
 					style={{

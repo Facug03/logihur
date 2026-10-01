@@ -22,7 +22,7 @@ import type { ComponentFactory, Instance } from "@/engine/component";
 import type { Loc } from "@/engine/geom";
 import { CircuitState, InstanceStateImpl } from "@/engine/simulation";
 import { Value } from "@/engine/value";
-import { t } from "@/i18n/es";
+import { localized, type Message, TranslatedError, t } from "@/i18n/i18n";
 import type { Project } from "@/project/project";
 import { getPinLabels } from "@/sim/pin-labels";
 import { BUS_ERROR, DONT_CARE, type Entry, ONE, OSCILLATE_ERROR, ZERO } from "./entry";
@@ -33,7 +33,7 @@ const MAX_ITERATIONS = 100;
 /** Expressions this large only come from feedback loops that double each pass. */
 const MAX_EXPRESSION_SIZE = 1 << 20;
 
-export class AnalyzeError extends Error {}
+export class AnalyzeError extends TranslatedError {}
 
 /** ExpressionComputer: thrown when a component has no expression. */
 class Unsupported extends Error {}
@@ -128,13 +128,13 @@ function propagateComponents(map: ExpressionMap, components: Iterable<Instance>)
 				computer(comp, map);
 			} catch (e) {
 				if (e instanceof Unsupported) {
-					throw new AnalyzeError(t("analyze.cannotHandleError", [displayName(comp.factory)]));
+					throw new AnalyzeError(() => t("analyze.cannotHandleError", [displayName(comp.factory)]));
 				}
 				throw e;
 			}
 		} else if (comp.factory !== PIN) {
 			// pins are handled elsewhere
-			throw new AnalyzeError(t("analyze.cannotHandleError", [displayName(comp.factory)]));
+			throw new AnalyzeError(() => t("analyze.cannotHandleError", [displayName(comp.factory)]));
 		}
 	}
 }
@@ -152,7 +152,7 @@ function propagateWires(map: ExpressionMap, points: Loc[]): void {
 			if (p2 === p) continue;
 			const old = map.get(p2);
 			if (old !== null && map.currentCause !== (map.causes.get(p2) ?? null) && !equals(old, e)) {
-				throw new AnalyzeError(t("analyze.conflictError"));
+				throw new AnalyzeError(() => t("analyze.conflictError"));
 			}
 			map.put(p2, e);
 		}
@@ -182,7 +182,7 @@ export function computeExpression(
 
 	propagateComponents(map, circuit.components);
 	for (let iterations = 0; map.dirtyPoints.size > 0; iterations++) {
-		if (iterations > MAX_ITERATIONS) throw new AnalyzeError(t("analyze.circularError"));
+		if (iterations > MAX_ITERATIONS) throw new AnalyzeError(() => t("analyze.circularError"));
 		propagateWires(map, Array.from(map.dirtyPoints));
 
 		const dirtyComponents = new Set<Instance>();
@@ -193,7 +193,8 @@ export function computeExpression(
 		// Java's isCircular can never hold for immutable trees; what can
 		// happen is a loop whose expression doubles on every pass
 		for (const p of map.dirtyPoints) {
-			if ((map.get(p)?.size ?? 0) > MAX_EXPRESSION_SIZE) throw new AnalyzeError(t("analyze.circularError"));
+			if ((map.get(p)?.size ?? 0) > MAX_EXPRESSION_SIZE)
+				throw new AnalyzeError(() => t("analyze.circularError"));
 		}
 	}
 
@@ -249,8 +250,8 @@ export function computeTable(
 export type AnalyzerTab = "inputs" | "outputs" | "table" | "expression" | "minimized";
 
 export type AnalyzeResult =
-	| { ok: false; error: string }
-	| { ok: true; tab: AnalyzerTab; notice: string | null };
+	| { ok: false; error: Message }
+	| { ok: true; tab: AnalyzerTab; notice: Message | null };
 
 /** ProjectCircuitActions.doAnalyze + configureAnalyzer. */
 export function analyzeCircuit(model: AnalyzerModel, project: Project, circuit: Circuit): AnalyzeResult {
@@ -261,13 +262,16 @@ export function analyzeCircuit(model: AnalyzerModel, project: Project, circuit: 
 		const input = isInputPin(pin);
 		(input ? inputNames : outputNames).push(label);
 		if ((pin.attrs.getByName("width") as number) > 1) {
-			return { ok: false, error: t(input ? "analyze.multibitInputError" : "analyze.multibitOutputError") };
+			return {
+				ok: false,
+				error: localized(input ? "analyze.multibitInputError" : "analyze.multibitOutputError"),
+			};
 		}
 	}
 	if (inputNames.length > MAX_INPUTS)
-		return { ok: false, error: t("analyze.tooManyInputsError", [MAX_INPUTS]) };
+		return { ok: false, error: localized("analyze.tooManyInputsError", [MAX_INPUTS]) };
 	if (outputNames.length > MAX_OUTPUTS)
-		return { ok: false, error: t("analyze.tooManyOutputsError", [MAX_OUTPUTS]) };
+		return { ok: false, error: localized("analyze.tooManyOutputsError", [MAX_OUTPUTS]) };
 
 	model.currentCircuit = circuit;
 	model.setVariables(inputNames, outputNames);
@@ -276,13 +280,13 @@ export function analyzeCircuit(model: AnalyzerModel, project: Project, circuit: 
 	if (outputNames.length === 0) return { ok: true, tab: "outputs", notice: null };
 
 	// attempt to show the corresponding expression
-	let notice: string;
+	let notice: Message;
 	try {
 		computeExpression(model, circuit, pinNames);
 		return { ok: true, tab: "expression", notice: null };
 	} catch (e) {
 		if (!(e instanceof AnalyzeError)) throw e;
-		notice = e.message;
+		notice = () => e.message;
 	}
 	// as a backup measure, compute a truth table
 	computeTable(model, project, circuit, pinNames);

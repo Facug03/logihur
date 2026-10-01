@@ -2,53 +2,54 @@
 
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { msg, t } from "@/i18n/i18n";
 
 const GROUPS = [
 	{
-		title: "Archivo y edición",
+		title: msg("Archivo y edición"),
 		entries: [
-			["Ctrl/⌘ + O", "Abrir .circ"],
-			["Ctrl/⌘ + S", "Descargar .circ"],
-			["Ctrl/⌘ + Z", "Deshacer"],
-			["Ctrl/⌘ + Y / Shift + Z", "Rehacer"],
-			["Ctrl/⌘ + C / X / V", "Copiar / cortar / pegar"],
-			["Ctrl/⌘ + D", "Duplicar"],
-			["Ctrl/⌘ + A", "Seleccionar todo"],
-			["Supr / Retroceso", "Borrar selección"],
+			[msg("Ctrl/⌘ + O"), msg("Abrir .circ")],
+			[msg("Ctrl/⌘ + S"), msg("Descargar .circ")],
+			[msg("Ctrl/⌘ + Z"), msg("Deshacer")],
+			[msg("Ctrl/⌘ + Y / Shift + Z"), msg("Rehacer")],
+			[msg("Ctrl/⌘ + C / X / V"), msg("Copiar / cortar / pegar")],
+			[msg("Ctrl/⌘ + D"), msg("Duplicar")],
+			[msg("Ctrl/⌘ + A"), msg("Seleccionar todo")],
+			[msg("Supr / Retroceso"), msg("Borrar selección")],
 		],
 	},
 	{
-		title: "Lienzo y componentes",
+		title: msg("Lienzo y componentes"),
 		entries: [
-			["Esc", "Volver a edición / cancelar"],
-			["Texto: Enter / Esc", "Confirmar / cancelar edición de texto"],
-			["Flechas", "Orientar el componente"],
-			["2–9", "Cambiar entradas de una puerta"],
-			["Shift + clic / arrastre", "Sumar a la selección"],
-			["Alt + arrastre / botón central", "Desplazar el lienzo"],
-			["Ctrl/⌘ + rueda / pellizco", "Zoom sobre el puntero"],
-			["Rueda", "Desplazar el lienzo"],
+			[msg("Esc"), msg("Volver a edición / cancelar")],
+			[msg("Texto: Enter / Esc"), msg("Confirmar / cancelar edición de texto")],
+			[msg("Flechas"), msg("Orientar el componente")],
+			[msg("2–9"), msg("Cambiar entradas de una puerta")],
+			[msg("Shift + clic / arrastre"), msg("Sumar a la selección")],
+			[msg("Alt + arrastre / botón central"), msg("Desplazar el lienzo")],
+			[msg("Ctrl/⌘ + rueda / pellizco"), msg("Zoom sobre el puntero")],
+			[msg("Rueda"), msg("Desplazar el lienzo")],
 		],
 	},
 	{
-		title: "Simulación",
+		title: msg("Simulación"),
 		entries: [
-			["Ctrl/⌘ + E", "Pausar / reanudar simulación"],
-			["Ctrl/⌘ + I", "Un paso de propagación"],
-			["Ctrl/⌘ + T", "Conmutar reloj una vez"],
-			["Ctrl/⌘ + K", "Activar / detener ticks"],
-			["Ctrl/⌘ + R", "Reiniciar simulación"],
-			["Tocar + clic", "Cambiar pines, relojes y controles"],
-			["Tocar + teclas", "Editar registros, memorias o teclado"],
-			["Ctrl + L (en Teclado)", "Enviar borrado de pantalla al TTY"],
+			[msg("Ctrl/⌘ + E"), msg("Pausar / reanudar simulación")],
+			[msg("Ctrl/⌘ + I"), msg("Un paso de propagación")],
+			[msg("Ctrl/⌘ + T"), msg("Conmutar reloj una vez")],
+			[msg("Ctrl/⌘ + K"), msg("Activar / detener ticks")],
+			[msg("Ctrl/⌘ + R"), msg("Reiniciar simulación")],
+			[msg("Tocar + clic"), msg("Cambiar pines, relojes y controles")],
+			[msg("Tocar + teclas"), msg("Editar registros, memorias o teclado")],
+			[msg("Ctrl + L (en Teclado)"), msg("Enviar borrado de pantalla al TTY")],
 		],
 	},
 	{
-		title: "Paneles y ayuda",
+		title: msg("Paneles y ayuda"),
 		entries: [
-			["?", "Consultar estos atajos"],
-			["Flechas (en separador)", "Ajustar ancho del panel"],
-			["Doble clic en separador", "Restaurar ancho original"],
+			[msg("?"), msg("Consultar estos atajos")],
+			[msg("Flechas (en separador)"), msg("Ajustar ancho del panel")],
+			[msg("Doble clic en separador"), msg("Restaurar ancho original")],
 		],
 	},
 ];
@@ -73,11 +74,11 @@ export function ShortcutsDialog({ onClose }: { onClose: () => void }) {
 		>
 			<div className="flex items-center justify-between gap-3">
 				<h2 id="shortcuts-title" className="text-lg font-semibold">
-					Atajos de teclado
+					{t("Atajos de teclado")}
 				</h2>
 				<button
 					type="button"
-					aria-label="Cerrar atajos"
+					aria-label={t("Cerrar atajos")}
 					onClick={onClose}
 					className="rounded-md p-2 hover:bg-black/5"
 				>
@@ -85,19 +86,20 @@ export function ShortcutsDialog({ onClose }: { onClose: () => void }) {
 				</button>
 			</div>
 			<p className="mt-1 text-xs text-muted">
-				Usá Ctrl en Windows/Linux o ⌘ en Mac. Mientras escribís en un campo, los atajos del editor quedan
-				suspendidos.
+				{t(
+					"Usá Ctrl en Windows/Linux o ⌘ en Mac. Mientras escribís en un campo, los atajos del editor quedan suspendidos.",
+				)}
 			</p>
 			{GROUPS.map((group) => (
-				<section key={group.title} className="mt-5">
-					<h3 className="mb-2 text-sm font-semibold">{group.title}</h3>
+				<section key={t(group.title)} className="mt-5">
+					<h3 className="mb-2 text-sm font-semibold">{t(group.title)}</h3>
 					<dl className="divide-y divide-line text-xs">
 						{group.entries.map(([keys, action]) => (
 							<div key={keys} className="grid grid-cols-2 gap-3 py-2">
 								<dt>
-									<kbd className="font-mono text-muted">{keys}</kbd>
+									<kbd className="font-mono text-muted">{t(keys)}</kbd>
 								</dt>
-								<dd>{action}</dd>
+								<dd>{t(action)}</dd>
 							</div>
 						))}
 					</dl>

@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 import { errorMessage, isError } from "@/analyze/entry";
 import type { AnalyzerModel } from "@/analyze/model";
 import { copyRegion, parsePaste, pasteRegion, type Region } from "@/analyze/table-clip";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import { entryForKey, nextEntry } from "./entries";
 import { ERROR_COLOR } from "./KarnaughMap";
 import { buttonClass } from "./VariablesTab";
@@ -231,7 +231,7 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 						if (text !== null) await navigator.clipboard?.writeText(text).catch(() => {});
 					}}
 				>
-					Copiar
+					{t("Copiar")}
 				</button>
 				<button
 					type="button"
@@ -243,16 +243,16 @@ export function TruthTableTab({ model }: { model: AnalyzerModel }) {
 						else setClipError(t("analyze.clipPasteSupportedError"));
 					}}
 				>
-					Pegar
+					{t("Pegar")}
 				</button>
 				<p role="alert" className="text-sm text-red-600">
 					{clipError}
 				</p>
 			</div>
 			<p className="text-xs text-muted">
-				Clic en una salida para alternar 0 → 1 → x. Con el teclado: 0, 1 o x escriben y avanzan; espacio
-				alterna; flechas, Inicio/Fin y RePág/AvPág mueven; con Shift se marca una región para copiar o pegar
-				(Ctrl/⌘+C, Ctrl/⌘+V).
+				{t(
+					"Clic en una salida para alternar 0 → 1 → x. Con el teclado: 0, 1 o x escriben y avanzan; espacio alterna; flechas, Inicio/Fin y RePág/AvPág mueven; con Shift se marca una región para copiar o pegar (Ctrl/⌘+C, Ctrl/⌘+V).",
+				)}
 			</p>
 		</div>
 	);

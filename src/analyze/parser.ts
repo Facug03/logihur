@@ -1,7 +1,7 @@
 // Port of com.cburch.logisim.analyze.model.Parser: accepts ~ ! ' for NOT,
 // juxtaposition & && AND for AND, + | || OR for OR, ^ XOR for XOR, 0 and 1.
 
-import { t } from "@/i18n/es";
+import { TranslatedError, t } from "@/i18n/i18n";
 import { isIdentPart, isIdentStart } from "@/sim/pin-labels";
 import {
 	AND_LEVEL,
@@ -17,9 +17,9 @@ import {
 	xor,
 } from "./expression";
 
-export class ParserError extends Error {
+export class ParserError extends TranslatedError {
 	constructor(
-		message: string,
+		message: () => string,
 		readonly offset: number,
 		readonly length: number,
 	) {
@@ -56,7 +56,7 @@ function token(type: TokenType, offset: number, text: string, length = text.leng
 }
 
 function tokenError(tok: Token, key: string, arg?: string): ParserError {
-	return new ParserError(t(key, arg === undefined ? undefined : [arg]), tok.offset, tok.length);
+	return new ParserError(() => t(key, arg === undefined ? undefined : [arg]), tok.offset, tok.length);
 }
 
 /** Character.isWhitespace: Unicode spaces except the non-breaking ones. */

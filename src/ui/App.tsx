@@ -37,7 +37,7 @@ import type { Circuit } from "@/engine/circuit";
 import type { Instance } from "@/engine/component";
 import type { Direction } from "@/engine/geom";
 import { setTextMeasurer } from "@/engine/graphics";
-import { t } from "@/i18n/es";
+import { localized, type Message, msg, renderMessage, TranslatedError, t } from "@/i18n/i18n";
 import { measureWith } from "@/render/canvas-graphics";
 import { APPEARANCE_TOOLS, AppearanceEditor, type AppearanceEditorHandle } from "./AppearanceEditor";
 import { AnalyzeMenu } from "./analyzer/AnalyzeMenu";
@@ -47,13 +47,14 @@ import { ContextMenu, type MenuEntry, type MenuRequest } from "./ContextMenu";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";
 import { ExportImageDialog } from "./ExportImageDialog";
 import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
+import { LocalizedText } from "./LocalizedText";
 import { LogDialog } from "./LogDialog";
 import { LogisimLibrariesSection, MissingLibrariesNotice, pickMainFile, readFiles } from "./LogisimLibraries";
 import { Disclosure, PanelResize } from "./PanelControls";
 import { PreferencesDialog } from "./PreferencesDialog";
 import { ProjectMenu } from "./ProjectMenu";
 import { AttributesPanel, CircuitsPanel, componentName, LibraryPanel, LogisimIcon } from "./panels";
-import { loadGateShape, useMediaQuery, usePreference } from "./preferences";
+import { loadGateShape, loadLocale, useMediaQuery, usePreference } from "./preferences";
 import { onLaunchFiles, pwa } from "./pwa";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { SimulationTree } from "./SimulationTree";
@@ -67,39 +68,46 @@ const measureCtx = document.createElement("canvas").getContext("2d");
 if (measureCtx) setTextMeasurer((text: string, font: Font) => measureWith(measureCtx, text, font));
 
 const EXAMPLES = [
-	{ file: "half-adder.circ", label: "Semisumador" },
-	{ file: "full-adder.circ", label: "Sumador completo (con subcircuitos)" },
-	{ file: "io-demo.circ", label: "Entrada/salida: teclado, TTY y controles" },
-	{ file: "marquee.circ", label: "Marquesina LED: ROM, registros de desplazamiento y matriz" },
+	{ file: "half-adder.circ", label: msg("Semisumador") },
+	{ file: "full-adder.circ", label: msg("Sumador completo (con subcircuitos)") },
+	{ file: "io-demo.circ", label: msg("Entrada/salida: teclado, TTY y controles") },
+	{ file: "marquee.circ", label: msg("Marquesina LED: ROM, registros de desplazamiento y matriz") },
 ];
 
 /** Logisim's default toolbar: two pin presets and three gates. */
 const QUICK_TOOLS = [
-	{ id: "pin-in", factory: PIN, preset: { tristate: false }, icon: "pinInput.gif", label: "Pin de entrada" },
+	{
+		id: "pin-in",
+		factory: PIN,
+		preset: { tristate: false },
+		icon: "pinInput.gif",
+		label: "pin.inputToolTip",
+	},
 	{
 		id: "pin-out",
 		factory: PIN,
 		preset: { facing: "west", output: true, labelloc: "east" },
 		icon: "pinOutputReversed.gif",
-		label: "Pin de salida",
+		label: "pin.outputToolTip",
 	},
-	{ id: NOT_GATE.name, factory: NOT_GATE, preset: {}, icon: "notGate.gif", label: t("gates.not") },
-	{ id: AND_GATE.name, factory: AND_GATE, preset: {}, icon: "andGate.gif", label: t("gates.and") },
-	{ id: OR_GATE.name, factory: OR_GATE, preset: {}, icon: "orGate.gif", label: t("gates.or") },
+	{ id: NOT_GATE.name, factory: NOT_GATE, preset: {}, icon: "notGate.gif", label: "gates.not" },
+	{ id: AND_GATE.name, factory: AND_GATE, preset: {}, icon: "andGate.gif", label: "gates.and" },
+	{ id: OR_GATE.name, factory: OR_GATE, preset: {}, icon: "orGate.gif", label: "gates.or" },
 ] as const;
 
 /** Status bar help of each appearance tool. */
 const APPEARANCE_HELP: Record<string, string> = {
-	select:
+	select: msg(
 		"Apariencia · clic para seleccionar, Shift suma · arrastrar mueve en la grilla (Alt: libre) · manijas cambian la forma · Supr borra",
-	text: "Texto · clic para escribir · Enter confirma · Esc cancela",
-	line: "Línea · arrastrá de un extremo al otro",
-	curve: "Curva · arrastrá entre los extremos y ajustá el punto de control con su manija",
-	polyline: "Polilínea · clic en cada vértice · doble clic o Enter termina · Esc cancela",
-	rect: "Rectángulo · arrastrá de una esquina a la opuesta",
-	roundrect: "Rectángulo redondeado · arrastrá de una esquina a la opuesta",
-	oval: "Óvalo · arrastrá el rectángulo que lo contiene",
-	polygon: "Polígono · clic en cada vértice · doble clic o Enter lo cierra · Esc cancela",
+	),
+	text: msg("Texto · clic para escribir · Enter confirma · Esc cancela"),
+	line: msg("Línea · arrastrá de un extremo al otro"),
+	curve: msg("Curva · arrastrá entre los extremos y ajustá el punto de control con su manija"),
+	polyline: msg("Polilínea · clic en cada vértice · doble clic o Enter termina · Esc cancela"),
+	rect: msg("Rectángulo · arrastrá de una esquina a la opuesta"),
+	roundrect: msg("Rectángulo redondeado · arrastrá de una esquina a la opuesta"),
+	oval: msg("Óvalo · arrastrá el rectángulo que lo contiene"),
+	polygon: msg("Polígono · clic en cada vértice · doble clic o Enter lo cierra · Esc cancela"),
 };
 
 /** Keys delivered to poke carets, as the characters Java's KeyEvent reports. */
@@ -162,8 +170,9 @@ export default function App() {
 	const wsRef = useRef<Workspace | null>(null);
 	if (wsRef.current === null) {
 		const ws = new Workspace();
+		ws.setLocale(loadLocale());
 		ws.setGateShape(loadGateShape());
-		if (ws.restoreAutosave()) ws.notice = "Se recuperó tu último trabajo.";
+		if (ws.restoreAutosave()) ws.notice = localized("Se recuperó tu último trabajo.");
 		wsRef.current = ws;
 	}
 	const ws = wsRef.current;
@@ -192,14 +201,18 @@ export default function App() {
 	const [preferencesOpen, setPreferencesOpen] = useState(false);
 	const [exportOpen, setExportOpen] = useState(false);
 	const [projectToDelete, setProjectToDelete] = useState<{ id: number; name: string } | null>(null);
-	const [analyzer, setAnalyzer] = useState<{ tab: AnalyzerTab; notice: string | null } | null>(null);
+	const [analyzer, setAnalyzer] = useState<{ tab: AnalyzerTab; notice: Message | null } | null>(null);
 	const [loadingExample, setLoadingExample] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<Message | null>(null);
 	const autosaveStatus = ws.autosaveStatus;
 	useEffect(() => {
 		if (autosaveStatus === "error") {
 			toast.error(
-				"No se pudo autoguardar en este navegador. Descargá tu archivo .circ para conservar los cambios.",
+				<LocalizedText
+					render={localized(
+						"No se pudo autoguardar en este navegador. Descargá tu archivo .circ para conservar los cambios.",
+					)}
+				/>,
 				{
 					id: "autosave-error",
 					duration: 10000,
@@ -211,7 +224,7 @@ export default function App() {
 	useEffect(() => {
 		const showNotice = () => {
 			if (ws.notice) {
-				toast.info(ws.notice, { id: "workspace-notice" });
+				toast.info(<LocalizedText render={ws.notice} />, { id: "workspace-notice" });
 				ws.notice = null;
 			}
 		};
@@ -220,7 +233,7 @@ export default function App() {
 	}, [ws]);
 	useEffect(() => {
 		if (error) {
-			toast.error(error, { duration: 10000 });
+			toast.error(<LocalizedText render={() => renderMessage(error)} />, { duration: 10000 });
 			setError(null);
 		}
 	}, [error]);
@@ -258,10 +271,10 @@ export default function App() {
 			ws.openFromText(text, name, kind, libraries);
 			setLibraryNoticeHidden(false);
 			setError(null);
-			ws.notify(`Se abrió ${name}.`);
+			ws.notify(localized("Se abrió {0}.", [name]));
 			requestAnimationFrame(() => canvasRef.current?.fit());
 		} catch (e) {
-			setError((e as Error).message);
+			setError(() => () => (e as Error).message);
 		}
 	};
 
@@ -277,7 +290,11 @@ export default function App() {
 	const analyze = () => {
 		const result = ws.analyzeViewedCircuit();
 		if (result.ok) setAnalyzer({ tab: result.tab, notice: result.notice });
-		else toast.error(t("analyze.errorTitle"), { description: result.error, duration: 8000 });
+		else
+			toast.error(<LocalizedText render={localized("analyze.errorTitle")} />, {
+				description: <LocalizedText render={() => renderMessage(result.error)} />,
+				duration: 8000,
+			});
 	};
 
 	/** MenuTool: a selection menu, or a component menu plus its MenuExtender items. */
@@ -286,23 +303,23 @@ export default function App() {
 			setMenu({
 				x,
 				y,
-				title: `${ws.selection.size + ws.selectedWires.size} elementos seleccionados`,
+				title: t("{0} elementos seleccionados", [ws.selection.size + ws.selectedWires.size]),
 				items: [
-					{ label: "Eliminar Selección", danger: true, onSelect: () => ws.deleteSelection() },
-					{ label: "Cortar Selección", onSelect: () => ws.cut() },
-					{ label: "Copiar Selección", onSelect: () => ws.copy() },
+					{ label: t("Eliminar Selección"), danger: true, onSelect: () => ws.deleteSelection() },
+					{ label: t("Cortar Selección"), onSelect: () => ws.cut() },
+					{ label: t("Copiar Selección"), onSelect: () => ws.copy() },
 				],
 			});
 			return;
 		}
 		ws.select(inst);
 		const items: MenuEntry[] = [
-			{ label: "Borrar", danger: true, onSelect: () => ws.deleteComponent(inst) },
-			{ label: "Mostrar Atributos", onSelect: showAttributes },
+			{ label: t("Borrar"), danger: true, onSelect: () => ws.deleteComponent(inst) },
+			{ label: t("Mostrar Atributos"), onSelect: showAttributes },
 		];
 		if (inst.factory instanceof SubcircuitFactory) {
 			items.push("separator", {
-				label: `Vista ${inst.factory.name}`,
+				label: t("Vista {0}", [inst.factory.name]),
 				onSelect: () => ws.enterSubcircuit(inst),
 			});
 		}
@@ -310,9 +327,9 @@ export default function App() {
 		if (contents) {
 			items.push(
 				"separator",
-				{ label: "Editar Contenidos...", onSelect: () => setMemoryEditing(inst) },
+				{ label: t("Editar Contenidos..."), onSelect: () => setMemoryEditing(inst) },
 				{
-					label: "Borrar Contenidos",
+					label: t("Borrar Contenidos"),
 					onSelect: () => {
 						const next = contents.clone();
 						next.clear();
@@ -320,14 +337,14 @@ export default function App() {
 					},
 				},
 				{
-					label: "Cargar Imagen...",
+					label: t("Cargar Imagen..."),
 					onSelect: () => {
 						memoryTarget.current = inst;
 						memoryFileRef.current?.click();
 					},
 				},
 				{
-					label: "Salvar Imagen...",
+					label: t("Salvar Imagen..."),
 					onSelect: () => downloadMemory(contents, `${inst.factory.name.toLowerCase()}.hex`),
 				},
 			);
@@ -336,12 +353,12 @@ export default function App() {
 			items.push(
 				"separator",
 				{
-					label: "Distribuir ascendente",
+					label: t("Distribuir ascendente"),
 					disabled: ws.splitterDistribution(inst, 1) === null,
 					onSelect: () => ws.distributeSplitter(inst, 1),
 				},
 				{
-					label: "Distribuir descendente",
+					label: t("Distribuir descendente"),
 					disabled: ws.splitterDistribution(inst, -1) === null,
 					onSelect: () => ws.distributeSplitter(inst, -1),
 				},
@@ -360,7 +377,7 @@ export default function App() {
 			title: c.name,
 			items: [
 				{
-					label: "Editar Circuito",
+					label: t("Editar Circuito"),
 					onSelect: () => {
 						ws.setCircuit(c);
 						ws.setAppearanceMode(false);
@@ -374,27 +391,27 @@ export default function App() {
 					},
 				},
 				{
-					label: "Editar Apariencia del Circuito",
+					label: t("Editar Apariencia del Circuito"),
 					onSelect: () => {
 						ws.setCircuit(c);
 						ws.setAppearanceMode(true);
 					},
 				},
-				{ label: "Obtener Estadísticas del Circuito", onSelect: () => setStatsCircuit(c) },
+				{ label: t("Obtener Estadísticas del Circuito"), onSelect: () => setStatsCircuit(c) },
 				"separator",
-				{ label: "Mover Arriba", disabled: index <= 0, onSelect: () => ws.moveCircuit(c, -1) },
+				{ label: t("Mover Arriba"), disabled: index <= 0, onSelect: () => ws.moveCircuit(c, -1) },
 				{
-					label: "Mover Abajo",
+					label: t("Mover Abajo"),
 					disabled: index >= ws.project.circuits.length - 1,
 					onSelect: () => ws.moveCircuit(c, 1),
 				},
 				"separator",
 				{
-					label: "Seleccionar Como Circuito Principal",
+					label: t("Seleccionar Como Circuito Principal"),
 					disabled: isMain,
 					onSelect: () => ws.setMainCircuit(c),
 				},
-				{ label: "Eliminar Circuito", danger: true, onSelect: () => ws.removeCircuit(c) },
+				{ label: t("Eliminar Circuito"), danger: true, onSelect: () => ws.removeCircuit(c) },
 			],
 		});
 	};
@@ -407,12 +424,12 @@ export default function App() {
 	}, []);
 	useEffect(() => {
 		if (!pwaState.updateReady) return;
-		toast("Hay una versión nueva de LogiHUR.", {
+		toast(<LocalizedText render={localized("Hay una versión nueva de LogiHUR.")} />, {
 			id: "pwa-update",
 			duration: Number.POSITIVE_INFINITY,
-			description: "Tu trabajo queda guardado en este navegador.",
+			description: <LocalizedText render={localized("Tu trabajo queda guardado en este navegador.")} />,
 			action: {
-				label: "Actualizar",
+				label: <LocalizedText render={localized("Actualizar")} />,
 				onClick: () =>
 					pwa.applyUpdate(() => {
 						ws.finishTextEditing();
@@ -430,7 +447,7 @@ export default function App() {
 		try {
 			sources = await readFiles(files);
 		} catch {
-			setError("No se pudo leer el archivo.");
+			setError(() => localized("No se pudo leer el archivo."));
 			return;
 		} finally {
 			e.target.value = "";
@@ -448,14 +465,14 @@ export default function App() {
 		a.download = ws.fileName.endsWith(".circ") ? ws.fileName : `${ws.fileName}.circ`;
 		a.click();
 		setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-		ws.notify(`Se inició la descarga de ${a.download}.`);
+		ws.notify(localized("Se inició la descarga de {0}.", [a.download]));
 	};
 
 	const loadExample = async (file: string) => {
 		setLoadingExample(true);
 		try {
 			const res = await fetch(`/examples/${file}`);
-			if (!res.ok) throw new Error("No se pudo cargar el ejemplo. Intentá de nuevo.");
+			if (!res.ok) throw new TranslatedError(localized("No se pudo cargar el ejemplo. Intentá de nuevo."));
 			openText(await res.text(), file, "example");
 		} catch (e) {
 			setError((e as Error).message);
@@ -557,7 +574,7 @@ export default function App() {
 					onConfirm={() => {
 						ws.deleteProject(projectToDelete.id);
 						setProjectToDelete(null);
-						ws.notify(`Se eliminó ${projectToDelete.name}.`);
+						ws.notify(localized("Se eliminó {0}.", [projectToDelete.name]));
 						requestAnimationFrame(() => canvasRef.current?.fit());
 					}}
 				/>
@@ -591,7 +608,7 @@ export default function App() {
 				type="file"
 				accept=".hex,.txt"
 				hidden
-				aria-label="Cargar imagen de memoria"
+				aria-label={t("Cargar imagen de memoria")}
 				onChange={async (e) => {
 					const file = e.target.files?.[0];
 					const inst = memoryTarget.current;
@@ -603,7 +620,7 @@ export default function App() {
 						loadImage(next, await file.text());
 						ws.setMemoryContents(inst, next);
 					} catch (err) {
-						setError(memoryImageError(err));
+						setError(() => () => memoryImageError(err));
 					}
 				}}
 			/>
@@ -615,7 +632,7 @@ export default function App() {
 					onClose={() => setAnalyzer(null)}
 					onBuilt={() => {
 						setAnalyzer(null);
-						ws.notify(`Se creó el circuito ${ws.viewCircuit.name}.`);
+						ws.notify(localized("Se creó el circuito {0}.", [ws.viewCircuit.name]));
 						requestAnimationFrame(() => canvasRef.current?.fit());
 					}}
 				/>
@@ -623,14 +640,14 @@ export default function App() {
 			{/* top bar */}
 			<header className="flex h-12 shrink-0 items-center gap-0.5 overflow-x-auto border-b border-line bg-panel px-2 [scrollbar-width:none]">
 				<IconButton
-					label="Componentes y circuitos"
+					label={t("Componentes y circuitos")}
 					active={desktopLeft ? leftVisible : leftOpen}
 					onClick={() => (desktopLeft ? setLeftVisible((v) => !v) : setLeftOpen((v) => !v))}
 				>
 					<Menu className="size-5" />
 				</IconButton>
 				<IconButton
-					label="Atributos"
+					label={t("Atributos")}
 					active={desktopRight ? rightVisible : rightOpen}
 					onClick={() => (desktopRight ? setRightVisible((v) => !v) : setRightOpen((v) => !v))}
 				>
@@ -654,8 +671,8 @@ export default function App() {
 					<Save className="size-[18px]" />
 				</IconButton>
 				<IconButton
-					label={"Exportar imagen"}
-					description={"Descarga uno o más circuitos como PNG o JPEG."}
+					label={t("Exportar imagen")}
+					description={t("Descarga uno o más circuitos como PNG o JPEG.")}
 					onClick={() => setExportOpen(true)}
 				>
 					<ImageDown className="size-[18px]" />
@@ -676,38 +693,42 @@ export default function App() {
 						))}
 						<Divider />
 						<IconButton
-							label={`Deshacer${ws.history.undoLabel() ? `: ${ws.history.undoLabel()}` : ""} (Ctrl+Z)`}
+							label={`${t("Deshacer")}${ws.history.undoLabel() ? `: ${t(ws.history.undoLabel() ?? "")}` : ""} (Ctrl+Z)`}
 							disabled={!ws.history.canUndo()}
 							onClick={() => ws.undo()}
 						>
 							<Undo2 className="size-[18px]" />
 						</IconButton>
-						<IconButton label={`Rehacer (Ctrl+Y)`} disabled={!ws.history.canRedo()} onClick={() => ws.redo()}>
+						<IconButton
+							label={`${t("Rehacer")} (Ctrl+Y)`}
+							disabled={!ws.history.canRedo()}
+							onClick={() => ws.redo()}
+						>
 							<Redo2 className="size-[18px]" />
 						</IconButton>
 						<IconButton
-							label="Borrar selección (Supr)"
+							label={t("Borrar selección (Supr)")}
 							disabled={!ws.appearanceSelected.some(isRemovable)}
 							onClick={() => ws.deleteAppearanceSelection()}
 						>
 							<Trash2 className="size-[18px]" />
 						</IconButton>
 						<IconButton
-							label="Traer al frente"
+							label={t("Traer al frente")}
 							disabled={ws.appearanceSelected.length === 0}
 							onClick={() => ws.reorderAppearanceSelection(true)}
 						>
 							<ArrowUpToLine className="size-[18px]" />
 						</IconButton>
 						<IconButton
-							label="Enviar al fondo"
+							label={t("Enviar al fondo")}
 							disabled={ws.appearanceSelected.length === 0}
 							onClick={() => ws.reorderAppearanceSelection(false)}
 						>
 							<ArrowDownToLine className="size-[18px]" />
 						</IconButton>
 						<IconButton
-							label="Revertir a la apariencia por defecto"
+							label={t("Revertir a la apariencia por defecto")}
 							disabled={ws.circuit.appearance.isDefault()}
 							onClick={() => ws.revertAppearance()}
 						>
@@ -719,32 +740,40 @@ export default function App() {
 						<Divider />
 
 						<IconButton
-							label="Tocar (cambiar valores)"
-							description="Probá el circuito: cambiá pines, pulsá botones, arrastrá el joystick o escribí en el componente tocado."
+							label={t("Tocar (cambiar valores)")}
+							description={t(
+								"Probá el circuito: cambiá pines, pulsá botones, arrastrá el joystick o escribí en el componente tocado.",
+							)}
 							active={tool.kind === "poke"}
 							onClick={() => ws.setTool({ kind: "poke" })}
 						>
 							<LogisimIcon name="poke.gif" size={20} />
 						</IconButton>
 						<IconButton
-							label="Editar (Esc)"
-							description="Seleccioná y mové componentes o cables. Shift suma a la selección; arrastrar desde un puerto permite cablear."
+							label={t("Editar (Esc)")}
+							description={t(
+								"Seleccioná y mové componentes o cables. Shift suma a la selección; arrastrar desde un puerto permite cablear.",
+							)}
 							active={tool.kind === "edit"}
 							onClick={() => ws.setTool({ kind: "edit" })}
 						>
 							<LogisimIcon name="select.gif" size={20} />
 						</IconButton>
 						<IconButton
-							label="Cablear"
-							description="Arrastrá entre puertos o puntos de la grilla para crear un cable. Escape vuelve a edición."
+							label={t("Cablear")}
+							description={t(
+								"Arrastrá entre puertos o puntos de la grilla para crear un cable. Escape vuelve a edición.",
+							)}
 							active={tool.kind === "wiring"}
 							onClick={() => ws.setTool({ kind: "wiring" })}
 						>
 							<LogisimIcon name="wiring.gif" size={20} />
 						</IconButton>
 						<IconButton
-							label="Texto"
-							description="Creá una etiqueta con un clic en vacío, o editá el texto de una etiqueta o componente. Enter confirma; Escape cancela."
+							label={t("Texto")}
+							description={t(
+								"Creá una etiqueta con un clic en vacío, o editá el texto de una etiqueta o componente. Enter confirma; Escape cancela.",
+							)}
 							active={tool.kind === "text"}
 							onClick={() => ws.selectTextTool()}
 						>
@@ -766,17 +795,21 @@ export default function App() {
 						<Divider />
 
 						<IconButton
-							label={`Deshacer${ws.history.undoLabel() ? `: ${ws.history.undoLabel()}` : ""} (Ctrl+Z)`}
+							label={`${t("Deshacer")}${ws.history.undoLabel() ? `: ${t(ws.history.undoLabel() ?? "")}` : ""} (Ctrl+Z)`}
 							disabled={!ws.history.canUndo()}
 							onClick={() => ws.undo()}
 						>
 							<Undo2 className="size-[18px]" />
 						</IconButton>
-						<IconButton label={`Rehacer (Ctrl+Y)`} disabled={!ws.history.canRedo()} onClick={() => ws.redo()}>
+						<IconButton
+							label={`${t("Rehacer")} (Ctrl+Y)`}
+							disabled={!ws.history.canRedo()}
+							onClick={() => ws.redo()}
+						>
 							<Redo2 className="size-[18px]" />
 						</IconButton>
 						<IconButton
-							label="Borrar selección (Supr)"
+							label={t("Borrar selección (Supr)")}
 							disabled={!ws.hasSelection()}
 							onClick={() => ws.deleteSelection()}
 						>
@@ -786,11 +819,11 @@ export default function App() {
 						<Divider />
 
 						<IconButton
-							label={ws.simEnabled ? "Pausar simulación (Ctrl+E)" : "Reanudar simulación (Ctrl+E)"}
+							label={ws.simEnabled ? t("Pausar simulación (Ctrl+E)") : t("Reanudar simulación (Ctrl+E)")}
 							description={
 								ws.simEnabled
-									? "Detiene la propagación automática de señales. Podés avanzar con Paso de simulación."
-									: "Vuelve a propagar los cambios de entradas y conexiones hasta estabilizar el circuito."
+									? t("Detiene la propagación automática de señales. Podés avanzar con Paso de simulación.")
+									: t("Vuelve a propagar los cambios de entradas y conexiones hasta estabilizar el circuito.")
 							}
 							active={ws.simEnabled}
 							onClick={() => ws.setSimEnabled(!ws.simEnabled)}
@@ -799,28 +832,36 @@ export default function App() {
 						</IconButton>
 						<IconButton
 							label={`${t("sim.reset")} (Ctrl+R)`}
-							description="Borra el estado de registros, memorias y controles de toda la jerarquía; conserva el circuito."
+							description={t(
+								"Borra el estado de registros, memorias y controles de toda la jerarquía; conserva el circuito.",
+							)}
 							onClick={() => ws.resetSimulation()}
 						>
 							<RotateCcw className="size-[18px]" />
 						</IconButton>
 						<IconButton
-							label="Paso de simulación (Ctrl+I)"
-							description="Pausa y avanza un solo paso de propagación. Los puntos que cambian aparecen marcados en azul. No es un tick de reloj."
+							label={t("Paso de simulación (Ctrl+I)")}
+							description={t(
+								"Pausa y avanza un solo paso de propagación. Los puntos que cambian aparecen marcados en azul. No es un tick de reloj.",
+							)}
 							onClick={() => ws.stepSimulation()}
 						>
 							<LogisimIcon name="simstep.png" size={20} />
 						</IconButton>
 						<IconButton
 							label={`${t("sim.tickOnce")} (Ctrl+T)`}
-							description="Avanza un tick de todos los relojes del circuito. Un ciclo completo requiere al menos dos ticks."
+							description={t(
+								"Avanza un tick de todos los relojes del circuito. Un ciclo completo requiere al menos dos ticks.",
+							)}
 							onClick={() => ws.tickOnce()}
 						>
 							<LogisimIcon name="simtstep.png" size={20} />
 						</IconButton>
 						<IconButton
-							label={`${ws.ticksEnabled ? "Detener ticks automáticos" : "Activar ticks automáticos"} (Ctrl+K)`}
-							description="Activa o detiene los ticks del reloj a la frecuencia elegida. Mientras la simulación está pausada, los ticks automáticos quedan suspendidos."
+							label={`${ws.ticksEnabled ? t("Detener ticks automáticos") : t("Activar ticks automáticos")} (Ctrl+K)`}
+							description={t(
+								"Activa o detiene los ticks del reloj a la frecuencia elegida. Mientras la simulación está pausada, los ticks automáticos quedan suspendidos.",
+							)}
 							active={ws.ticksEnabled}
 							onClick={() => ws.setTicksEnabled(!ws.ticksEnabled)}
 						>
@@ -828,7 +869,7 @@ export default function App() {
 						</IconButton>
 						<select
 							aria-label={t("sim.tickFreq")}
-							title="Frecuencia de ticks por segundo. Un ciclo de reloj necesita al menos dos ticks."
+							title={t("Frecuencia de ticks por segundo. Un ciclo de reloj necesita al menos dos ticks.")}
 							value={ws.tickFrequency}
 							onChange={(e) => ws.setTickFrequency(Number(e.target.value))}
 							className="h-8 shrink-0 rounded-md border border-line bg-panel px-1 text-xs"
@@ -841,8 +882,10 @@ export default function App() {
 						</select>
 
 						<IconButton
-							label="Registro"
-							description="Registra los valores de pines, sondas, relojes, biestables, registros y memorias en cada cambio, y permite descargarlos."
+							label={t("Registro")}
+							description={t(
+								"Registra los valores de pines, sondas, relojes, biestables, registros y memorias en cada cambio, y permite descargarlos.",
+							)}
 							active={logOpen}
 							onClick={() => setLogOpen((v) => !v)}
 						>
@@ -858,21 +901,21 @@ export default function App() {
 				/>
 
 				<div className="ml-auto flex items-center pl-2">
-					<IconButton label="Alejar" onClick={() => viewRef().zoomBy(1 / 1.25)}>
+					<IconButton label={t("Alejar")} onClick={() => viewRef().zoomBy(1 / 1.25)}>
 						<Minus className="size-[18px]" />
 					</IconButton>
 					<span className="hidden w-12 text-center font-mono text-xs tabular-nums text-muted sm:inline">
 						{Math.round(zoom * 100)}%
 					</span>
-					<IconButton label="Acercar" onClick={() => viewRef().zoomBy(1.25)}>
+					<IconButton label={t("Acercar")} onClick={() => viewRef().zoomBy(1.25)}>
 						<Plus className="size-[18px]" />
 					</IconButton>
-					<IconButton label="Ajustar a la pantalla" onClick={fitView}>
+					<IconButton label={t("Ajustar a la pantalla")} onClick={fitView}>
 						<Maximize className="size-[18px]" />
 					</IconButton>
 					<IconButton
-						label={"Preferencias"}
-						description={"Forma de las puertas."}
+						label={t("Preferencias")}
+						description={t("Idioma y forma de las puertas.")}
 						onClick={() => setPreferencesOpen(true)}
 					>
 						<Settings className="size-[18px]" />
@@ -899,12 +942,12 @@ export default function App() {
 			>
 				{/* left: circuits + palette */}
 				<aside
-					aria-label="Componentes y circuitos"
+					aria-label={t("Componentes y circuitos")}
 					className={`sidebar sidebar-left ${leftOpen ? "mobile-open" : ""} ${leftVisible ? "desktop-open" : ""}`}
 				>
 					<div className="flex justify-end p-1">
 						<IconButton
-							label="Ocultar componentes y circuitos"
+							label={t("Ocultar componentes y circuitos")}
 							onClick={() => (desktopLeft ? setLeftVisible(false) : setLeftOpen(false))}
 						>
 							<X className="size-4" />
@@ -918,7 +961,7 @@ export default function App() {
 					</LibraryPanel>
 					<div className="mx-3 h-px bg-line" />
 					<section className="flex flex-col gap-1 p-3">
-						<Disclosure id="examples" title="Ejemplos">
+						<Disclosure id="examples" title={t("Ejemplos")}>
 							{EXAMPLES.map((ex) => (
 								<button
 									key={ex.file}
@@ -935,7 +978,7 @@ export default function App() {
 							))}
 							{loadingExample && (
 								<p role="status" className="px-2 py-1 text-xs text-muted">
-									Cargando ejemplo…
+									{t("Cargando ejemplo…")}
 								</p>
 							)}
 						</Disclosure>
@@ -945,7 +988,7 @@ export default function App() {
 				{leftVisible && <PanelResize side="left" width={leftWidth} onChange={setLeftWidth} />}
 				<button
 					type="button"
-					aria-label="Cerrar paneles"
+					aria-label={t("Cerrar paneles")}
 					data-open={leftOpen || rightOpen ? "" : undefined}
 					onClick={() => {
 						setLeftOpen(false);
@@ -974,7 +1017,7 @@ export default function App() {
 
 					<div className="absolute left-3 top-3 flex items-center gap-1 rounded-lg border border-line bg-panel/95 py-1 pl-1 pr-3 text-sm shadow-sm">
 						{ws.viewStack.length > 1 ? (
-							<IconButton label="Volver" onClick={() => ws.leaveSubcircuit()}>
+							<IconButton label={t("Volver")} onClick={() => ws.leaveSubcircuit()}>
 								<ChevronLeft className="size-4" />
 							</IconButton>
 						) : (
@@ -983,10 +1026,10 @@ export default function App() {
 						<span className={ws.viewStack.length > 1 ? "text-muted" : "font-medium"}>{ws.circuit.name}</span>
 						{ws.viewStack.length === 1 && (
 							<fieldset className="ml-2 flex rounded-md border border-line p-0.5 text-xs">
-								<legend className="sr-only">Vista del circuito</legend>
+								<legend className="sr-only">{t("Vista del circuito")}</legend>
 								{[
-									[false, "Diseño", "Editar los componentes y cables del circuito"],
-									[true, "Apariencia", "Editar cómo se ve el circuito cuando se usa como subcircuito"],
+									[false, t("Diseño"), t("Editar los componentes y cables del circuito")],
+									[true, t("Apariencia"), t("Editar cómo se ve el circuito cuando se usa como subcircuito")],
 								].map(([mode, label, title]) => (
 									<button
 										key={String(label)}
@@ -1020,7 +1063,7 @@ export default function App() {
 						{ws.messages.length > 0 && (
 							<div className="pointer-events-auto max-w-lg rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow ring-1 ring-amber-200">
 								<div className="mb-1 flex items-center gap-2 font-medium">
-									<AlertTriangle className="size-4" /> Avisos al abrir el archivo
+									<AlertTriangle className="size-4" /> {t("Avisos al abrir el archivo")}
 									<button
 										type="button"
 										className="ml-auto"
@@ -1028,14 +1071,14 @@ export default function App() {
 											ws.messages = [];
 											ws.changed();
 										}}
-										aria-label="Cerrar"
+										aria-label={t("Cerrar")}
 									>
 										<X className="size-4" />
 									</button>
 								</div>
 								<ul className="list-disc pl-5">
 									{ws.messages.slice(0, 6).map((m) => (
-										<li key={m}>{m}</li>
+										<li key={renderMessage(m)}>{renderMessage(m)}</li>
 									))}
 								</ul>
 							</div>
@@ -1046,13 +1089,13 @@ export default function App() {
 				{/* right: attributes */}
 				{rightVisible && <PanelResize side="right" width={rightWidth} onChange={setRightWidth} />}
 				<aside
-					aria-label="Atributos"
+					aria-label={t("Atributos")}
 					className={`sidebar sidebar-right ${rightOpen ? "mobile-open" : ""} ${rightVisible ? "desktop-open" : ""}`}
 				>
 					<div className="flex items-center justify-between border-b border-line px-4 py-2">
-						<span className="text-sm font-medium">Atributos</span>
+						<span className="text-sm font-medium">{t("Atributos")}</span>
 						<IconButton
-							label="Ocultar atributos"
+							label={t("Ocultar atributos")}
 							onClick={() => (desktopRight ? setRightVisible(false) : setRightOpen(false))}
 						>
 							<X className="size-4" />
@@ -1064,47 +1107,49 @@ export default function App() {
 			<footer className="flex min-h-8 shrink-0 items-center gap-3 border-t border-line bg-panel px-3 text-[11px] text-muted">
 				<span className="min-w-0 flex-1 truncate">
 					{ws.appearanceMode
-						? APPEARANCE_HELP[ws.appearanceTool]
+						? t(APPEARANCE_HELP[ws.appearanceTool])
 						: tool.kind === "add"
-							? `Colocar ${componentName(tool)} · flechas: orientar · Esc: editar`
+							? t("Colocar {0} · flechas: orientar · Esc: editar", [componentName(tool)])
 							: tool.kind === "text"
-								? "Texto · clic para crear o editar · Enter: confirmar · Esc: cancelar"
+								? t("Texto · clic para crear o editar · Enter: confirmar · Esc: cancelar")
 								: tool.kind === "wiring"
-									? "Cablear · clic para iniciar y terminar · Esc: cancelar"
+									? t("Cablear · clic para iniciar y terminar · Esc: cancelar")
 									: tool.kind === "poke"
-										? "Tocar · clic para cambiar valores y probar controles"
-										: "Editar · arrastrá para seleccionar o mover · Shift: sumar selección"}
+										? t("Tocar · clic para cambiar valores y probar controles")
+										: t("Editar · arrastrá para seleccionar o mover · Shift: sumar selección")}
 				</span>
 				<span className="hidden shrink-0 sm:inline">
-					{ws.simEnabled ? "Simulación activa" : "Simulación pausada"}
+					{ws.simEnabled ? t("Simulación activa") : t("Simulación pausada")}
 				</span>
 				<span
 					role="status"
-					title="El autoguardado conserva una copia local. Usá Guardar (Ctrl/⌘+S) para descargar el archivo .circ."
+					title={t(
+						"El autoguardado conserva una copia local. Usá Guardar (Ctrl/⌘+S) para descargar el archivo .circ.",
+					)}
 					className="hidden shrink-0 md:inline"
 				>
 					{ws.autosaveStatus === "pending"
-						? "Guardando en este navegador…"
+						? t("Guardando en este navegador…")
 						: ws.autosaveStatus === "saved"
-							? "Guardado en este navegador"
+							? t("Guardado en este navegador")
 							: ws.autosaveStatus === "error"
-								? "Sin autoguardado · descargá tu .circ"
+								? t("Sin autoguardado · descargá tu .circ")
 								: ws.dirty
-									? "Cambios sin descargar"
-									: "Sin cambios pendientes"}
+									? t("Cambios sin descargar")
+									: t("Sin cambios pendientes")}
 				</span>
 				<button
 					type="button"
 					onClick={() => setShortcutsOpen(true)}
-					title="Atajos de teclado (?)"
+					title={t("Atajos de teclado (?)")}
 					className="flex shrink-0 items-center gap-1 rounded px-2 py-1 hover:bg-black/5"
 				>
 					<Keyboard className="size-3.5" />
-					Atajos
+					{t("Atajos")}
 				</button>
 			</footer>
 			<Toaster
-				containerAriaLabel="Notificaciones"
+				containerAriaLabel={t("Notificaciones")}
 				position="bottom-right"
 				closeButton
 				visibleToasts={3}
@@ -1112,7 +1157,7 @@ export default function App() {
 				mobileOffset={44}
 				theme="light"
 				toastOptions={{
-					closeButtonAriaLabel: "Cerrar notificación",
+					closeButtonAriaLabel: t("Cerrar notificación"),
 					style: { fontFamily: "var(--font-geist-sans), sans-serif", borderColor: "var(--line)" },
 				}}
 			/>

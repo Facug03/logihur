@@ -9,7 +9,7 @@ import type { Instance } from "@/engine/component";
 import { formatLoc } from "@/engine/geom";
 import { type CircuitState, InstanceStateImpl } from "@/engine/simulation";
 import type { Value } from "@/engine/value";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import { formatLogValue, type InstanceLogger, LOGGERS } from "./loggers";
 
 const LOG_SIZE = 400;

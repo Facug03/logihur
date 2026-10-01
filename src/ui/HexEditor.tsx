@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HexFormatError, loadImage, type MemContents, saveImage } from "@/components/memory/mem-contents";
-import { t } from "@/i18n/es";
+import { localized, type Message, renderMessage, t } from "@/i18n/i18n";
 
 const COLUMNS = 16;
 const ROW_HEIGHT = 28;
@@ -20,7 +20,7 @@ export function downloadMemory(contents: MemContents, name = "memoria.hex"): voi
 }
 
 export function memoryImageError(error: unknown): string {
-	return error instanceof HexFormatError ? t(error.message) : "No se pudo leer la imagen de memoria.";
+	return error instanceof HexFormatError ? t(error.message) : t("No se pudo leer la imagen de memoria.");
 }
 
 /** Edits an isolated snapshot; only Accept commits it to the workspace. */
@@ -38,7 +38,7 @@ export function HexEditor({
 	const [scrollTop, setScrollTop] = useState(0);
 	const [address, setAddress] = useState(0);
 	const [draft, setDraft] = useState<string | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<Message | null>(null);
 	const [jump, setJump] = useState("");
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const viewportRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,9 @@ export function HexEditor({
 	function commit(): boolean {
 		if (draft === null) return true;
 		if (!/^[0-9a-fA-F]+$/.test(draft) || Number.parseInt(draft, 16) >= 2 ** memory.dataWidth) {
-			setError(`Ingresá un valor hexadecimal entre 0 y ${hex(2 ** memory.dataWidth - 1, digits)}.`);
+			setError(() =>
+				localized("Ingresá un valor hexadecimal entre 0 y {0}.", [hex(2 ** memory.dataWidth - 1, digits)]),
+			);
 			return false;
 		}
 		memory.set(address, Number.parseInt(draft, 16));
@@ -105,14 +107,14 @@ export function HexEditor({
 			className="modal-motion fixed inset-0 m-auto max-h-[96dvh] w-[min(960px,96vw)] overflow-auto rounded-xl border border-line bg-white p-4 shadow-xl backdrop:bg-black/40"
 		>
 			<h2 id="hex-title" className="text-lg font-semibold">
-				Editar contenidos de memoria
+				{t("Editar contenidos de memoria")}
 			</h2>
 			<p className="mb-3 text-sm text-muted">
-				{memory.lastOffset + 1} direcciones · {memory.dataWidth} bits · valores hexadecimales
+				{t("{0} direcciones · {1} bits · valores hexadecimales", [memory.lastOffset + 1, memory.dataWidth])}
 			</p>
 			<div className="mb-3 flex flex-wrap gap-2">
 				<button type="button" className={buttonClass} onClick={() => fileRef.current?.click()}>
-					Cargar imagen
+					{t("Cargar imagen")}
 				</button>
 				<button
 					type="button"
@@ -121,7 +123,7 @@ export function HexEditor({
 						if (commit()) downloadMemory(memory);
 					}}
 				>
-					Guardar imagen
+					{t("Guardar imagen")}
 				</button>
 				<button
 					type="button"
@@ -133,14 +135,14 @@ export function HexEditor({
 						setRevision((v) => v + 1);
 					}}
 				>
-					Borrar
+					{t("hex.clear")}
 				</button>
 				<input
 					ref={fileRef}
 					type="file"
 					accept=".hex,.txt"
 					className="hidden"
-					aria-label="Cargar imagen de memoria"
+					aria-label={t("Cargar imagen de memoria")}
 					onChange={async (e) => {
 						const file = e.target.files?.[0];
 						e.target.value = "";
@@ -152,7 +154,7 @@ export function HexEditor({
 							setDraft(null);
 							setError(null);
 						} catch (err) {
-							setError(memoryImageError(err));
+							setError(() => () => memoryImageError(err));
 						}
 					}}
 				/>
@@ -161,14 +163,14 @@ export function HexEditor({
 					onSubmit={(e) => {
 						e.preventDefault();
 						if (!/^[0-9a-fA-F]+$/.test(jump) || Number.parseInt(jump, 16) > memory.lastOffset) {
-							setError("La dirección hexadecimal está fuera de la memoria.");
+							setError(() => localized("La dirección hexadecimal está fuera de la memoria."));
 							return;
 						}
 						navigate(Number.parseInt(jump, 16));
 					}}
 				>
 					<label htmlFor="hex-jump" className="text-sm">
-						Dirección
+						{t("Dirección")}
 					</label>
 					<input
 						id="hex-jump"
@@ -177,14 +179,14 @@ export function HexEditor({
 						className="w-20 rounded border border-line px-2 py-1 font-mono"
 					/>
 					<button type="submit" className={buttonClass}>
-						Ir
+						{t("Ir")}
 					</button>
 				</form>
 			</div>
 			<div className="overflow-x-auto rounded border border-line">
 				<div style={{ minWidth: Math.max(880, 80 + COLUMNS * (digits * 8 + 12)) }}>
 					<div className="grid grid-cols-[80px_repeat(16,minmax(0,1fr))] bg-panel text-center font-mono text-xs leading-7">
-						<span>Dirección</span>
+						<span>{t("Dirección")}</span>
 						{Array.from({ length: COLUMNS }, (_, i) => hex(i, 1)).map((column) => (
 							<span key={column}>{column}</span>
 						))}
@@ -211,7 +213,7 @@ export function HexEditor({
 												<input
 													key={addr}
 													ref={addr === address ? activeRef : undefined}
-													aria-label={`Dirección ${hex(addr, addressDigits)}`}
+													aria-label={t("Dirección {0}", [hex(addr, addressDigits)])}
 													spellCheck={false}
 													value={addr === address && draft !== null ? draft : hex(memory.get(addr), digits)}
 													className="min-w-0 border border-transparent px-0.5 py-1 text-center outline-none focus:border-accent focus:bg-accent/10"
@@ -256,15 +258,15 @@ export function HexEditor({
 			</div>
 			{error && (
 				<p role="alert" className="mt-2 text-sm text-red-600">
-					{error}
+					{error && renderMessage(error)}
 				</p>
 			)}
 			<p className="mt-2 text-xs text-muted">
-				Flechas para navegar · Enter o Tab para avanzar · Cancelar descarta los cambios.
+				{t("Flechas para navegar · Enter o Tab para avanzar · Cancelar descarta los cambios.")}
 			</p>
 			<div className="mt-4 flex justify-end gap-2">
 				<button type="button" className={buttonClass} onClick={onClose}>
-					Cancelar
+					{t("Cancelar")}
 				</button>
 				<button
 					type="button"
@@ -273,7 +275,7 @@ export function HexEditor({
 						if (commit()) onAccept(memory.clone());
 					}}
 				>
-					Aceptar
+					{t("Aceptar")}
 				</button>
 			</div>
 		</dialog>,

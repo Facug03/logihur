@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { FORMAT_PRODUCT_OF_SUMS, FORMAT_SUM_OF_PRODUCTS } from "@/analyze/implicant";
 import type { AnalyzerModel } from "@/analyze/model";
 import { ParserError, parseExpression } from "@/analyze/parser";
-import { t } from "@/i18n/es";
+import { type Message, renderMessage, t } from "@/i18n/i18n";
 import { ExpressionView } from "./ExpressionView";
 import { KarnaughMap } from "./KarnaughMap";
 import { buttonClass, primaryButtonClass } from "./VariablesTab";
@@ -52,7 +52,7 @@ export function ExpressionTab({
 	const current = exprs.getExpressionString(output);
 	// null while the field shows the current expression unedited
 	const [draft, setDraft] = useState<{ output: string | null; text: string } | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<Message | null>(null);
 	const fieldRef = useRef<HTMLTextAreaElement>(null);
 	const text = draft !== null && draft.output === output ? draft.text : current;
 	const edited = text !== current;
@@ -66,7 +66,7 @@ export function ExpressionTab({
 			setDraft(null);
 		} catch (e) {
 			if (!(e instanceof ParserError)) throw e;
-			setError(e.message);
+			setError(() => () => e.message);
 			fieldRef.current?.setSelectionRange(e.offset, e.endOffset);
 		}
 		fieldRef.current?.focus();
@@ -83,10 +83,10 @@ export function ExpressionTab({
 					onOutputChange(o);
 				}}
 			/>
-			<ExpressionView expr={exprs.getExpression(output)} label={`Expresión de ${output ?? ""}`} />
+			<ExpressionView expr={exprs.getExpression(output)} label={t("Expresión de {0}", [output ?? ""])} />
 			<textarea
 				ref={fieldRef}
-				aria-label="Editar expresión"
+				aria-label={t("Editar expresión")}
 				rows={4}
 				value={text}
 				disabled={output === null}
@@ -104,7 +104,7 @@ export function ExpressionTab({
 			/>
 			<div className="flex flex-wrap items-center justify-end gap-2">
 				<p role="alert" className="mr-auto min-h-5 text-sm text-red-600">
-					{error}
+					{error && renderMessage(error)}
 				</p>
 				<button
 					type="button"
@@ -140,9 +140,10 @@ export function ExpressionTab({
 				</button>
 			</div>
 			<p className="text-xs text-muted">
-				Operadores: NOT <code>~a</code>, <code>!a</code> o <code>a'</code> · AND <code>a b</code>,{" "}
-				<code>a &amp; b</code> · XOR <code>a ^ b</code> · OR <code>a + b</code> o <code>a | b</code>. Enter
-				aplica la expresión.
+				{t("Operadores: NOT")} <code>~a</code>, <code>!a</code> {t("o")} <code>a'</code> · AND{" "}
+				<code>a b</code>, <code>a &amp; b</code> · XOR <code>a ^ b</code> · OR <code>a + b</code> {t("o")}{" "}
+				<code>a | b</code>
+				{t(". Enter aplica la expresión.")}
 			</p>
 		</div>
 	);
@@ -179,7 +180,7 @@ export function MinimizedTab({
 			<KarnaughMap model={model} output={output} />
 			<ExpressionView
 				expr={exprs.getMinimalExpression(output)}
-				label={`Expresión minimizada de ${output ?? ""}`}
+				label={t("Expresión minimizada de {0}", [output ?? ""])}
 			/>
 			<button
 				type="button"

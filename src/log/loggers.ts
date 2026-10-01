@@ -13,6 +13,7 @@ import { isInputPin, PIN, PROBE } from "@/components/wiring/pin";
 import type { ComponentFactory, InstanceState } from "@/engine/component";
 import { formatLoc } from "@/engine/geom";
 import { Value } from "@/engine/value";
+import { t } from "@/i18n/i18n";
 
 export interface InstanceLogger {
 	/** Several values per component (RAM words, shift register stages), or null for one. */
@@ -44,7 +45,7 @@ export const LOGGERS = new Map<ComponentFactory, InstanceLogger>([
 		PIN,
 		{
 			getLogName: (state) =>
-				label(state) ?? `${isInputPin(state.instance) ? "Entrada" : "Salida"}${at(state)}`,
+				label(state) ?? `${isInputPin(state.instance) ? t("Entrada") : t("Salida")}${at(state)}`,
 			getLogValue: (state) => PIN.getValue(state),
 		},
 	],
@@ -85,7 +86,7 @@ export const LOGGERS = new Map<ComponentFactory, InstanceLogger>([
 		{
 			getLogOptions: (state) => Array.from({ length: state.getAttr(SHIFT_LENGTH) }, (_, i) => i),
 			getLogName: (state, option) => {
-				const name = label(state) ?? `Registro de desplazamiento${at(state)}`;
+				const name = label(state) ?? `${t("Registro de desplazamiento")}${at(state)}`;
 				return option === null ? name : `${name}[${option}]`;
 			},
 			getLogValue: (state, option) => {

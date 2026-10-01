@@ -6,6 +6,7 @@ import { Circuit, type CircuitEvent } from "@/engine/circuit";
 import type { ProjectOptions } from "@/engine/component";
 import { DEFAULT_OPTIONS } from "@/engine/simulation";
 import { el, type XmlElement } from "@/format/xml";
+import type { Message } from "@/i18n/i18n";
 
 export interface LibraryRef {
 	/** Name used in the file ("0", "1", ...). */
@@ -113,7 +114,7 @@ export class Project {
 	mappings: XmlElement = defaultMappings();
 	toolbar: XmlElement = defaultToolbar();
 	/** Warnings produced while loading. */
-	messages: string[] = [];
+	messages: Message[] = [];
 	sourceVersion = "2.7.1";
 	/** Contents of library files by name, shared with nested libraries. */
 	librarySources = new Map<string, string>();

@@ -6,7 +6,7 @@
 
 import { AppWindow, ChevronDown, Sigma, Table2 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import { Tooltip } from "../Tooltip";
 
 export function AnalyzeMenu({
@@ -31,7 +31,9 @@ export function AnalyzeMenu({
 		<>
 			<Tooltip
 				label={t("analyze.windowTitle")}
-				description="Tabla de verdad, expresiones, mapa de Karnaugh y construcción de circuitos combinacionales."
+				description={t(
+					"Tabla de verdad, expresiones, mapa de Karnaugh y construcción de circuitos combinacionales.",
+				)}
 			>
 				{(tooltipId) => (
 					<button
@@ -73,7 +75,7 @@ export function AnalyzeMenu({
 					<span>
 						{t("analyze.projectAnalyzeCircuitItem")}
 						<span className="block truncate text-xs text-muted">
-							Calcula la tabla y las expresiones de «{circuitName}»
+							{t("Calcula la tabla y las expresiones de «{0}»", [circuitName])}
 						</span>
 					</span>
 				</button>
@@ -89,7 +91,7 @@ export function AnalyzeMenu({
 					<span>
 						{t("analyze.windowTitle")}
 						<span className="block text-xs text-muted">
-							Abre la ventana como la dejaste, para editar la tabla a mano
+							{t("Abre la ventana como la dejaste, para editar la tabla a mano")}
 						</span>
 					</span>
 				</button>

@@ -8,13 +8,14 @@ import { type ComponentFactory, Instance } from "@/engine/component";
 import { type Loc, parseLoc } from "@/engine/geom";
 import { compareVersion } from "@/engine/version";
 import { Wire } from "@/engine/wire";
+import { localized, type Message, TranslatedError, t } from "@/i18n/i18n";
 import { type LibraryRef, LoadedLibrary, libraryFileName, Project } from "@/project/project";
 import { childElements, getAttr, hasAttr, parseXml, setAttr, textContent, type XmlElement } from "./xml";
 
-export class CircReadError extends Error {}
+export class CircReadError extends TranslatedError {}
 
 /** Collect <a name=".." val=".."/> children (val attribute or text content). */
-function readAttrElements(parent: XmlElement, messages: string[]): Map<string, string> {
+function readAttrElements(parent: XmlElement, messages: Message[]): Map<string, string> {
 	const defined = new Map<string, string>();
 	for (const a of childElements(parent, "a")) {
 		if (!hasAttr(a, "name")) {
@@ -36,7 +37,7 @@ export function initAttributeSet(
 	attrs: AttributeSet,
 	defined: Map<string, string>,
 	sourceVersion: string,
-	messages: string[],
+	messages: Message[],
 	context: string,
 ): void {
 	for (let i = 0; ; i++) {
@@ -205,7 +206,7 @@ function repairForLegacyLibrary(root: XmlElement): void {
 
 export interface ReadResult {
 	project: Project;
-	messages: string[];
+	messages: Message[];
 }
 
 /**
@@ -222,9 +223,9 @@ export function readCirc(
 	try {
 		root = parseXml(source);
 	} catch (e) {
-		throw new CircReadError(`El archivo no es XML válido: ${(e as Error).message}`);
+		throw new CircReadError(() => t("El archivo no es XML válido: {0}", [(e as Error).message]));
 	}
-	if (root.tag !== "project") throw new CircReadError("El archivo no es un proyecto de Logisim");
+	if (root.tag !== "project") throw new CircReadError(() => t("El archivo no es un proyecto de Logisim"));
 	considerRepairs(root);
 
 	const project = new Project();
@@ -251,9 +252,9 @@ export function readCirc(
 			const text = libraries.get(fileName);
 			if (text === undefined) {
 				project.missingLibraries.push(fileName);
-				messages.push(`Falta la librería ${fileName}`);
+				messages.push(localized("Falta la librería {0}", [fileName]));
 			} else if (loading.has(fileName)) {
-				messages.push(`La librería ${fileName} se incluye a sí misma`);
+				messages.push(localized("La librería {0} se incluye a sí misma", [fileName]));
 			} else {
 				try {
 					const lib = readCirc(text, libraries, new Set([...loading, fileName]));
@@ -262,13 +263,13 @@ export function readCirc(
 						if (!project.missingLibraries.includes(missing)) project.missingLibraries.push(missing);
 					}
 				} catch (e) {
-					messages.push(`No se pudo leer la librería ${fileName}: ${(e as Error).message}`);
+					messages.push(localized("No se pudo leer la librería {0}: {1}", [fileName, (e as Error).message]));
 				}
 			}
 		} else if (!ref.desc.startsWith("#")) {
-			messages.push(`Librería externa no soportada: ${ref.desc}`);
+			messages.push(localized("Librería externa no soportada: {0}", [ref.desc]));
 		} else if (!findLibrary(ref.desc)) {
-			messages.push(`Librería desconocida: ${ref.desc}`);
+			messages.push(localized("Librería desconocida: {0}", [ref.desc]));
 		}
 		project.libraries.push(ref);
 		libsByName.set(ref.name, ref);
@@ -352,7 +353,7 @@ function buildCircuit(
 	circElt: XmlElement,
 	libsByName: Map<string, LibraryRef>,
 	sourceVersion: string,
-	messages: string[],
+	messages: Message[],
 ): void {
 	// static attributes (circuit name, shared label)
 	const staticDefined = readAttrElements(circElt, messages);
@@ -373,7 +374,7 @@ function buildCircuit(
 			const context = `${circuit.name}.${getAttr(sub, "name")}${getAttr(sub, "loc")}`;
 			const factory = resolveFactory(project, sub, libsByName);
 			if (!factory) {
-				messages.push(`${context}: componente desconocido`);
+				messages.push(localized("{0}: componente desconocido", [context]));
 				continue;
 			}
 			const locStr = getAttr(sub, "loc");
@@ -381,7 +382,7 @@ function buildCircuit(
 			try {
 				l = parseLoc(locStr);
 			} catch {
-				messages.push(`${context}: ubicación inválida`);
+				messages.push(localized("{0}: ubicación inválida", [context]));
 				continue;
 			}
 			const attrs = factory.createAttributeSet();
@@ -397,7 +398,7 @@ function buildCircuit(
 				const w = Wire.create(parseLoc(getAttr(sub, "from")), parseLoc(getAttr(sub, "to")));
 				circuit.addWire(w);
 			} catch {
-				messages.push(`${circuit.name}: cable inválido`);
+				messages.push(localized("{0}: cable inválido", [circuit.name]));
 			}
 		}
 	}

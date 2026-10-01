@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { containsXor } from "@/analyze/expression";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import type { Workspace } from "../workspace";
 import { buttonClass, primaryButtonClass } from "./VariablesTab";
 
@@ -56,10 +56,10 @@ export function BuildCircuitDialog({
 			{confirmReplace ? (
 				<>
 					<p className="mt-3 text-sm">{t("analyze.buildConfirmReplaceMessage", [name.trim()])}</p>
-					<p className="mt-2 text-xs text-muted">Podés deshacerlo con Ctrl+Z.</p>
+					<p className="mt-2 text-xs text-muted">{t("Podés deshacerlo con Ctrl+Z.")}</p>
 					<div className="mt-5 flex justify-end gap-2">
 						<button type="button" className={buttonClass} onClick={() => setConfirmReplace(false)}>
-							Cancelar
+							{t("Cancelar")}
 						</button>
 						<button
 							type="button"
@@ -108,13 +108,15 @@ export function BuildCircuitDialog({
 						/>
 						{t("analyze.buildNandsLabel")}
 					</label>
-					{!enableNands && <p className="text-xs text-muted">No disponible: alguna expresión usa XOR.</p>}
+					{!enableNands && (
+						<p className="text-xs text-muted">{t("No disponible: alguna expresión usa XOR.")}</p>
+					)}
 					<p role="alert" className="min-h-5 text-sm text-red-600">
 						{error}
 					</p>
 					<div className="flex justify-end gap-2">
 						<button type="button" className={buttonClass} onClick={onClose}>
-							Cancelar
+							{t("Cancelar")}
 						</button>
 						<button type="submit" className={primaryButtonClass}>
 							{t("analyze.buildCircuitButton")}

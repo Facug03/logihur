@@ -30,6 +30,8 @@ import { type CircuitState, InstanceStateImpl } from "@/engine/simulation";
 import { Wire } from "@/engine/wire";
 import { readCirc } from "@/format/circ-reader";
 import { writeCirc } from "@/format/circ-writer";
+import type { Message } from "@/i18n/i18n";
+import { type Locale, localized, msg, setLocale as setI18nLocale, t } from "@/i18n/i18n";
 import { LogModel } from "@/log/log-model";
 import { Project } from "@/project/project";
 import { Simulator } from "@/sim/simulator";
@@ -96,8 +98,8 @@ export class Workspace {
 	tickFrequency = 1;
 	selection = new Set<Instance>();
 	selectedWires = new Set<Wire>();
-	messages: string[] = [];
-	notice: string | null = null;
+	messages: Message[] = [];
+	notice: (() => string) | null = null;
 	dirty = false;
 	autosaveStatus: "idle" | "pending" | "saved" | "error" = "idle";
 	readonly history = new History();
@@ -131,8 +133,8 @@ export class Workspace {
 	get returnToProjectLabel(): string {
 		const previous = this.savedProjects.find((p) => p.id === this.previousProjectId);
 		return this.projectKind === "example" && previous?.kind === "project"
-			? "Volver a mi proyecto"
-			: "Volver al proyecto anterior";
+			? t("Volver a mi proyecto")
+			: t("Volver al proyecto anterior");
 	}
 
 	get canReturnToProject(): boolean {
@@ -212,7 +214,7 @@ export class Workspace {
 		for (const l of Array.from(this.listeners)) l();
 	}
 
-	notify(message: string): void {
+	notify(message: () => string): void {
 		this.notice = message;
 		this.changed();
 	}
@@ -288,7 +290,7 @@ export class Workspace {
 	loadLibrary(fileName: string, text: string): void {
 		const desc = `file#${fileName}`;
 		if (this.project.libraries.some((l) => l.desc === desc)) {
-			this.notify(`La librería ${fileName} ya está cargada.`);
+			this.notify(localized("La librería {0} ya está cargada.", [fileName]));
 			return;
 		}
 		let n = this.project.libraries.length;
@@ -297,13 +299,13 @@ export class Workspace {
 		this.dirty = true;
 		this.provideLibraries(new Map([[fileName, text]]));
 		this.dirty = true;
-		this.notify(`Se cargó la librería ${fileName}.`);
+		this.notify(localized("Se cargó la librería {0}.", [fileName]));
 	}
 
 	/** Proyecto > Descargar Librería: only when nothing uses it. */
 	unloadLibrary(desc: string): void {
 		if (this.project.usesLibrary(desc)) {
-			this.notify("La librería se usa en algún circuito; quitá esos componentes primero.");
+			this.notify(localized("La librería se usa en algún circuito; quitá esos componentes primero."));
 			return;
 		}
 		this.project.libraries = this.project.libraries.filter((l) => l.desc !== desc);
@@ -558,14 +560,14 @@ export class Workspace {
 			const { instance, attr, draft, creating } = editing;
 			if (creating && draft !== "") {
 				instance.attrs.set(attr, draft);
-				this.edit("Agregar etiqueta", (tx, circuit) => tx.addComponent(circuit, instance), false);
+				this.edit(msg("Agregar etiqueta"), (tx, circuit) => tx.addComponent(circuit, instance), false);
 				this.selection = new Set([instance]);
 			} else if (!creating && editing.circuit.components.has(instance)) {
 				if (draft === "" && instance.factory === TEXT) {
-					this.edit("Borrar etiqueta", (tx, circuit) => tx.removeComponent(circuit, instance), false);
+					this.edit(msg("Borrar etiqueta"), (tx, circuit) => tx.removeComponent(circuit, instance), false);
 				} else if (draft !== instance.attrs.get(attr)) {
 					this.edit(
-						"Editar texto",
+						msg("Editar texto"),
 						(tx, circuit) => tx.changeAttributes(circuit, instance, (attrs) => attrs.set(attr, draft)),
 						false,
 					);
@@ -634,7 +636,7 @@ export class Workspace {
 		// like Logisim, a library's circuits can be viewed but not changed
 		if (Array.from(tx.circuits()).some((c) => this.project.isLibraryCircuit(c))) {
 			tx.undo();
-			this.notify("Este circuito pertenece a una librería y no se puede modificar acá.");
+			this.notify(localized("Este circuito pertenece a una librería y no se puede modificar acá."));
 			return;
 		}
 		if (repair) {
@@ -675,7 +677,7 @@ export class Workspace {
 			factory instanceof SubcircuitFactory &&
 			this.project.wouldCreateCycle(this.viewCircuit, factory.source)
 		) {
-			this.notify("No se puede agregar un circuito dentro de sí mismo.");
+			this.notify(localized("No se puede agregar un circuito dentro de sí mismo."));
 			return false;
 		}
 		return true;
@@ -685,13 +687,13 @@ export class Workspace {
 		const tool = this.tool;
 		if (tool.kind !== "add" || !this.canPlace(tool.factory)) return null;
 		const inst = new Instance(tool.factory, at, tool.attrs.clone());
-		this.edit(`Agregar ${tool.factory.name}`, (tx, c) => tx.addComponent(c, inst));
+		this.edit(t("Agregar {0}", [tool.factory.name]), (tx, c) => tx.addComponent(c, inst));
 		return inst;
 	}
 
 	addWires(wires: Wire[]): void {
 		if (wires.length === 0) return;
-		this.edit("Agregar cable", (tx, c) => {
+		this.edit(msg("Agregar cable"), (tx, c) => {
 			for (const w of wires) tx.addWire(c, w);
 		});
 	}
@@ -701,7 +703,7 @@ export class Workspace {
 		const comps = Array.from(this.selection);
 		const wires = Array.from(this.selectedWires);
 		this.clearSelection();
-		this.edit("Borrar", (tx, c) => {
+		this.edit(msg("Borrar"), (tx, c) => {
 			for (const comp of comps) tx.removeComponent(c, comp);
 			for (const w of wires) tx.removeWire(c, w);
 		});
@@ -710,7 +712,7 @@ export class Workspace {
 	/** Menu Tool "Borrar": one component, whether or not it is selected. */
 	deleteComponent(comp: Instance): void {
 		this.selection.delete(comp);
-		this.edit("Borrar", (tx, c) => tx.removeComponent(c, comp));
+		this.edit(msg("Borrar"), (tx, c) => tx.removeComponent(c, comp));
 	}
 
 	/** SplitterDistributeItem: the bit layout of `order` (1 ascending, -1 descending), or null if already so. */
@@ -724,7 +726,7 @@ export class Workspace {
 	distributeSplitter(comp: Instance, order: number): void {
 		const desired = this.splitterDistribution(comp, order);
 		if (!desired) return;
-		this.edit(order > 0 ? "Distribuir ascendente" : "Distribuir descendente", (tx, c) => {
+		this.edit(order > 0 ? msg("Distribuir ascendente") : msg("Distribuir descendente"), (tx, c) => {
 			tx.changeAttributes(c, comp, (attrs) => {
 				desired.forEach((end, i) => {
 					SPLITTER.setAttribute(attrs, splitterBitAttr(i), end);
@@ -737,7 +739,7 @@ export class Workspace {
 		if ((dx === 0 && dy === 0) || !this.hasSelection()) return;
 		const comps = Array.from(this.selection);
 		const wires = Array.from(this.selectedWires);
-		this.edit("Mover", (tx, c) => {
+		this.edit(msg("Mover"), (tx, c) => {
 			for (const comp of comps) tx.move(c, comp, loc(comp.x + dx, comp.y + dy));
 			for (const w of wires) tx.removeWire(c, w);
 			const moved = wires.map((w) =>
@@ -758,7 +760,7 @@ export class Workspace {
 			c.factory.getAttributes(c.attrs).some((a) => a.name === attr.name),
 		);
 		if (targets.length > 0) {
-			this.edit("Cambiar atributo", (tx, circuit) => {
+			this.edit(msg("Cambiar atributo"), (tx, circuit) => {
 				for (const comp of targets) {
 					if (comp.factory instanceof SubcircuitFactory && !comp.factory.isToSave(attr)) {
 						this.changeCircuitAttr(tx, comp.factory.source, attr, value);
@@ -780,7 +782,11 @@ export class Workspace {
 		if (attr.name === CIRCUIT_NAME_ATTR.name) {
 			const name = String(value).trim();
 			if (!name || this.project.circuits.some((c) => c !== circuit && c.name === name)) {
-				this.notify(name ? `Ya existe un circuito llamado "${name}".` : "El nombre no puede estar vacío.");
+				this.notify(
+					name
+						? localized('Ya existe un circuito llamado "{0}".', [name])
+						: localized("El nombre no puede estar vacío."),
+				);
 				return false;
 			}
 			value = name;
@@ -804,7 +810,7 @@ export class Workspace {
 		next.setDimensions(current.logLength, current.dataWidth);
 		if (inst.factory === ROM) {
 			this.edit(
-				"Editar contenidos de ROM",
+				msg("Editar contenidos de ROM"),
 				(tx, circuit) => {
 					tx.changeAttributes(circuit, inst, (attrs) => ROM.setAttribute(attrs, ROM_CONTENTS, next));
 				},
@@ -821,7 +827,7 @@ export class Workspace {
 
 	setCircuitAttribute(circuit: Circuit, attr: AnyAttribute, value: unknown): void {
 		this.edit(
-			"Cambiar atributo del circuito",
+			msg("Cambiar atributo del circuito"),
 			(tx) => {
 				this.changeCircuitAttr(tx, circuit, attr, value);
 			},
@@ -833,7 +839,7 @@ export class Workspace {
 	setFacing(dir: Direction): void {
 		const targets = Array.from(this.selection).filter((c) => c.factory.facingAttr);
 		if (targets.length > 0) {
-			this.edit("Cambiar orientación", (tx, circuit) => {
+			this.edit(msg("Cambiar orientación"), (tx, circuit) => {
 				for (const comp of targets) {
 					const fa = comp.factory.facingAttr as AnyAttribute;
 					tx.changeAttributes(circuit, comp, (a) => comp.factory.setAttribute(a, fa, dir));
@@ -874,7 +880,7 @@ export class Workspace {
 				loc(locX(w.e1) + offset, locY(w.e1) + offset),
 			),
 		);
-		this.edit("Pegar", (tx, c) => {
+		this.edit(msg("Pegar"), (tx, c) => {
 			for (const comp of comps) tx.addComponent(c, comp);
 			for (const w of wires) tx.addWire(c, w);
 		});
@@ -901,25 +907,27 @@ export class Workspace {
 		const trimmed = name.trim();
 		if (!trimmed) return;
 		if (this.project.getCircuit(trimmed)) {
-			this.notify(`Ya existe un circuito llamado "${trimmed}".`);
+			this.notify(localized('Ya existe un circuito llamado "{0}".', [trimmed]));
 			return;
 		}
 		const circuit = new Circuit(trimmed);
-		this.edit("Agregar circuito", (tx) => tx.addCircuit(this.project, circuit), false);
+		this.edit(msg("Agregar circuito"), (tx) => tx.addCircuit(this.project, circuit), false);
 		this.setCircuit(circuit);
 	}
 
 	removeCircuit(circuit: Circuit): void {
 		if (this.project.circuits.length <= 1) {
-			this.notify("El proyecto tiene que tener al menos un circuito.");
+			this.notify(localized("El proyecto tiene que tener al menos un circuito."));
 			return;
 		}
 		if (this.project.getUsers(circuit).length > 0) {
-			this.notify(`"${circuit.name}" se usa como subcircuito; quitalo primero de los otros circuitos.`);
+			this.notify(
+				localized('"{0}" se usa como subcircuito; quitalo primero de los otros circuitos.', [circuit.name]),
+			);
 			return;
 		}
 		this.edit(
-			"Borrar circuito",
+			msg("Borrar circuito"),
 			(tx) => {
 				if (this.project.mainCircuit === circuit) {
 					const other = this.project.circuits.find((c) => c !== circuit) as Circuit;
@@ -943,7 +951,7 @@ export class Workspace {
 		const built = buildCircuit(this.analyzer, twoInputs, useNands);
 		const existing = this.project.getCircuit(name);
 		const target = existing ?? new Circuit(name);
-		this.edit(existing ? "Reemplazar circuito" : "Crear circuito", (tx) => {
+		this.edit(existing ? msg("Reemplazar circuito") : msg("Crear circuito"), (tx) => {
 			if (existing) {
 				for (const comp of Array.from(existing.components)) tx.removeComponent(existing, comp);
 				for (const w of Array.from(existing.wires.values())) tx.removeWire(existing, w);
@@ -1019,7 +1027,7 @@ export class Workspace {
 		if (doomed.size === 0) return;
 		this.appearanceSelection = [];
 		this.editAppearance(
-			"Borrar",
+			msg("Borrar"),
 			shapes.filter((_, i) => !doomed.has(i)),
 		);
 	}
@@ -1033,12 +1041,12 @@ export class Workspace {
 		const rest = shapes.filter((_, i) => !sel.has(i));
 		const next = toTop ? [...rest, ...moved] : [...moved, ...rest];
 		this.appearanceSelection = moved.map((s) => next.indexOf(s));
-		this.editAppearance(toTop ? "Traer al frente" : "Enviar al fondo", next);
+		this.editAppearance(toTop ? t("Traer al frente") : t("Enviar al fondo"), next);
 	}
 
 	revertAppearance(): void {
 		this.appearanceSelection = [];
-		this.editAppearance("Revertir apariencia", null);
+		this.editAppearance(msg("Revertir apariencia"), null);
 	}
 
 	/** The explorer's up/down arrows: reorder circuits in the project. */
@@ -1047,7 +1055,7 @@ export class Workspace {
 		const to = from + delta;
 		if (from < 0 || to < 0 || to >= this.project.circuits.length) return;
 		this.edit(
-			delta < 0 ? "Mover circuito arriba" : "Mover circuito abajo",
+			delta < 0 ? msg("Mover circuito arriba") : msg("Mover circuito abajo"),
 			(tx) => tx.moveCircuit(this.project, circuit, to),
 			false,
 		);
@@ -1055,7 +1063,7 @@ export class Workspace {
 
 	setMainCircuit(circuit: Circuit): void {
 		if (this.project.mainCircuit === circuit) return;
-		this.edit("Circuito principal", (tx) => tx.setMain(this.project, circuit), false);
+		this.edit(msg("Circuito principal"), (tx) => tx.setMain(this.project, circuit), false);
 	}
 
 	// --- simulation ------------------------------------------------------
@@ -1206,6 +1214,12 @@ export class Workspace {
 			active.poker.stopEditing(active.state);
 			this.propagate();
 		}
+	}
+
+	/** Preferencias > Internacional > Lenguaje: everything shown is translated on the next render. */
+	setLocale(locale: Locale): void {
+		setI18nLocale(locale);
+		this.changed();
 	}
 
 	setGateShape(shape: typeof prefs.gateShape): void {

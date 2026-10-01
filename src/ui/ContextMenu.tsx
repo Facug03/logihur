@@ -4,6 +4,7 @@
 // press outside, Escape, blur or resize; arrow keys move between items.
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { t } from "@/i18n/i18n";
 
 export type MenuEntry =
 	| { label: string; onSelect: () => void; disabled?: boolean; danger?: boolean; hint?: string }
@@ -72,7 +73,7 @@ export function ContextMenu({ menu, onClose }: { menu: MenuRequest; onClose: () 
 			ref={ref}
 			popover="manual"
 			role="menu"
-			aria-label={menu.title ?? "Menú"}
+			aria-label={menu.title ?? t("Menú")}
 			style={position}
 			onKeyDown={(e) => {
 				e.stopPropagation();

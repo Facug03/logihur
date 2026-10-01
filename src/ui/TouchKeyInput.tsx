@@ -8,6 +8,7 @@
 
 import { Keyboard } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { t } from "@/i18n/i18n";
 import type { Workspace } from "./workspace";
 
 /** What the field holds between keystrokes, so Backspace always has something to delete. */
@@ -64,7 +65,7 @@ export function TouchKeyInput({ ws }: { ws: Workspace }) {
 		<>
 			<input
 				ref={ref}
-				aria-label="Escribir en el componente"
+				aria-label={t("Escribir en el componente")}
 				defaultValue={SENTINEL}
 				autoCapitalize="off"
 				autoCorrect="off"
@@ -98,7 +99,9 @@ export function TouchKeyInput({ ws }: { ws: Workspace }) {
 				className="fixed bottom-12 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border border-line bg-panel px-4 py-2 text-sm shadow-lg"
 			>
 				<Keyboard className="size-4" />
-				Escribir en {caret.state.instance.factory.name === "Keyboard" ? "el teclado" : "el componente"}
+				{caret.state.instance.factory.name === "Keyboard"
+					? t("Escribir en el teclado")
+					: t("Escribir en el componente")}
 			</button>
 		</>
 	);

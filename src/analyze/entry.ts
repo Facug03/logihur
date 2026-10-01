@@ -1,7 +1,7 @@
 // Port of com.cburch.logisim.analyze.model.Entry: the value of a truth table
 // cell. Entries are compared by identity.
 
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 
 export interface Entry {
 	readonly description: string;

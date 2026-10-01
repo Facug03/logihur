@@ -7,6 +7,7 @@
 import { ChevronRight, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { msg, t } from "@/i18n/i18n";
 import { type LogItem, type LogModel, type LogTreeNode, logTree } from "@/log/log-model";
 import { formatLogValue } from "@/log/loggers";
 import { buttonClass, primaryButtonClass } from "./analyzer/VariablesTab";
@@ -15,11 +16,11 @@ type Tab = "selection" | "table" | "file";
 const TABS: { id: Tab; label: string; help: string }[] = [
 	{
 		id: "selection",
-		label: "Selección",
-		help: "Seleccionar que valores de los componentes son registrados.",
+		label: msg("Selección"),
+		help: msg("Seleccionar que valores de los componentes son registrados."),
 	},
-	{ id: "table", label: "Tabla", help: "Ver valores registrados recientemente." },
-	{ id: "file", label: "Archivo", help: "Configurar fichero de salida." },
+	{ id: "table", label: msg("Tabla"), help: msg("Ver valores registrados recientemente.") },
+	{ id: "file", label: msg("Archivo"), help: msg("Configurar fichero de salida.") },
 ];
 
 function TreeView({
@@ -101,14 +102,14 @@ function SelectionTab({ model }: { model: LogModel }) {
 	return (
 		<div className="grid gap-3 md:grid-cols-[1fr_auto_1fr]">
 			<ul
-				aria-label="Componentes"
+				aria-label={t("Componentes")}
 				className="h-64 overflow-auto rounded-md border border-line bg-panel p-1 md:h-80"
 			>
 				<TreeView node={tree} chosen={chosen} onChoose={setChosen} onAdd={add} />
 			</ul>
 			<div className="flex flex-row flex-wrap content-start gap-2 md:w-36 md:flex-col md:justify-center">
 				<button type="button" className={buttonClass} disabled={!chosen} onClick={() => add(chosen)}>
-					Añadir &gt;&gt;
+					{t("Añadir")} &gt;&gt;
 				</button>
 				<button
 					type="button"
@@ -116,7 +117,7 @@ function SelectionTab({ model }: { model: LogModel }) {
 					disabled={!current}
 					onClick={() => current && model.changeRadix(current)}
 				>
-					Cambiar Base
+					{t("Cambiar Base")}
 				</button>
 				<button
 					type="button"
@@ -124,7 +125,7 @@ function SelectionTab({ model }: { model: LogModel }) {
 					disabled={!current || index <= 0}
 					onClick={() => current && model.move(current, -1)}
 				>
-					Mover Arriba
+					{t("log.moveUp")}
 				</button>
 				<button
 					type="button"
@@ -132,7 +133,7 @@ function SelectionTab({ model }: { model: LogModel }) {
 					disabled={!current || index >= model.selection.length - 1}
 					onClick={() => current && model.move(current, 1)}
 				>
-					Mover Abajo
+					{t("log.moveDown")}
 				</button>
 				<button
 					type="button"
@@ -140,12 +141,12 @@ function SelectionTab({ model }: { model: LogModel }) {
 					disabled={!current}
 					onClick={() => current && model.remove(current)}
 				>
-					&lt;&lt; Eliminar
+					&lt;&lt; {t("Eliminar")}
 				</button>
 			</div>
 			<div
 				role="listbox"
-				aria-label="Valores registrados"
+				aria-label={t("Valores registrados")}
 				className="h-48 overflow-auto rounded-md border border-line bg-panel py-1 md:h-80"
 			>
 				{model.selection.map((item) => (
@@ -176,7 +177,7 @@ function TableTab({ model }: { model: LogModel }) {
 		if (el) el.scrollTop = el.scrollHeight;
 	}, [rows]);
 	if (model.selection.length === 0) {
-		return <p className="py-10 text-center text-muted">La selección está vacía.</p>;
+		return <p className="py-10 text-center text-muted">{t("La selección está vacía.")}</p>;
 	}
 	const columns = model.selection.map((item) => model.getValues(item));
 	return (
@@ -229,14 +230,14 @@ function FileTab({ model, fileName }: { model: LogModel; fileName: string }) {
 		<div className="flex flex-col gap-4">
 			<div className="flex flex-wrap items-center gap-3">
 				<p className="text-sm">
-					{model.fileEnabled ? "Fichero de salida habilitado." : "Fichero de salida deshabilitado."}
+					{model.fileEnabled ? t("Fichero de salida habilitado.") : t("Fichero de salida deshabilitado.")}
 				</p>
 				<button
 					type="button"
 					className={model.fileEnabled ? buttonClass : primaryButtonClass}
 					onClick={() => model.setFileEnabled(!model.fileEnabled)}
 				>
-					{model.fileEnabled ? "Deshabilitar" : "Habilitar"}
+					{model.fileEnabled ? t("Deshabilitar") : t("Habilitar")}
 				</button>
 			</div>
 			<label className="flex items-center gap-2 text-sm">
@@ -245,15 +246,17 @@ function FileTab({ model, fileName }: { model: LogModel; fileName: string }) {
 					checked={model.fileHeader}
 					onChange={(e) => model.setFileHeader(e.target.checked)}
 				/>
-				Incluir Línea De Cabecera
+				{t("Incluir Línea De Cabecera")}
 			</label>
 			<p className="text-sm text-muted">
-				Mientras está habilitado, cada cambio de los valores seleccionados agrega una línea separada por
-				tabuladores (en la base elegida). {lines} {lines === 1 ? "línea" : "líneas"} hasta ahora.
+				{t(
+					"Mientras está habilitado, cada cambio de los valores seleccionados agrega una línea separada por tabuladores (en la base elegida).",
+				)}{" "}
+				{lines === 1 ? t("1 línea hasta ahora.") : t("{0} líneas hasta ahora.", [lines])}
 			</p>
 			<div className="flex gap-2">
 				<button type="button" className={primaryButtonClass} disabled={lines === 0} onClick={download}>
-					Descargar archivo
+					{t("Descargar archivo")}
 				</button>
 				<button
 					type="button"
@@ -264,7 +267,7 @@ function FileTab({ model, fileName }: { model: LogModel; fileName: string }) {
 						model.setFileEnabled(true);
 					}}
 				>
-					Empezar de nuevo
+					{t("Empezar de nuevo")}
 				</button>
 			</div>
 		</div>
@@ -291,7 +294,8 @@ export function LogDialog({
 		dialog?.show();
 		return () => dialog?.close();
 	}, []);
-	const help = TABS.find((x) => x.id === tab)?.help;
+	const helpKey = TABS.find((x) => x.id === tab)?.help;
+	const help = helpKey ? t(helpKey) : undefined;
 	return createPortal(
 		<dialog
 			ref={ref}
@@ -305,27 +309,31 @@ export function LogDialog({
 			<header className="flex items-start gap-2 border-b border-line px-4 pt-3">
 				<div className="min-w-0 flex-1">
 					<h2 id="log-title" className="text-lg font-semibold">
-						Registro de {circuitName}
+						{t("Registro de {0}", [circuitName])}
 					</h2>
 					<p className="truncate text-xs text-muted">{help}</p>
 				</div>
 				<button
 					type="button"
-					aria-label="Cerrar"
+					aria-label={t("Cerrar")}
 					onClick={onClose}
 					className="inline-flex size-9 shrink-0 items-center justify-center rounded-md hover:bg-black/5"
 				>
 					<X className="size-5" />
 				</button>
 			</header>
-			<div role="tablist" aria-label="Registro" className="flex shrink-0 gap-1 border-b border-line px-3">
+			<div
+				role="tablist"
+				aria-label={t("Registro")}
+				className="flex shrink-0 gap-1 border-b border-line px-3"
+			>
 				{TABS.map((x) => (
 					<button
 						key={x.id}
 						type="button"
 						role="tab"
 						aria-selected={tab === x.id}
-						title={x.help}
+						title={t(x.help)}
 						onClick={() => setTab(x.id)}
 						className={`-mb-px border-b-2 px-3 py-2 text-sm ${
 							tab === x.id
@@ -333,7 +341,7 @@ export function LogDialog({
 								: "border-transparent text-muted hover:text-foreground"
 						}`}
 					>
-						{x.label}
+						{t(x.label)}
 						{x.id === "table" && model.rowCount > 0 ? ` (${model.rowCount})` : ""}
 					</button>
 				))}
@@ -345,7 +353,7 @@ export function LogDialog({
 			</div>
 			<footer className="flex justify-end border-t border-line px-4 py-3">
 				<button type="button" className={buttonClass} onClick={onClose}>
-					Cerrar Ventana
+					{t("Cerrar Ventana")}
 				</button>
 			</footer>
 		</dialog>,

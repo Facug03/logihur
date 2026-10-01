@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { t } from "@/i18n/i18n";
 
 export function DeleteProjectDialog({
 	name,
@@ -32,11 +33,13 @@ export function DeleteProjectDialog({
 			className="modal-motion m-auto w-[min(440px,calc(100vw-24px))] rounded-xl border border-line bg-panel p-5 text-foreground shadow-xl backdrop:bg-black/30"
 		>
 			<h2 id="delete-project-title" className="text-lg font-semibold">
-				Eliminar proyecto
+				{t("Eliminar proyecto")}
 			</h2>
 			<p id="delete-project-description" className="mt-3 break-words text-sm">
-				¿Querés eliminar <strong>{name}</strong>? Se borrará su copia de este navegador y no podrás
-				recuperarla. Los archivos .circ descargados se conservan.
+				{t("¿Querés eliminar")} <strong>{name}</strong>
+				{t(
+					"? Se borrará su copia de este navegador y no podrás recuperarla. Los archivos .circ descargados se conservan.",
+				)}
 			</p>
 			<div className="mt-5 flex justify-end gap-2">
 				<button
@@ -45,14 +48,14 @@ export function DeleteProjectDialog({
 					onClick={onClose}
 					className="rounded-md border border-line px-3 py-2 text-sm hover:bg-black/5"
 				>
-					Cancelar
+					{t("Cancelar")}
 				</button>
 				<button
 					type="button"
 					onClick={onConfirm}
 					className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
 				>
-					Eliminar proyecto
+					{t("Eliminar proyecto")}
 				</button>
 			</div>
 		</dialog>

@@ -5,7 +5,7 @@
 import { type Entry, errorMessage, isError } from "@/analyze/entry";
 import type { Implicant } from "@/analyze/implicant";
 import type { AnalyzerModel } from "@/analyze/model";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import { nextEntry } from "./entries";
 
 const MAX_VARS = 4;
@@ -153,7 +153,7 @@ export function KarnaughMap({ model, output }: { model: AnalyzerModel; output: s
 	return (
 		<svg
 			role="img"
-			aria-label={`Mapa de Karnaugh de ${output}`}
+			aria-label={t("Mapa de Karnaugh de {0}", [output])}
 			viewBox={`0 0 ${width} ${height}`}
 			width={width * 1.15}
 			className="mx-auto block h-auto max-w-full select-none font-serif"

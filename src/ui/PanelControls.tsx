@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import { useRef } from "react";
+import { t } from "@/i18n/i18n";
 import { usePreference } from "./preferences";
 
 export function Disclosure({
@@ -47,13 +48,13 @@ export function PanelResize({
 	return (
 		<hr
 			aria-orientation="vertical"
-			aria-label={side === "left" ? "Ancho de componentes y circuitos" : "Ancho de atributos"}
+			aria-label={side === "left" ? t("Ancho de componentes y circuitos") : t("Ancho de atributos")}
 			aria-valuemin={minimum}
 			aria-valuemax={maximum}
 			aria-valuenow={clamp(width)}
 			tabIndex={0}
 			className={`panel-resize panel-resize-${side} h-full w-1.5 shrink-0 border-0 cursor-col-resize touch-none bg-line/50 hover:bg-accent/40 focus-visible:bg-accent/40 focus-visible:outline-none`}
-			title="Arrastrá para ajustar · flechas para cambiar el ancho · doble clic para restaurar"
+			title={t("Arrastrá para ajustar · flechas para cambiar el ancho · doble clic para restaurar")}
 			onPointerDown={(e) => {
 				if (e.button !== 0) return;
 				start.current = { x: e.clientX, width: clamp(width) };

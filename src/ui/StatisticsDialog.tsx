@@ -4,7 +4,7 @@
 
 import { useEffect, useRef } from "react";
 import type { Circuit } from "@/engine/circuit";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import { type ComponentCount, computeStatistics } from "@/project/statistics";
 import { componentName } from "./panels";
 import type { Workspace } from "./workspace";
@@ -42,28 +42,31 @@ export function StatisticsDialog({
 			className="modal-motion m-auto max-h-[90dvh] w-[min(640px,calc(100vw-16px))] overflow-hidden rounded-xl border border-line bg-panel p-0 text-foreground shadow-xl backdrop:bg-black/30 [&[open]]:flex [&[open]]:flex-col"
 		>
 			<h2 id="stats-title" className="border-b border-line px-5 py-3 text-lg font-semibold">
-				Estadísticas de {circuit.name}
+				{t("Estadísticas de {0}", [circuit.name])}
 			</h2>
 			<div className="min-h-0 flex-1 overflow-auto">
 				<table className="w-full text-sm">
 					<thead className="sticky top-0 bg-panel text-left text-xs text-muted">
 						<tr>
-							<th className="px-3 py-2 font-medium">Componente</th>
-							<th className="px-3 py-2 font-medium">Librería</th>
-							<th className="px-3 py-2 text-right font-medium" title="Componentes colocados en este circuito">
-								Simple
+							<th className="px-3 py-2 font-medium">{t("Componente")}</th>
+							<th className="px-3 py-2 font-medium">{t("Librería")}</th>
+							<th
+								className="px-3 py-2 text-right font-medium"
+								title={t("Componentes colocados en este circuito")}
+							>
+								{t("Simple")}
 							</th>
 							<th
 								className="px-3 py-2 text-right font-medium"
-								title="Sumando una vez cada circuito distinto que usa"
+								title={t("Sumando una vez cada circuito distinto que usa")}
 							>
-								Único
+								{t("Único")}
 							</th>
 							<th
 								className="px-3 py-2 text-right font-medium"
-								title="Expandiendo cada instancia de subcircuito"
+								title={t("Expandiendo cada instancia de subcircuito")}
 							>
-								Recursivo
+								{t("Recursivo")}
 							</th>
 						</tr>
 					</thead>
@@ -79,13 +82,13 @@ export function StatisticsDialog({
 						))}
 						<tr className="border-t-2 border-line font-semibold">
 							<td className="px-3 py-1.5" colSpan={2}>
-								TOTAL (sin subcircuitos del proyecto)
+								{t("TOTAL (sin subcircuitos del proyecto)")}
 							</td>
 							{cells(stats.totalWithoutSubcircuits)}
 						</tr>
 						<tr className="border-t border-line font-semibold">
 							<td className="px-3 py-1.5" colSpan={2}>
-								TOTAL (con subcircuitos)
+								{t("TOTAL (con subcircuitos)")}
 							</td>
 							{cells(stats.totalWithSubcircuits)}
 						</tr>
@@ -98,7 +101,7 @@ export function StatisticsDialog({
 					onClick={onClose}
 					className="rounded-md border border-line px-3 py-1.5 text-sm hover:bg-black/5"
 				>
-					Cerrar
+					{t("Cerrar")}
 				</button>
 			</div>
 		</dialog>

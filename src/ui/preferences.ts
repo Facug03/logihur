@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { GateShape } from "@/engine/component";
+import { LOCALES, type Locale } from "@/i18n/i18n";
 
 /** UI preferences are separate from circuit files and tolerate unavailable storage. */
 export function usePreference<T extends boolean | number>(key: string, fallback: T) {
@@ -53,6 +54,25 @@ export function loadGateShape(): GateShape {
 export function saveGateShape(shape: GateShape): void {
 	try {
 		localStorage.setItem("logihur.ui.gateShape", shape);
+	} catch {
+		/* Optional persistence. */
+	}
+}
+
+/** AppPreferences.LOCALE, kept in this browser. Spanish unless English was chosen. */
+export function loadLocale(): Locale {
+	try {
+		const raw = localStorage.getItem("logihur.ui.locale");
+		if (LOCALES.some((l) => l.value === raw)) return raw as Locale;
+	} catch {
+		/* Use the default when storage is unavailable. */
+	}
+	return "es";
+}
+
+export function saveLocale(locale: Locale): void {
+	try {
+		localStorage.setItem("logihur.ui.locale", locale);
 	} catch {
 		/* Optional persistence. */
 	}

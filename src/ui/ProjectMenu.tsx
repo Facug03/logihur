@@ -2,6 +2,7 @@
 
 import { Check, ChevronDown, Download, Files, Share, Trash2, Undo2 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { t } from "@/i18n/i18n";
 import type { PwaState } from "./pwa";
 import type { Workspace } from "./workspace";
 
@@ -32,7 +33,7 @@ export function ProjectMenu({
 			<button
 				type="button"
 				popoverTarget={id}
-				aria-label={`Proyectos: ${ws.fileName}`}
+				aria-label={t("Proyectos: {0}", [ws.fileName])}
 				onClick={(e) => {
 					const bounds = e.currentTarget.getBoundingClientRect();
 					setPosition({
@@ -44,7 +45,7 @@ export function ProjectMenu({
 			>
 				<Files className="size-[18px] md:hidden" />
 				<span className="hidden flex-col text-left leading-tight md:flex">
-					<span className="text-sm font-semibold tracking-tight">LogiHUR</span>
+					<span className="text-sm font-semibold tracking-tight">{t("LogiHUR")}</span>
 					<span className="max-w-32 truncate font-mono text-[10px] text-muted">
 						{ws.fileName}
 						{ws.dirty ? " •" : ""}
@@ -56,11 +57,11 @@ export function ProjectMenu({
 				ref={ref}
 				id={id}
 				popover="auto"
-				aria-label="Proyectos"
+				aria-label={t("Proyectos")}
 				style={position}
 				className="popover-motion fixed inset-auto m-0 w-72 max-w-[calc(100vw-16px)] rounded-lg border border-line bg-panel p-2 text-foreground shadow-lg"
 			>
-				<p className="px-2 py-1 text-xs font-semibold text-muted">Proyectos</p>
+				<p className="px-2 py-1 text-xs font-semibold text-muted">{t("Proyectos")}</p>
 				{ws.canReturnToProject && (
 					<button
 						type="button"
@@ -93,8 +94,8 @@ export function ProjectMenu({
 							</button>
 							<button
 								type="button"
-								aria-label={`Eliminar ${project.name}`}
-								title={`Eliminar ${project.name}`}
+								aria-label={t("Eliminar {0}", [project.name])}
+								title={t("Eliminar {0}", [project.name])}
 								onClick={() => {
 									close();
 									onDelete(project);
@@ -117,15 +118,17 @@ export function ProjectMenu({
 					>
 						<Download className="size-4 shrink-0" />
 						<span>
-							Instalar LogiHUR
-							<span className="block text-xs text-muted">Funciona sin conexión y abre archivos .circ</span>
+							{t("Instalar LogiHUR")}
+							<span className="block text-xs text-muted">
+								{t("Funciona sin conexión y abre archivos .circ")}
+							</span>
 						</span>
 					</button>
 				)}
 				{pwa.iosHint && (
 					<p className="mt-1 flex gap-2 border-t border-line px-2 pt-3 pb-1 text-xs text-muted">
 						<Share className="size-4 shrink-0" />
-						Para instalarla: Compartir → Agregar a inicio. Después funciona sin conexión.
+						{t("Para instalarla: Compartir → Agregar a inicio. Después funciona sin conexión.")}
 					</p>
 				)}
 			</section>

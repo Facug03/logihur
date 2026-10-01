@@ -4,25 +4,26 @@ import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { GateShape } from "@/engine/component";
 import { prefs } from "@/engine/prefs";
+import { getLocale, LOCALES, type Locale, msg, t } from "@/i18n/i18n";
 import { LogisimIcon } from "./panels";
-import { saveGateShape } from "./preferences";
+import { saveGateShape, saveLocale } from "./preferences";
 import type { Workspace } from "./workspace";
 
 /** IntlOptions' gate shape choices, with the icons each one uses. */
 const SHAPES: { value: GateShape; label: string; icons: string[] }[] = [
 	{
 		value: "shaped",
-		label: "Con forma",
+		label: msg("Con forma"),
 		icons: ["andGate.gif", "orGate.gif", "xorGate.gif", "notGate.gif"],
 	},
 	{
 		value: "rectangular",
-		label: "Rectangular",
+		label: msg("Rectangular"),
 		icons: ["andGateRect.gif", "orGateRect.gif", "xorGateRect.gif", "notGateRect.gif"],
 	},
 	{
 		value: "din40700",
-		label: "DIN 40700",
+		label: msg("DIN 40700"),
 		icons: ["dinAndGate.gif", "dinOrGate.gif", "dinXorGate.gif", "dinNotGate.gif"],
 	},
 ];
@@ -30,6 +31,7 @@ const SHAPES: { value: GateShape; label: string; icons: string[] }[] = [
 export function PreferencesDialog({ ws, onClose }: { ws: Workspace; onClose: () => void }) {
 	const ref = useRef<HTMLDialogElement>(null);
 	const [gateShape, setGateShape] = useState(prefs.gateShape);
+	const [locale, setLocale] = useState(getLocale);
 	useEffect(() => {
 		const previous = document.activeElement;
 		const dialog = ref.current;
@@ -39,6 +41,11 @@ export function PreferencesDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 			if (previous instanceof HTMLElement) previous.focus();
 		};
 	}, []);
+	const chooseLocale = (value: Locale) => {
+		setLocale(value);
+		saveLocale(value);
+		ws.setLocale(value);
+	};
 	const chooseShape = (shape: GateShape) => {
 		setGateShape(shape);
 		saveGateShape(shape);
@@ -53,11 +60,11 @@ export function PreferencesDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 		>
 			<div className="flex items-center justify-between gap-3">
 				<h2 id="preferences-title" className="text-lg font-semibold">
-					{"Preferencias"}
+					{t("Preferencias")}
 				</h2>
 				<button
 					type="button"
-					aria-label={"Cerrar preferencias"}
+					aria-label={t("Cerrar preferencias")}
 					onClick={onClose}
 					className="rounded-md p-2 hover:bg-black/5"
 				>
@@ -65,10 +72,24 @@ export function PreferencesDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 				</button>
 			</div>
 			<p className="mt-1 text-xs text-muted">
-				{"Se guardan en este navegador y no cambian los archivos .circ."}
+				{t("Se guardan en este navegador y no cambian los archivos .circ.")}
 			</p>
+			<label className="mt-5 flex items-center justify-between gap-3 text-sm">
+				<span className="font-semibold">{t("Idioma")}</span>
+				<select
+					value={locale}
+					onChange={(e) => chooseLocale(e.target.value as Locale)}
+					className="rounded-md border border-line bg-panel px-2 py-1.5"
+				>
+					{LOCALES.map((l) => (
+						<option key={l.value} value={l.value} lang={l.value}>
+							{l.label}
+						</option>
+					))}
+				</select>
+			</label>
 			<fieldset className="mt-5">
-				<legend className="mb-2 text-sm font-semibold">{"Forma de las puertas"}</legend>
+				<legend className="mb-2 text-sm font-semibold">{t("Forma de las puertas")}</legend>
 				<div className="grid gap-2">
 					{SHAPES.map((shape) => (
 						<label
@@ -83,7 +104,7 @@ export function PreferencesDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 								onChange={() => chooseShape(shape.value)}
 								className="accent-accent"
 							/>
-							<span className="flex-1">{shape.label}</span>
+							<span className="flex-1">{t(shape.label)}</span>
 							<span className="flex gap-1" aria-hidden="true">
 								{shape.icons.map((icon) => (
 									<LogisimIcon key={icon} name={icon} size={24} />

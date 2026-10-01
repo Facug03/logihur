@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { prefs } from "@/engine/prefs";
+import { localized, t } from "@/i18n/i18n";
 import { type ImageFormat, renderCircuitImage } from "@/render/export-image";
 import type { Workspace } from "./workspace";
 
@@ -67,8 +68,10 @@ export function ExportImageDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 		}
 		setBusy(false);
 		if (count > 0)
-			ws.notify(count === 1 ? "Se exportó la imagen." : `Se exportaron ${String(count)} imágenes.`);
-		if (empty.length > 0) ws.notify(`No se exportaron circuitos vacíos: ${String(empty.join(", "))}.`);
+			ws.notify(
+				count === 1 ? localized("Se exportó la imagen.") : localized("Se exportaron {0} imágenes.", [count]),
+			);
+		if (empty.length > 0) ws.notify(localized("No se exportaron circuitos vacíos: {0}.", [empty.join(", ")]));
 		onClose();
 	};
 	return (
@@ -80,11 +83,11 @@ export function ExportImageDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 		>
 			<div className="flex items-center justify-between gap-3">
 				<h2 id="export-title" className="text-lg font-semibold">
-					{"Exportar imagen"}
+					{t("Exportar imagen")}
 				</h2>
 				<button
 					type="button"
-					aria-label={"Cerrar exportar imagen"}
+					aria-label={t("Cerrar exportar imagen")}
 					onClick={onClose}
 					className="rounded-md p-2 hover:bg-black/5"
 				>
@@ -92,7 +95,7 @@ export function ExportImageDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 				</button>
 			</div>
 			<fieldset className="mt-4">
-				<legend className="mb-2 text-sm font-semibold">{"Circuitos"}</legend>
+				<legend className="mb-2 text-sm font-semibold">{t("Circuitos")}</legend>
 				<div className="max-h-40 overflow-y-auto rounded-lg border border-line p-1">
 					{circuits.map((c) => (
 						<label
@@ -110,11 +113,11 @@ export function ExportImageDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 					))}
 				</div>
 				{selected.size > 1 && (
-					<p className="mt-1 text-xs text-muted">{"Se descarga un archivo por circuito."}</p>
+					<p className="mt-1 text-xs text-muted">{t("Se descarga un archivo por circuito.")}</p>
 				)}
 			</fieldset>
 			<fieldset className="mt-4">
-				<legend className="mb-2 text-sm font-semibold">{"Formato"}</legend>
+				<legend className="mb-2 text-sm font-semibold">{t("Formato")}</legend>
 				<div className="flex gap-4 text-sm">
 					{FORMATS.map((f) => (
 						<label key={f.value} className="flex items-center gap-2">
@@ -131,7 +134,7 @@ export function ExportImageDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 				</div>
 			</fieldset>
 			<label className="mt-4 block text-sm font-semibold" htmlFor="export-scale">
-				{"Tamaño"}
+				{t("Tamaño")}
 			</label>
 			<div className="mt-2 flex items-center gap-3">
 				<input
@@ -153,15 +156,15 @@ export function ExportImageDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 					className="mt-0.5 accent-accent"
 				/>
 				<span>
-					{"Vista de impresión"}
+					{t("Vista de impresión")}
 					<span className="block text-xs text-muted">
-						{"En blanco y negro, sin los valores de la simulación."}
+						{t("En blanco y negro, sin los valores de la simulación.")}
 					</span>
 				</span>
 			</label>
 			<div className="mt-5 flex justify-end gap-2">
 				<button type="button" onClick={onClose} className="rounded-md px-3 py-2 text-sm hover:bg-black/5">
-					{"Cancelar"}
+					{t("Cancelar")}
 				</button>
 				<button
 					type="button"
@@ -169,7 +172,7 @@ export function ExportImageDialog({ ws, onClose }: { ws: Workspace; onClose: () 
 					onClick={onExport}
 					className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
 				>
-					{"Exportar"}
+					{t("Exportar")}
 				</button>
 			</div>
 		</dialog>

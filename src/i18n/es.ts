@@ -201,6 +201,9 @@ export const es: Record<string, string> = {
 	"hex.numberFormat": "El archivo contiene un número inválido",
 	"hex.sizeError": "El archivo tiene más datos de los que caben en la memoria",
 	"hex.headerError": "El archivo no es una imagen de memoria de Logisim (v2.0 raw)",
+	"hex.clear": "Borrar",
+	"log.moveUp": "Mover Arriba",
+	"log.moveDown": "Mover Abajo",
 
 	// UI
 	"io.button": "Botón",
@@ -312,9 +315,3 @@ export const es: Record<string, string> = {
 	"analyze.tooManyOutputsError": "El análisis no se puede llevar a cabo con mas de {0} salidas.",
 	"analyze.noExpressionTitle": "Expresión No Definida",
 };
-
-export function t(key: string, args?: readonly (string | number)[]): string {
-	let s = es[key] ?? key;
-	for (const [i, a] of (args ?? []).entries()) s = s.replace(`{${i}}`, String(a));
-	return s;
-}

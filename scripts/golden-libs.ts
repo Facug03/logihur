@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { readCirc } from "@/format/circ-reader";
 import { writeCirc } from "@/format/circ-writer";
+import { renderMessage } from "@/i18n/i18n";
 import { addHarness } from "../tests/golden/harness";
 import { libraryFiles } from "../tests/golden/libraries";
 
@@ -20,7 +21,8 @@ mkdirSync(dir, { recursive: true });
 const files = libraryFiles();
 const sources = new Map(Object.entries(files));
 const main = readCirc(files["principal.circ"], sources);
-if (main.missingLibraries.length > 0 || main.messages.length > 0) throw new Error(main.messages.join("\n"));
+if (main.missingLibraries.length > 0 || main.messages.length > 0)
+	throw new Error(main.messages.map(renderMessage).join("\n"));
 addHarness(main, main.circuits[0]);
 writeFileSync(path.join(dir, "base.circ"), files["base.circ"]);
 writeFileSync(path.join(dir, "compuertas.circ"), files["compuertas.circ"]);

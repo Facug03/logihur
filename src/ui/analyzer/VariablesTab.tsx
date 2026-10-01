@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { VariableList } from "@/analyze/model";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 import { isIdentPart, isIdentStart } from "@/sim/pin-labels";
 
 const baseButton =
@@ -55,7 +55,7 @@ export function VariablesTab({ list, label }: { list: VariableList; label: strin
 				aria-label={label}
 				className="h-48 overflow-y-auto rounded-md border border-line bg-panel py-1 sm:h-56"
 			>
-				{names.length === 0 && <p className="px-3 py-2 text-sm text-muted">Sin variables todavía.</p>}
+				{names.length === 0 && <p className="px-3 py-2 text-sm text-muted">{t("Sin variables todavía.")}</p>}
 				{names.map((name) => (
 					<button
 						key={name}
@@ -110,7 +110,7 @@ export function VariablesTab({ list, label }: { list: VariableList; label: strin
 				}}
 			>
 				<input
-					aria-label="Nombre de variable"
+					aria-label={t("Nombre de variable")}
 					value={field}
 					onChange={(e) => setField(e.target.value)}
 					autoCapitalize="off"

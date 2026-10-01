@@ -6,7 +6,7 @@ import { Info, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import type { AnalyzerTab } from "@/analyze/analyze";
-import { t } from "@/i18n/es";
+import { type Message, msg, renderMessage, t } from "@/i18n/i18n";
 import type { Workspace } from "../workspace";
 import { BuildCircuitDialog } from "./BuildCircuitDialog";
 import { ExpressionTab, MinimizedTab } from "./ExpressionTabs";
@@ -14,11 +14,11 @@ import { TruthTableTab } from "./TruthTableTab";
 import { buttonClass, primaryButtonClass, VariablesTab } from "./VariablesTab";
 
 const TABS: { id: AnalyzerTab; label: string; tip: string }[] = [
-	{ id: "inputs", label: "analyze.inputsTab", tip: "analyze.inputsTabTip" },
-	{ id: "outputs", label: "analyze.outputsTab", tip: "analyze.outputsTabTip" },
-	{ id: "table", label: "analyze.tableTab", tip: "analyze.tableTabTip" },
-	{ id: "expression", label: "analyze.expressionTab", tip: "analyze.expressionTabTip" },
-	{ id: "minimized", label: "analyze.minimizedTab", tip: "analyze.minimizedTabTip" },
+	{ id: "inputs", label: msg("analyze.inputsTab"), tip: "analyze.inputsTabTip" },
+	{ id: "outputs", label: msg("analyze.outputsTab"), tip: "analyze.outputsTabTip" },
+	{ id: "table", label: msg("analyze.tableTab"), tip: "analyze.tableTabTip" },
+	{ id: "expression", label: msg("analyze.expressionTab"), tip: "analyze.expressionTabTip" },
+	{ id: "minimized", label: msg("analyze.minimizedTab"), tip: "analyze.minimizedTabTip" },
 ];
 
 export function AnalyzerDialog({
@@ -30,14 +30,14 @@ export function AnalyzerDialog({
 }: {
 	ws: Workspace;
 	initialTab: AnalyzerTab;
-	notice: string | null;
+	notice: Message | null;
 	onClose: () => void;
 	onBuilt: () => void;
 }) {
 	const model = ws.analyzer;
 	useSyncExternalStore(model.subscribe, model.getVersion, model.getVersion);
 	const [tab, setTab] = useState(initialTab);
-	const [shownNotice, setShownNotice] = useState(notice);
+	const [shownNotice, setShownNotice] = useState(() => notice);
 	const [selectedOutput, setSelectedOutput] = useState<string | null>(null);
 	const [building, setBuilding] = useState(false);
 	const dialogRef = useRef<HTMLDialogElement>(null);
@@ -77,13 +77,15 @@ export function AnalyzerDialog({
 						{t("analyze.windowTitle")}
 					</h2>
 					<p className="truncate text-xs text-muted">
-						{model.currentCircuit ? `Circuito: ${model.currentCircuit.name}` : "Tabla definida a mano"} ·{" "}
-						{model.inputs.size} entradas · {model.outputs.size} salidas
+						{model.currentCircuit
+							? t("Circuito: {0}", [model.currentCircuit.name])
+							: t("Tabla definida a mano")}{" "}
+						· {t("{0} entradas · {1} salidas", [model.inputs.size, model.outputs.size])}
 					</p>
 				</div>
 				<button
 					type="button"
-					aria-label="Cerrar"
+					aria-label={t("Cerrar")}
 					onClick={onClose}
 					className="inline-flex size-9 shrink-0 items-center justify-center rounded-md hover:bg-black/5"
 				>
@@ -140,11 +142,12 @@ export function AnalyzerDialog({
 					>
 						<Info className="mt-0.5 size-4 shrink-0 text-amber-700" />
 						<p className="flex-1">
-							<strong className="font-semibold">{t("analyze.noExpressionTitle")}.</strong> {shownNotice}
+							<strong className="font-semibold">{t("analyze.noExpressionTitle")}.</strong>{" "}
+							{renderMessage(shownNotice)}
 						</p>
 						<button
 							type="button"
-							aria-label="Ocultar aviso"
+							aria-label={t("Ocultar aviso")}
 							onClick={() => setShownNotice(null)}
 							className="rounded p-0.5 hover:bg-black/5"
 						>
@@ -166,7 +169,7 @@ export function AnalyzerDialog({
 			</div>
 			<footer className="flex shrink-0 justify-end gap-2 border-t border-line px-4 py-3">
 				<button type="button" className={buttonClass} onClick={onClose}>
-					Cerrar
+					{t("Cerrar")}
 				</button>
 				<button type="button" className={primaryButtonClass} onClick={() => setBuilding(true)}>
 					{t("analyze.buildCircuitButton")}

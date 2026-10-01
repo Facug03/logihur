@@ -3,7 +3,7 @@
 
 import type { ReactNode } from "react";
 import { BINARY_OPS, type Expression, precedence } from "@/analyze/expression";
-import { t } from "@/i18n/es";
+import { t } from "@/i18n/i18n";
 
 function render(e: Expression, key = "e"): ReactNode {
 	switch (e.kind) {

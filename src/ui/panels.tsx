@@ -9,7 +9,7 @@ import type { AnyAttribute, Font, FontStyle } from "@/engine/attributes";
 import { CIRCUIT_STATIC_ATTRS, type Circuit } from "@/engine/circuit";
 import type { ComponentFactory, Instance } from "@/engine/component";
 import { prefs } from "@/engine/prefs";
-import { t } from "@/i18n/es";
+import { localized, type Message, renderMessage, t } from "@/i18n/i18n";
 import { AppearanceAttributes } from "./AppearanceAttributes";
 import { downloadMemory, HexEditor, memoryImageError } from "./HexEditor";
 import { Disclosure } from "./PanelControls";
@@ -101,12 +101,12 @@ export function CircuitsPanel({
 	const tool = ws.tool;
 	return (
 		<section className="flex flex-col gap-0.5 p-3">
-			<Disclosure id="circuits" title="Circuitos">
+			<Disclosure id="circuits" title={t("Circuitos")}>
 				<div className="flex items-center justify-end px-1 pb-1">
 					<button
 						type="button"
-						title="Agregar circuito"
-						aria-label="Agregar circuito"
+						title={t("Agregar circuito")}
+						aria-label={t("Agregar circuito")}
 						onClick={() => {
 							setAdding(true);
 							setName(`circuito${ws.project.circuits.length + 1}`);
@@ -157,8 +157,8 @@ export function CircuitsPanel({
 								type="button"
 								title={
 									canInsert
-										? `Agregar ${c.name} como subcircuito`
-										: "No se puede agregar un circuito dentro de sí mismo"
+										? t("Agregar {0} como subcircuito", [c.name])
+										: t("No se puede agregar un circuito dentro de sí mismo")
 								}
 								disabled={!canInsert}
 								onClick={() => ws.selectAddTool(factory)}
@@ -175,7 +175,7 @@ export function CircuitsPanel({
 							</button>
 							<button
 								type="button"
-								title={isMain ? "Circuito principal" : "Usar como circuito principal"}
+								title={isMain ? t("Circuito principal") : t("Usar como circuito principal")}
 								onClick={() => ws.setMainCircuit(c)}
 								className={`rounded p-1 ${isMain ? "text-amber-500" : "text-muted opacity-0 group-hover:opacity-100"}`}
 							>
@@ -184,8 +184,8 @@ export function CircuitsPanel({
 							{onCircuitMenu && (
 								<button
 									type="button"
-									title={`Más acciones para ${c.name}`}
-									aria-label={`Más acciones para ${c.name}`}
+									title={t("Más acciones para {0}", [c.name])}
+									aria-label={t("Más acciones para {0}", [c.name])}
 									onClick={(e) => {
 										const b = e.currentTarget.getBoundingClientRect();
 										onCircuitMenu(c, b.left, b.bottom + 4);
@@ -197,7 +197,7 @@ export function CircuitsPanel({
 							)}
 							<button
 								type="button"
-								title="Borrar circuito"
+								title={t("Borrar circuito")}
 								onClick={() => ws.removeCircuit(c)}
 								className="rounded p-1 text-muted opacity-0 hover:text-red-600 group-hover:opacity-100"
 							>
@@ -226,13 +226,15 @@ export function LibraryPanel({
 	const tool = ws.tool;
 	return (
 		<section className="flex flex-col gap-0.5 p-3">
-			<Disclosure id="libraries" title="Librerías">
+			<Disclosure id="libraries" title={t("Librerías")}>
 				{LIBRARIES.map((lib) => (
 					<LibraryDisclosure key={lib.desc} id={lib.desc}>
 						<summary className="flex cursor-pointer list-none items-center gap-1 rounded-md px-1 py-1 text-sm hover:bg-black/5">
 							<ChevronRight className="size-3.5 transition-transform group-open:rotate-90" />
 							{t(lib.displayKey)}
-							{lib.factories.length === 0 && <span className="ml-auto text-[10px] text-muted">pronto</span>}
+							{lib.factories.length === 0 && (
+								<span className="ml-auto text-[10px] text-muted">{t("pronto")}</span>
+							)}
 						</summary>
 						<ul className="ml-3 border-l border-line pl-1">
 							{lib.factories.map((f) => {
@@ -298,14 +300,14 @@ function AttrEditor({
 	onChange: (v: unknown) => void;
 }) {
 	const [draft, setDraft] = useState<string | null>(null);
-	const [validationError, setValidationError] = useState<string | null>(null);
+	const [validationError, setValidationError] = useState<Message | null>(null);
 	const [editingMemory, setEditingMemory] = useState(false);
 
 	if (attr.kind === "memory") {
 		return (
 			<>
 				<button type="button" className={inputClass} onClick={() => setEditingMemory(true)}>
-					(click para editar)
+					{t("(click para editar)")}
 				</button>
 				{editingMemory && (
 					<HexEditor
@@ -363,7 +365,7 @@ function AttrEditor({
 				value={value as number}
 				onChange={(e) => onChange(Number(e.target.value))}
 			>
-				<option value={0}>Nada</option>
+				<option value={0}>{t("Nada")}</option>
 				{Array.from({ length: max }, (_, i) => i + 1).map((n) => (
 					<option key={n} value={n}>
 						{n - 1}
@@ -426,7 +428,7 @@ function AttrEditor({
 				<label className="flex min-w-0 items-center gap-1 text-xs text-muted">
 					<input
 						type="number"
-						aria-label={`Opacidad de ${attrLabel(attr)} (%)`}
+						aria-label={t("Opacidad de {0} (%)", [attrLabel(attr)])}
 						min={0}
 						max={100}
 						value={Math.round((opacity * 100) / 255)}
@@ -449,7 +451,7 @@ function AttrEditor({
 			onChange(attr.parse(draft));
 			setValidationError(null);
 		} catch {
-			setValidationError(`Valor inválido. Se conservó ${attr.format(value)}.`);
+			setValidationError(() => localized("Valor inválido. Se conservó {0}.", [attr.format(value)]));
 		}
 		setDraft(null);
 	};
@@ -477,7 +479,7 @@ function AttrEditor({
 			/>
 			{validationError && (
 				<p role="alert" className="mt-1 text-xs text-red-700">
-					{validationError}
+					{renderMessage(validationError)}
 				</p>
 			)}
 		</div>
@@ -521,7 +523,9 @@ export function AttributesPanel({ ws }: { ws: Workspace }) {
 		const first = selected[0];
 		const sameKind = selected.every((c) => c.factory === first.factory);
 		if (!sameKind) {
-			return <div className="p-4 text-sm text-muted">{selected.length} componentes seleccionados.</div>;
+			return (
+				<div className="p-4 text-sm text-muted">{t("{0} componentes seleccionados.", [selected.length])}</div>
+			);
 		}
 		const isSub = first.factory instanceof SubcircuitFactory;
 		const attrs = first.factory.getAttributes(first.attrs);
@@ -549,7 +553,7 @@ export function AttributesPanel({ ws }: { ws: Workspace }) {
 						onClick={() => ws.enterSubcircuit(first)}
 						className="m-4 rounded-md border border-line px-3 py-1.5 text-sm hover:bg-black/5"
 					>
-						Ver adentro de {first.factory.name}
+						{t("Ver adentro de {0}", [first.factory.name])}
 					</button>
 				)}
 				{selected.length === 1 && ws.memoryContents(first) && (
@@ -567,11 +571,13 @@ export function AttributesPanel({ ws }: { ws: Workspace }) {
 			<div className="flex flex-col">
 				<Header
 					icon={iconFor(tool.factory, tool.attrs.getByName("output") === true)}
-					title={tool.kind === "text" ? "Herramienta: Texto" : `Herramienta: ${componentName(tool)}`}
+					title={
+						tool.kind === "text" ? t("Herramienta: Texto") : t("Herramienta: {0}", [componentName(tool)])
+					}
 					subtitle={
 						tool.kind === "text"
-							? "Clic para crear o editar una etiqueta"
-							: "Tocá el lienzo para colocar · flechas para orientar"
+							? t("Clic para crear o editar una etiqueta")
+							: t("Tocá el lienzo para colocar · flechas para orientar")
 					}
 				/>
 				<AttrTable
@@ -591,7 +597,11 @@ export function AttributesPanel({ ws }: { ws: Workspace }) {
 	const circuit: Circuit = ws.viewCircuit;
 	return (
 		<div className="flex flex-col">
-			<Header icon="subcirc.gif" title={`Circuito: ${circuit.name}`} subtitle="Atributos del circuito" />
+			<Header
+				icon="subcirc.gif"
+				title={t("Circuito: {0}", [circuit.name])}
+				subtitle={t("Atributos del circuito")}
+			/>
 			<AttrTable
 				rows={CIRCUIT_STATIC_ATTRS.map((attr) => ({
 					attr: attr as AnyAttribute,
@@ -600,8 +610,9 @@ export function AttributesPanel({ ws }: { ws: Workspace }) {
 				onChange={(attr, v) => ws.setCircuitAttribute(circuit, attr, v)}
 			/>
 			<p className="p-4 text-xs leading-relaxed text-muted">
-				Con la herramienta de edición: tocá un componente para seleccionarlo, arrastrá desde un puerto para
-				cablear, arrastrá en vacío para seleccionar varios. Con la mano: tocá pines de entrada y relojes.
+				{t(
+					"Con la herramienta de edición: tocá un componente para seleccionarlo, arrastrá desde un puerto para cablear, arrastrá en vacío para seleccionar varios. Con la mano: tocá pines de entrada y relojes.",
+				)}
 			</p>
 		</div>
 	);
@@ -609,7 +620,7 @@ export function AttributesPanel({ ws }: { ws: Workspace }) {
 
 function MemoryActions({ ws, inst }: { ws: Workspace; inst: Instance }) {
 	const [editing, setEditing] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<Message | null>(null);
 	const fileRef = useRef<HTMLInputElement>(null);
 	const contents = ws.memoryContents(inst);
 	if (!contents) return null;
@@ -617,7 +628,7 @@ function MemoryActions({ ws, inst }: { ws: Workspace; inst: Instance }) {
 	return (
 		<div className="flex flex-col gap-2 p-4">
 			<button type="button" className={actionClass} onClick={() => setEditing(true)}>
-				Editar contenidos
+				{t("Editar contenidos")}
 			</button>
 			<button
 				type="button"
@@ -628,24 +639,24 @@ function MemoryActions({ ws, inst }: { ws: Workspace; inst: Instance }) {
 					ws.setMemoryContents(inst, next);
 				}}
 			>
-				Borrar contenidos
+				{t("Borrar contenidos")}
 			</button>
 			<button type="button" className={actionClass} onClick={() => fileRef.current?.click()}>
-				Cargar imagen
+				{t("Cargar imagen")}
 			</button>
 			<button
 				type="button"
 				className={actionClass}
 				onClick={() => downloadMemory(contents, `${inst.factory.name.toLowerCase()}.hex`)}
 			>
-				Guardar imagen
+				{t("Guardar imagen")}
 			</button>
 			<input
 				ref={fileRef}
 				type="file"
 				accept=".hex,.txt"
 				className="hidden"
-				aria-label="Cargar imagen de memoria"
+				aria-label={t("Cargar imagen de memoria")}
 				onChange={async (e) => {
 					const file = e.target.files?.[0];
 					e.target.value = "";
@@ -656,13 +667,13 @@ function MemoryActions({ ws, inst }: { ws: Workspace; inst: Instance }) {
 						ws.setMemoryContents(inst, next);
 						setError(null);
 					} catch (err) {
-						setError(memoryImageError(err));
+						setError(() => () => memoryImageError(err));
 					}
 				}}
 			/>
 			{error && (
 				<p role="alert" className="text-xs text-red-600">
-					{error}
+					{error && renderMessage(error)}
 				</p>
 			)}
 			{editing && (

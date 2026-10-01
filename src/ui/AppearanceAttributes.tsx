@@ -7,6 +7,7 @@
 import type { PaintType, ToolStyle } from "@/editor/appearance-edit";
 import type { AppearanceShape } from "@/engine/appearance";
 import type { Direction } from "@/engine/geom";
+import { msg, t } from "@/i18n/i18n";
 import { APPEARANCE_TOOLS, shapeLabel } from "./AppearanceEditor";
 import type { Workspace } from "./workspace";
 
@@ -31,15 +32,19 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 	const onChange = (label: string, fn: (s: AppearanceShape) => AppearanceShape) =>
 		ws.updateAppearanceSelected(label, fn);
 	const editingTool = shapes.length === 0;
-	const toolName = APPEARANCE_TOOLS.find((t) => t.id === tool)?.label.replace(/ \(.*\)$/, "") ?? "";
+	const toolLabel = APPEARANCE_TOOLS.find((x) => x.id === tool)?.label;
+	const toolName = toolLabel ? t(toolLabel).replace(/ \(.*\)$/, "") : "";
 	if (editingTool && tool === "select") {
 		return (
 			<div className="flex flex-col">
-				<Title title={`Apariencia de ${ws.circuit.name}`} subtitle="Cómo se ve al usarlo como subcircuito" />
+				<Title
+					title={t("Apariencia de {0}", [ws.circuit.name])}
+					subtitle={t("Cómo se ve al usarlo como subcircuito")}
+				/>
 				<p className="p-4 text-xs leading-relaxed text-muted">
-					Elegí una figura para ver sus atributos, o una herramienta de dibujo para elegir los de las figuras
-					nuevas. Los puertos (azul) y el ancla (verde) se mueven pero no se borran; arrastrar mueve en la
-					grilla (Alt: libre) y las manijas cambian la forma.
+					{t(
+						"Elegí una figura para ver sus atributos, o una herramienta de dibujo para elegir los de las figuras nuevas. Los puertos (azul) y el ancla (verde) se mueven pero no se borran; arrastrar mueve en la grilla (Alt: libre) y las manijas cambian la forma.",
+					)}
 				</p>
 			</div>
 		);
@@ -71,24 +76,26 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 							? shapeLabel(shapes[0])
 							: `${shapes.length} objetos`
 				}
-				subtitle={editingTool ? "Atributos de las figuras nuevas" : `Apariencia de ${ws.circuit.name}`}
+				subtitle={
+					editingTool ? t("Atributos de las figuras nuevas") : t("Apariencia de {0}", [ws.circuit.name])
+				}
 			/>
 			{single?.kind === "anchor" && (
 				<label className={field}>
-					Orientación
+					{t("Orientación")}
 					<select
 						className={input}
 						value={single.facing}
 						onChange={(e) =>
-							onChange("Orientación", (s) =>
+							onChange(msg("Orientación"), (s) =>
 								s.kind === "anchor" ? { ...s, facing: e.target.value as Direction } : s,
 							)
 						}
 					>
-						<option value="east">Este</option>
-						<option value="west">Oeste</option>
-						<option value="north">Norte</option>
-						<option value="south">Sur</option>
+						<option value="east">{t("Este")}</option>
+						<option value="west">{t("Oeste")}</option>
+						<option value="north">{t("Norte")}</option>
+						<option value="south">{t("Sur")}</option>
 					</select>
 				</label>
 			)}
@@ -96,20 +103,20 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 				<>
 					{(editingTool || !(first?.kind === "line" || (first?.kind === "poly" && !first.closed))) && (
 						<label className={field}>
-							Tipo de pintura
+							{t("Tipo de pintura")}
 							<select
 								className={input}
 								value={current.paint}
-								onChange={(e) => set("Tipo de pintura", { paint: e.target.value })}
+								onChange={(e) => set(msg("Tipo de pintura"), { paint: e.target.value })}
 							>
-								<option value="stroke">Sólo borde</option>
-								<option value="fill">Sólo relleno</option>
-								<option value="both">Borde y relleno</option>
+								<option value="stroke">{t("Sólo borde")}</option>
+								<option value="fill">{t("Sólo relleno")}</option>
+								<option value="both">{t("Borde y relleno")}</option>
 							</select>
 						</label>
 					)}
 					<label className={field}>
-						Ancho del lápiz
+						{t("Ancho del lápiz")}
 						<input
 							type="number"
 							min={1}
@@ -118,33 +125,33 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 							value={current.strokeWidth}
 							onChange={(e) => {
 								const v = Number(e.target.value);
-								if (v >= 1 && v <= 8) set("Ancho del lápiz", { strokeWidth: v });
+								if (v >= 1 && v <= 8) set(msg("Ancho del lápiz"), { strokeWidth: v });
 							}}
 						/>
 					</label>
 					<label className={field}>
-						Color del lápiz
+						{t("Color del lápiz")}
 						<input
 							className="h-7 w-full"
 							type="color"
 							value={current.stroke.slice(0, 7)}
-							onChange={(e) => set("Color del lápiz", { stroke: e.target.value })}
+							onChange={(e) => set(msg("Color del lápiz"), { stroke: e.target.value })}
 						/>
 					</label>
 					<label className={field}>
-						Color de relleno
+						{t("Color de relleno")}
 						<input
 							className="h-7 w-full"
 							type="color"
 							value={current.fill.slice(0, 7)}
-							onChange={(e) => set("Color de relleno", { fill: e.target.value })}
+							onChange={(e) => set(msg("Color de relleno"), { fill: e.target.value })}
 						/>
 					</label>
 				</>
 			)}
 			{single?.kind === "rect" && single.rx > 0 && (
 				<label className={field}>
-					Radio de esquina
+					{t("Radio de esquina")}
 					<input
 						type="number"
 						min={1}
@@ -154,7 +161,7 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 						onChange={(e) => {
 							const v = Number(e.target.value);
 							if (v >= 1 && v <= 1000)
-								onChange("Radio de esquina", (s) => (s.kind === "rect" ? { ...s, rx: v } : s));
+								onChange(msg("Radio de esquina"), (s) => (s.kind === "rect" ? { ...s, rx: v } : s));
 						}}
 					/>
 				</label>
@@ -163,22 +170,24 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 				<>
 					{single?.kind === "text" && (
 						<label className={field}>
-							Texto
+							{t("Texto")}
 							<input
 								className={input}
 								value={single.text}
 								onChange={(e) =>
-									onChange("Editar texto", (s) => (s.kind === "text" ? { ...s, text: e.target.value } : s))
+									onChange(msg("Editar texto"), (s) =>
+										s.kind === "text" ? { ...s, text: e.target.value } : s,
+									)
 								}
 							/>
 						</label>
 					)}
 					<label className={field}>
-						Fuente
+						{t("Fuente")}
 						<select
 							className={input}
 							value={text.font.family}
-							onChange={(e) => set("Fuente", { font: { ...text.font, family: e.target.value } })}
+							onChange={(e) => set(msg("Fuente"), { font: { ...text.font, family: e.target.value } })}
 						>
 							{["SansSerif", "Serif", "Monospaced"].map((f) => (
 								<option key={f}>{f}</option>
@@ -186,7 +195,7 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 						</select>
 					</label>
 					<label className={field}>
-						Tamaño
+						{t("Tamaño")}
 						<input
 							type="number"
 							min={4}
@@ -195,43 +204,43 @@ export function AppearanceAttributes({ ws }: { ws: Workspace }) {
 							value={text.font.size}
 							onChange={(e) => {
 								const v = Number(e.target.value);
-								if (v >= 4 && v <= 72) set("Fuente", { font: { ...text.font, size: v } });
+								if (v >= 4 && v <= 72) set(msg("Fuente"), { font: { ...text.font, size: v } });
 							}}
 						/>
 					</label>
 					<label className={field}>
-						Estilo
+						{t("Estilo")}
 						<select
 							className={input}
 							value={text.font.style}
-							onChange={(e) => set("Fuente", { font: { ...text.font, style: e.target.value } })}
+							onChange={(e) => set(msg("Fuente"), { font: { ...text.font, style: e.target.value } })}
 						>
-							<option value="plain">Normal</option>
-							<option value="bold">Negrita</option>
-							<option value="italic">Cursiva</option>
-							<option value="bolditalic">Negrita cursiva</option>
+							<option value="plain">{t("Normal")}</option>
+							<option value="bold">{t("Negrita")}</option>
+							<option value="italic">{t("Cursiva")}</option>
+							<option value="bolditalic">{t("Negrita cursiva")}</option>
 						</select>
 					</label>
 					<label className={field}>
-						Alineación
+						{t("Alineación")}
 						<select
 							className={input}
 							value={text.align}
-							onChange={(e) => set("Alineación", { align: e.target.value })}
+							onChange={(e) => set(msg("Alineación"), { align: e.target.value })}
 						>
-							<option value="start">Izquierda</option>
-							<option value="middle">Centro</option>
-							<option value="end">Derecha</option>
+							<option value="start">{t("Izquierda")}</option>
+							<option value="middle">{t("Centro")}</option>
+							<option value="end">{t("Derecha")}</option>
 						</select>
 					</label>
 					<label className={field}>
-						Color
+						{t("Color")}
 						<input
 							className="h-7 w-full"
 							type="color"
 							value={("textFill" in text ? text.textFill : text.fill).slice(0, 7)}
 							onChange={(e) =>
-								set("Color", editingTool ? { textFill: e.target.value } : { fill: e.target.value })
+								set(msg("Color"), editingTool ? { textFill: e.target.value } : { fill: e.target.value })
 							}
 						/>
 					</label>

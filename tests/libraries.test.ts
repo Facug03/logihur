@@ -1,5 +1,6 @@
 // Logisim libraries (`file#` descriptors): nested loading checked against
 // Logisim 2.7.1 (scripts/golden-libs.ts), saving, and the workspace flow.
+
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -8,6 +9,7 @@ import { SubcircuitFactory } from "@/components/subcircuit";
 import { loc } from "@/engine/geom";
 import { readCirc } from "@/format/circ-reader";
 import { writeCirc } from "@/format/circ-writer";
+import { renderMessage } from "@/i18n/i18n";
 import { Simulator } from "@/sim/simulator";
 import { Workspace } from "@/ui/workspace";
 import { libraryFiles } from "./golden/libraries";
@@ -59,7 +61,7 @@ describe("librerías Logisim (file#)", () => {
 		);
 		const project = readCirc(self, new Map([["yo.circ", self]]));
 		expect(project.loadedLibraries.size).toBe(1);
-		expect(project.loadedLibraries.get("file#yo.circ")?.project.messages).toContain(
+		expect(project.loadedLibraries.get("file#yo.circ")?.project.messages.map(renderMessage)).toContain(
 			"La librería yo.circ se incluye a sí misma",
 		);
 	});
@@ -89,7 +91,7 @@ describe("librerías Logisim (file#)", () => {
 		ws.selectAddTool(AND_GATE);
 		ws.placeComponent(loc(900, 900));
 		expect(ws.viewCircuit.components.size).toBe(before);
-		expect(ws.notice).toContain("librería");
+		expect(ws.notice?.()).toContain("librería");
 	});
 
 	it("pide los archivos faltantes y los incorpora al proyecto abierto", () => {

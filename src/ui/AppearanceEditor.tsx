@@ -30,22 +30,27 @@ import {
 } from "@/editor/appearance-edit";
 import type { AppearanceShape } from "@/engine/appearance";
 import { locX, locY } from "@/engine/geom";
+import { msg, t } from "@/i18n/i18n";
 import type { Workspace } from "./workspace";
 
 export const APPEARANCE_TOOLS: { id: DrawTool; label: string; icon: React.ReactNode }[] = [
-	{ id: "select", label: "Seleccionar", icon: <MousePointer2 className="size-[18px]" /> },
-	{ id: "text", label: "Texto", icon: <Type className="size-[18px]" /> },
-	{ id: "line", label: "Línea", icon: <Minus className="size-[18px] -rotate-45" /> },
-	{ id: "curve", label: "Curva", icon: <Spline className="size-[18px]" /> },
+	{ id: "select", label: msg("Seleccionar"), icon: <MousePointer2 className="size-[18px]" /> },
+	{ id: "text", label: msg("Texto"), icon: <Type className="size-[18px]" /> },
+	{ id: "line", label: msg("Línea"), icon: <Minus className="size-[18px] -rotate-45" /> },
+	{ id: "curve", label: msg("Curva"), icon: <Spline className="size-[18px]" /> },
 	{
 		id: "polyline",
-		label: "Polilínea (doble clic para terminar)",
+		label: msg("Polilínea (doble clic para terminar)"),
 		icon: <Waypoints className="size-[18px]" />,
 	},
-	{ id: "rect", label: "Rectángulo", icon: <Square className="size-[18px]" /> },
-	{ id: "roundrect", label: "Rectángulo redondeado", icon: <Squircle className="size-[18px]" /> },
-	{ id: "oval", label: "Óvalo", icon: <Circle className="size-[18px]" /> },
-	{ id: "polygon", label: "Polígono (doble clic para cerrar)", icon: <Pentagon className="size-[18px]" /> },
+	{ id: "rect", label: msg("Rectángulo"), icon: <Square className="size-[18px]" /> },
+	{ id: "roundrect", label: msg("Rectángulo redondeado"), icon: <Squircle className="size-[18px]" /> },
+	{ id: "oval", label: msg("Óvalo"), icon: <Circle className="size-[18px]" /> },
+	{
+		id: "polygon",
+		label: msg("Polígono (doble clic para cerrar)"),
+		icon: <Pentagon className="size-[18px]" />,
+	},
 ];
 
 const PORT_COLOR = "#0000ff";
@@ -157,21 +162,21 @@ function HitArea({ s }: { s: AppearanceShape }) {
 }
 
 export const SHAPE_LABELS: Record<string, string> = {
-	rect: "Rectángulo",
-	oval: "Óvalo",
-	line: "Línea",
+	rect: msg("Rectángulo"),
+	oval: msg("Óvalo"),
+	line: msg("Línea"),
 	curve: "Curva",
-	poly: "Polígono",
-	text: "Texto",
-	port: "Puerto",
-	anchor: "Ancla",
+	poly: msg("Polígono"),
+	text: msg("Texto"),
+	port: msg("Puerto"),
+	anchor: msg("Ancla"),
 };
 
 export function shapeLabel(s: AppearanceShape): string {
-	if (s.kind === "rect" && s.rx > 0) return "Rectángulo redondeado";
-	if (s.kind === "poly" && !s.closed) return "Polilínea";
-	if (s.kind === "port") return `Puerto de ${s.pin.attrs.getByName("label") || "pin"}`;
-	return SHAPE_LABELS[s.kind];
+	if (s.kind === "rect" && s.rx > 0) return t("Rectángulo redondeado");
+	if (s.kind === "poly" && !s.closed) return t("Polilínea");
+	if (s.kind === "port") return t("Puerto de {0}", [String(s.pin.attrs.getByName("label") || "pin")]);
+	return t(SHAPE_LABELS[s.kind]);
 }
 
 export interface AppearanceEditorHandle {
@@ -258,7 +263,7 @@ export const AppearanceEditor = forwardRef<
 		if (poly) {
 			const shape = createPoly(polyTool === "polygon", toolStyle, poly);
 			if (shape) {
-				commit(polyTool === "polygon" ? "Agregar polígono" : "Agregar polilínea", [...shapes, shape]);
+				commit(polyTool === "polygon" ? t("Agregar polígono") : t("Agregar polilínea"), [...shapes, shape]);
 				setSelected([shapes.length]);
 			}
 		}
@@ -342,14 +347,14 @@ export const AppearanceEditor = forwardRef<
 		gesture.current = null;
 		if (!g) return;
 		if (g.mode === "move") {
-			if ((g.dx !== 0 || g.dy !== 0) && draft) commit("Mover", draft);
+			if ((g.dx !== 0 || g.dy !== 0) && draft) commit(msg("Mover"), draft);
 			else setDraft(null);
 		} else if (g.mode === "handle") {
-			if (draft) commit("Cambiar forma", draft);
+			if (draft) commit(msg("Cambiar forma"), draft);
 		} else if (g.mode === "draw") {
 			const shape = createDragged(tool, toolStyle, g.x0, g.y0, g.x1, g.y1);
 			if (shape) {
-				commit(`Agregar ${SHAPE_LABELS[shape.kind].toLowerCase()}`, [...committed, shape]);
+				commit(t("Agregar {0}", [t(SHAPE_LABELS[shape.kind]).toLowerCase()]), [...committed, shape]);
 				setSelected([committed.length]);
 			} else setDraft(null);
 		}
@@ -381,7 +386,7 @@ export const AppearanceEditor = forwardRef<
 				<svg
 					ref={svgRef}
 					role="application"
-					aria-label={`Apariencia de ${circuit.name}`}
+					aria-label={t("Apariencia de {0}", [circuit.name])}
 					// biome-ignore lint/a11y/noNoninteractiveTabindex: the drawing takes focus for its keyboard shortcuts
 					tabIndex={0}
 					width={size.w}
@@ -478,12 +483,12 @@ export const AppearanceEditor = forwardRef<
 					<input
 						// biome-ignore lint/a11y/noAutofocus: inline text entry where the user clicked
 						autoFocus
-						aria-label="Texto"
+						aria-label={t("Texto")}
 						value={textAt.value}
 						onChange={(e) => setTextAt({ ...textAt, value: e.target.value })}
 						onBlur={() => {
 							const shape = createText(toolStyle, textAt.x, textAt.y, textAt.value);
-							if (shape) commit("Agregar texto", [...shapes, shape]);
+							if (shape) commit(msg("Agregar texto"), [...shapes, shape]);
 							setTextAt(null);
 						}}
 						onKeyDown={(e) => {

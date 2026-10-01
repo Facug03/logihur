@@ -5,6 +5,7 @@
 
 import { ChevronRight, FileWarning, Plus, X } from "lucide-react";
 import { useRef } from "react";
+import { localized, t } from "@/i18n/i18n";
 import { LibraryDisclosure, LogisimIcon } from "./panels";
 import type { Workspace } from "./workspace";
 
@@ -38,21 +39,23 @@ export function MissingLibrariesNotice({ ws, onDismiss }: { ws: Workspace; onDis
 			<FileWarning className="mt-0.5 size-5 shrink-0 text-amber-700" />
 			<div className="min-w-0 flex-1">
 				<p>
-					Este proyecto usa {missing.length === 1 ? "la librería" : "las librerías"}{" "}
-					<strong className="break-all">{missing.join(", ")}</strong>. Sus componentes se muestran como cajas
-					hasta que elijas {missing.length === 1 ? "el archivo" : "los archivos"}.
+					{missing.length === 1 ? t("Este proyecto usa la librería") : t("Este proyecto usa las librerías")}{" "}
+					<strong className="break-all">{missing.join(", ")}</strong>.{" "}
+					{missing.length === 1
+						? t("Sus componentes se muestran como cajas hasta que elijas el archivo.")
+						: t("Sus componentes se muestran como cajas hasta que elijas los archivos.")}
 				</p>
 				<button
 					type="button"
 					onClick={() => fileRef.current?.click()}
 					className="mt-2 rounded-md border border-amber-400 bg-white px-3 py-1.5 font-medium hover:bg-amber-100"
 				>
-					Elegir {missing.length === 1 ? "archivo" : "archivos"}…
+					{missing.length === 1 ? t("Elegir archivo…") : t("Elegir archivos…")}
 				</button>
 			</div>
 			<button
 				type="button"
-				aria-label="Ocultar aviso"
+				aria-label={t("Ocultar aviso")}
 				onClick={onDismiss}
 				className="rounded p-1 hover:bg-black/5"
 			>
@@ -71,7 +74,11 @@ export function MissingLibrariesNotice({ ws, onDismiss }: { ws: Workspace; onDis
 					e.target.value = "";
 					ws.provideLibraries(sources);
 					const still = ws.project.missingLibraries;
-					ws.notify(still.length > 0 ? `Todavía faltan: ${still.join(", ")}.` : "Librerías cargadas.");
+					ws.notify(
+						still.length > 0
+							? localized("Todavía faltan: {0}.", [still.join(", ")])
+							: localized("Librerías cargadas."),
+					);
 				}}
 			/>
 		</div>
@@ -112,7 +119,7 @@ export function LogisimLibrariesSection({ ws, onPick }: { ws: Workspace; onPick?
 								<li key={c.id}>
 									<button
 										type="button"
-										title={`Agregar ${c.name} (${lib.fileName})`}
+										title={t("Agregar {0} ({1})", [c.name, lib.fileName])}
 										onClick={() => {
 											ws.selectAddTool(factory, `${lib.desc}:${c.name}`);
 											onPick?.();
@@ -136,7 +143,7 @@ export function LogisimLibrariesSection({ ws, onPick }: { ws: Workspace; onPick?
 				className="mt-1 flex w-full items-center gap-1.5 rounded-md px-1 py-1 text-left text-sm text-muted hover:bg-black/5 hover:text-foreground"
 			>
 				<Plus className="size-3.5" />
-				Cargar librería .circ…
+				{t("Cargar librería .circ…")}
 			</button>
 			<input
 				ref={fileRef}
