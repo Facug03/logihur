@@ -1,11 +1,11 @@
 // Undoable edits (Logisim's CircuitMutation/Action). Every change to the
 // project goes through a Transaction that records reversible operations.
 
+import type { AppearanceShape } from "@/engine/appearance";
 import type { AttributeSet } from "@/engine/attributes";
 import type { Circuit } from "@/engine/circuit";
 import type { Instance } from "@/engine/component";
 import type { Loc } from "@/engine/geom";
-import type { AppearanceShape } from "@/engine/appearance";
 import type { Wire } from "@/engine/wire";
 import type { Project } from "@/project/project";
 

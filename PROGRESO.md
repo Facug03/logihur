@@ -190,9 +190,16 @@ Las fases 0–4 están implementadas y versionadas en git.
   subcircuitos y archivo con cabecera. `tests/log.test.ts`; Playwright tocando pines con la
   ventana abierta y descargando el archivo.
 
+- **Editor de apariencia** (`src/editor/appearance-edit.ts`, `src/ui/AppearanceEditor.tsx`): port de
+  `SvgCreator` y `PortManager` (actualización por lotes como una transacción), operación deshacible
+  `appearance` y evento de circuito para refrescar instancias. Caso `appear` del arnés Java: SVG
+  por defecto y puertos agregados/quitados coinciden en 181 circuitos; Logisim abre un archivo con
+  apariencia editada. Además, toda edición repropaga todas las simulaciones abiertas (antes un
+  circuito que usaba el subcircuito editado quedaba con valores viejos).
+
 ## Siguiente (en este orden)
 
-1. **Fase 5 (resto)**: editor de apariencia; copiar/pegar en la tabla.
+1. **Fase 5 (resto)**: copiar/pegar regiones en la tabla de verdad.
 2. **Fase 6 (resto)**: pulido móvil (incluido teclado virtual para el componente Teclado).
 
 ## Notas útiles

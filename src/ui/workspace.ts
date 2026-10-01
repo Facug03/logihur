@@ -977,8 +977,11 @@ export class Workspace {
 	// --- simulation ------------------------------------------------------
 
 	propagate(): void {
-		if (this.simEnabled) this.stepPoints.clear();
-		if (this.simEnabled) this.rootSimulator.propagate();
+		if (!this.simEnabled) return;
+		this.stepPoints.clear();
+		this.rootSimulator.propagate();
+		// an edit may change subcircuits used by the other top-level simulations
+		for (const sim of this.simulators.values()) if (sim !== this.rootSimulator) sim.propagate();
 	}
 
 	setSimEnabled(v: boolean): void {

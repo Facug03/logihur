@@ -16,7 +16,7 @@ import { Transaction } from "@/editor/history";
 import { repairWires } from "@/editor/wires";
 import { writeAppearanceShape } from "@/engine/appearance";
 import { Circuit } from "@/engine/circuit";
-import { compareLoc, formatLoc, loc } from "@/engine/geom";
+import { compareLoc, formatLoc } from "@/engine/geom";
 import { readCirc } from "@/format/circ-reader";
 import type { XmlElement } from "@/format/xml";
 import { t } from "@/i18n/es";

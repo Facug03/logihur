@@ -34,6 +34,7 @@ import type { Direction } from "@/engine/geom";
 import { setTextMeasurer } from "@/engine/graphics";
 import { t } from "@/i18n/es";
 import { measureWith } from "@/render/canvas-graphics";
+import { AppearanceEditor } from "./AppearanceEditor";
 import { AnalyzeMenu } from "./analyzer/AnalyzeMenu";
 import { AnalyzerDialog } from "./analyzer/AnalyzerDialog";
 import { CircuitCanvas, type CircuitCanvasHandle } from "./CircuitCanvas";
@@ -322,12 +323,25 @@ export default function App() {
 			y,
 			title: c.name,
 			items: [
-				{ label: "Editar Circuito", onSelect: () => ws.setCircuit(c) },
+				{
+					label: "Editar Circuito",
+					onSelect: () => {
+						ws.setCircuit(c);
+						ws.setAppearanceMode(false);
+					},
+				},
 				{
 					label: t("analyze.projectAnalyzeCircuitItem"),
 					onSelect: () => {
 						ws.setCircuit(c);
 						analyze();
+					},
+				},
+				{
+					label: "Editar Apariencia del Circuito",
+					onSelect: () => {
+						ws.setCircuit(c);
+						ws.setAppearanceMode(true);
 					},
 				},
 				{ label: "Obtener Estadísticas del Circuito", onSelect: () => setStatsCircuit(c) },
@@ -834,13 +848,19 @@ export default function App() {
 					{!libraryNoticeHidden && (
 						<MissingLibrariesNotice ws={ws} onDismiss={() => setLibraryNoticeHidden(true)} />
 					)}
-					<CircuitCanvas
-						ref={canvasRef}
-						ws={ws}
-						version={version}
-						onZoomChange={setZoom}
-						onComponentMenu={openComponentMenu}
-					/>
+					{ws.appearanceMode ? (
+						<div className="absolute inset-0 pt-12">
+							<AppearanceEditor key={ws.circuit.id} ws={ws} />
+						</div>
+					) : (
+						<CircuitCanvas
+							ref={canvasRef}
+							ws={ws}
+							version={version}
+							onZoomChange={setZoom}
+							onComponentMenu={openComponentMenu}
+						/>
+					)}
 
 					<div className="absolute left-3 top-3 flex items-center gap-1 rounded-lg border border-line bg-panel/95 py-1 pl-1 pr-3 text-sm shadow-sm">
 						{ws.viewStack.length > 1 ? (
@@ -851,6 +871,26 @@ export default function App() {
 							<LogisimIcon name="subcirc.gif" className="mx-2" />
 						)}
 						<span className={ws.viewStack.length > 1 ? "text-muted" : "font-medium"}>{ws.circuit.name}</span>
+						{ws.viewStack.length === 1 && (
+							<fieldset className="ml-2 flex rounded-md border border-line p-0.5 text-xs">
+								<legend className="sr-only">Vista del circuito</legend>
+								{[
+									[false, "Diseño", "Editar los componentes y cables del circuito"],
+									[true, "Apariencia", "Editar cómo se ve el circuito cuando se usa como subcircuito"],
+								].map(([mode, label, title]) => (
+									<button
+										key={String(label)}
+										type="button"
+										title={String(title)}
+										aria-pressed={ws.appearanceMode === mode}
+										onClick={() => ws.setAppearanceMode(mode as boolean)}
+										className={`rounded px-2 py-0.5 ${ws.appearanceMode === mode ? "bg-accent text-white" : "hover:bg-black/5"}`}
+									>
+										{label}
+									</button>
+								))}
+							</fieldset>
+						)}
 						{ws.viewStack.slice(1).map((v, i) => (
 							<span key={v.via?.id ?? v.state.circuit.id} className="flex items-center gap-1">
 								<span className="text-muted">/</span>
