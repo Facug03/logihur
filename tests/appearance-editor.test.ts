@@ -1,6 +1,7 @@
 // Appearance editor: shape geometry, undoable edits, saving and updating the
 // circuits that use the edited subcircuit.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { SubcircuitFactory } from "@/components/subcircuit";
 import {
 	createDragged,
 	createPoly,
@@ -9,7 +10,6 @@ import {
 	moveHandle,
 	translate,
 } from "@/editor/appearance-edit";
-import { SubcircuitFactory } from "@/components/subcircuit";
 import type { AppearanceShape } from "@/engine/appearance";
 import { readCirc } from "@/format/circ-reader";
 import { Workspace } from "@/ui/workspace";
