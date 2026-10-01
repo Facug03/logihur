@@ -25,7 +25,8 @@ export type CircuitEvent =
 	| { type: "change"; comp: Instance }
 	| { type: "invalidate"; comp: Instance }
 	| { type: "clear" }
-	| { type: "rename"; name: string };
+	| { type: "rename"; name: string }
+	| { type: "appearance" };
 
 export type CircuitListener = (e: CircuitEvent) => void;
 
@@ -139,6 +140,12 @@ export class Circuit {
 	/** InstanceComponent.fireInvalidated: state changed, needs repropagation. */
 	componentInvalidated(c: Instance): void {
 		this.fire({ type: "invalidate", comp: c });
+	}
+
+	/** The subcircuit appearance was edited: users must refresh their ports and bounds. */
+	appearanceChanged(): void {
+		this.touch();
+		this.fire({ type: "appearance" });
 	}
 
 	clear(): void {

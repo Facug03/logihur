@@ -19,6 +19,7 @@ import {
 } from "@/components/wiring/splitter";
 import { History, Transaction } from "@/editor/history";
 import { repairWires } from "@/editor/wires";
+import type { AppearanceShape } from "@/engine/appearance";
 import type { AnyAttribute, AttributeSet } from "@/engine/attributes";
 import { CIRCUIT_NAME_ATTR, Circuit } from "@/engine/circuit";
 import { type ComponentFactory, Instance, type Poker } from "@/engine/component";
@@ -424,6 +425,7 @@ export class Workspace {
 	setCircuit(c: Circuit): void {
 		this.finishTextEditing();
 		if (c === this.circuit && this.viewStack.length === 1) return;
+		this.appearanceMode = false;
 		this.stopPoking();
 		this.circuit = c;
 		this.clearSelection();
@@ -933,6 +935,26 @@ export class Workspace {
 		});
 		this.setCircuit(target);
 		return target;
+	}
+
+	// --- appearance editor (Proyecto > Editar Apariencia del Circuito) ---------
+
+	/** Whether the viewed circuit shows its appearance editor instead of its layout. */
+	appearanceMode = false;
+
+	setAppearanceMode(on: boolean): void {
+		this.finishTextEditing();
+		this.stopPoking();
+		if (on && this.viewStack.length > 1) this.leaveSubcircuit(this.viewStack.length - 1);
+		this.appearanceMode = on;
+		this.clearSelection();
+		this.changed();
+	}
+
+	/** Commit edited shapes of the viewed circuit's appearance as one undoable step. */
+	editAppearance(label: string, shapes: AppearanceShape[] | null): void {
+		const circuit = this.circuit;
+		this.edit(label, (tx) => tx.setAppearance(circuit, shapes), false);
 	}
 
 	/** The explorer's up/down arrows: reorder circuits in the project. */

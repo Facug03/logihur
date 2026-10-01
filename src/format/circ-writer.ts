@@ -51,9 +51,8 @@ function circuitElement(project: Project, circuit: Circuit): XmlElement {
 		const a = attr as AnyAttribute;
 		children.push(attrElement(a.name, a.format(circuit.staticAttrs.get(a))));
 	}
-	if (!circuit.appearance.isDefault() && circuit.appearance.customXml) {
-		children.push(el("appear", {}, circuit.appearance.customXml));
-	}
+	const appear = circuit.appearance.toXml();
+	if (appear !== null) children.push(el("appear", {}, appear));
 	for (const w of circuit.wires.values()) {
 		children.push(el("wire", { from: formatLoc(w.e0), to: formatLoc(w.e1) }));
 	}

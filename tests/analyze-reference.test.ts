@@ -11,17 +11,20 @@ import { toText } from "@/analyze/expression";
 import { FORMAT_PRODUCT_OF_SUMS } from "@/analyze/implicant";
 import { AnalyzerModel } from "@/analyze/model";
 import { ParserError, parseExpression } from "@/analyze/parser";
-import { isInputPin } from "@/components/wiring/pin";
+import { isInputPin, PIN } from "@/components/wiring/pin";
 import { Transaction } from "@/editor/history";
 import { repairWires } from "@/editor/wires";
+import { writeAppearanceShape } from "@/engine/appearance";
 import { Circuit } from "@/engine/circuit";
-import { formatLoc } from "@/engine/geom";
+import { compareLoc, formatLoc, loc } from "@/engine/geom";
 import { readCirc } from "@/format/circ-reader";
+import type { XmlElement } from "@/format/xml";
 import { t } from "@/i18n/es";
 import { computeStatistics } from "@/project/statistics";
 import { getPinLabels } from "@/sim/pin-labels";
 import { type AnalyzeCase, analyzeCases } from "./golden/analyze-cases";
 import reference from "./golden/analyze-reference.json";
+import { make } from "./golden/harness";
 
 const root = path.resolve(__dirname, "..");
 const cases = analyzeCases();
@@ -101,6 +104,23 @@ function run(c: AnalyzeCase): unknown {
 				with: row(st.totalWithSubcircuits),
 			};
 		}
+		case "appear": {
+			const project = readCirc(readFileSync(path.join(root, c.file), "utf8"));
+			const circuit = project.getCircuit(c.circuit) as Circuit;
+			const svg = (e: XmlElement) => ({
+				tag: e.tag,
+				attrs: Object.fromEntries(Object.entries(e.attrs).sort(([a], [b]) => (a < b ? -1 : 1))),
+				text: e.children.join(""),
+			});
+			const before = circuit.appearance.getShapes().map((sh) => svg(writeAppearanceShape(sh)));
+			circuit.appearance.setShapes(circuit.appearance.getEditableShapes());
+			const first = circuit.pins.sort((a, b) => compareLoc(a.loc, b.loc))[0];
+			if (first) circuit.removeComponent(first);
+			circuit.addComponent(make(PIN, 20, 900));
+			circuit.addComponent(make(PIN, 900, 20, { facing: "south", output: true }));
+			const after = (circuit.appearance.toXml() ?? []).map(svg);
+			return { default: before, edited: after };
+		}
 		case "build": {
 			const model = new AnalyzerModel();
 			model.setVariables(c.inputs, c.outputs);
@@ -160,7 +180,7 @@ describe("combinational analysis matches Logisim 2.7.1", () => {
 		expect(reference.length).toBe(cases.length);
 	});
 
-	for (const kind of ["min", "parse", "circ", "build", "stats"] as const) {
+	for (const kind of ["min", "parse", "circ", "build", "stats", "appear"] as const) {
 		it(`${kind} cases`, () => {
 			const mismatches: string[] = [];
 			cases.forEach((c, i) => {

@@ -5,6 +5,7 @@ import type { AttributeSet } from "@/engine/attributes";
 import type { Circuit } from "@/engine/circuit";
 import type { Instance } from "@/engine/component";
 import type { Loc } from "@/engine/geom";
+import type { AppearanceShape } from "@/engine/appearance";
 import type { Wire } from "@/engine/wire";
 import type { Project } from "@/project/project";
 
@@ -19,7 +20,13 @@ type Op =
 	| { kind: "addCircuit"; project: Project; circuit: Circuit; index: number }
 	| { kind: "removeCircuit"; project: Project; circuit: Circuit; index: number }
 	| { kind: "main"; project: Project; from: Circuit | null; to: Circuit | null }
-	| { kind: "moveCircuit"; project: Project; circuit: Circuit; from: number; to: number };
+	| { kind: "moveCircuit"; project: Project; circuit: Circuit; from: number; to: number }
+	| {
+			kind: "appearance";
+			circuit: Circuit;
+			before: AppearanceShape[] | null;
+			after: AppearanceShape[] | null;
+	  };
 
 function apply(op: Op, forward: boolean): void {
 	switch (op.kind) {
@@ -60,6 +67,10 @@ function apply(op: Op, forward: boolean): void {
 			break;
 		case "moveCircuit":
 			op.project.moveCircuit(op.circuit, forward ? op.to : op.from);
+			break;
+		case "appearance":
+			op.circuit.appearance.setShapes(forward ? op.after : op.before);
+			op.circuit.appearanceChanged();
 			break;
 	}
 }
@@ -122,6 +133,13 @@ export class Transaction {
 	moveCircuit(project: Project, circuit: Circuit, to: number): void {
 		const from = project.circuits.indexOf(circuit);
 		if (from >= 0 && from !== to) this.run({ kind: "moveCircuit", project, circuit, from, to });
+	}
+
+	/** Replace a circuit's custom appearance (null: back to the default one). */
+	setAppearance(circuit: Circuit, after: AppearanceShape[] | null): void {
+		const app = circuit.appearance;
+		const before = app.isDefault() ? null : app.getEditableShapes();
+		this.run({ kind: "appearance", circuit, before, after });
 	}
 
 	setMain(project: Project, to: Circuit): void {

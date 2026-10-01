@@ -30,7 +30,7 @@ export type AnalyzeCase =
 	| { kind: "min"; inputs: string[]; column: string }
 	| { kind: "parse"; inputs: string[]; text: string }
 	| { kind: "circ"; file: string; circuit: string }
-	| { kind: "stats"; file: string; circuit: string }
+	| { kind: "stats" | "appear"; file: string; circuit: string }
 	| {
 			kind: "build";
 			inputs: string[];
@@ -300,8 +300,10 @@ function statsCases(): AnalyzeCase[] {
 	].filter((f) => f.endsWith(".circ"));
 	for (const file of files.sort()) {
 		const text = readFileSync(path.join(root, file), "utf8");
-		for (const m of text.matchAll(/<circuit name="([^"]*)">/g))
+		for (const m of text.matchAll(/<circuit name="([^"]*)">/g)) {
 			cases.push({ kind: "stats", file, circuit: m[1] });
+			if (m[1] !== "tty_harness") cases.push({ kind: "appear", file, circuit: m[1] });
+		}
 	}
 	return cases;
 }
@@ -318,6 +320,7 @@ export function caseLine(c: AnalyzeCase): string {
 			return ["parse", c.inputs.join(","), c.text].join("\t");
 		case "circ":
 		case "stats":
+		case "appear":
 			return [c.kind, path.join(root, c.file), c.circuit].join("\t");
 		case "build":
 			return [

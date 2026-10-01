@@ -2,7 +2,7 @@
 // DefaultAppearance, AppearancePort, AppearanceAnchor} and the SVG shapes of
 // com.cburch.draw used by custom subcircuit appearances.
 
-import { childElements, getAttr, hasAttr, textContent, type XmlElement } from "../format/xml";
+import { childElements, el, getAttr, hasAttr, textContent, type XmlElement } from "../format/xml";
 import { type Font, parseFont } from "./attributes";
 import type { Circuit } from "./circuit";
 import type { Instance } from "./component";
@@ -226,6 +226,19 @@ export function paintShape(g: Graphics, s: AppearanceShape): void {
 }
 
 /** DefaultAppearance.build */
+/** DefaultAppearance.sortPinList: along the edge the pins sit on. */
+function sortPinList(pins: Instance[], facing: Direction): void {
+	const byX = facing === "north" || facing === "south";
+	pins.sort((a, b) => {
+		if (byX) {
+			if (a.x !== b.x) return a.x < b.x ? -1 : 1;
+		} else if (a.y !== b.y) {
+			return a.y < b.y ? -1 : 1;
+		}
+		return compareLoc(a.loc, b.loc);
+	});
+}
+
 export function buildDefaultAppearance(pins: Instance[]): AppearanceShape[] {
 	const edge: Record<Direction, Instance[]> = { north: [], south: [], east: [], west: [] };
 	for (const pin of pins) {
@@ -243,17 +256,7 @@ export function buildDefaultAppearance(pins: Instance[]): AppearanceShape[] {
 		})();
 		edge[pinEdge].push(pin);
 	}
-	for (const dir of ["north", "south", "east", "west"] as Direction[]) {
-		const byX = dir === "north" || dir === "south";
-		edge[dir].sort((a, b) => {
-			if (byX) {
-				if (a.x !== b.x) return a.x < b.x ? -1 : 1;
-			} else if (a.y !== b.y) {
-				return a.y < b.y ? -1 : 1;
-			}
-			return compareLoc(a.loc, b.loc);
-		});
-	}
+	for (const dir of ["north", "south", "east", "west"] as Direction[]) sortPinList(edge[dir], dir);
 	const numNorth = edge.north.length;
 	const numSouth = edge.south.length;
 	const numEast = edge.east.length;
@@ -470,6 +473,162 @@ export function readAppearanceShape(e: XmlElement, pins: Map<Loc, Instance>): Ap
 	return shape;
 }
 
+// --- SvgCreator / AppearancePort.toSvgElement ---------------------------------
+
+function colorParts(c: string): { hex: string; alpha: number } {
+	const v = c.toLowerCase();
+	if (/^#[0-9a-f]{8}$/.test(v)) return { hex: v.slice(0, 7), alpha: Number.parseInt(v.slice(7), 16) };
+	return { hex: v, alpha: 255 };
+}
+
+/** Java's String.format("%5.3f", alpha / 255.0) */
+const opacity = (alpha: number) => (alpha / 255).toFixed(3).padStart(5, " ");
+
+/** "" + double in Java: always a decimal point. */
+function javaDouble(v: number): string {
+	return Number.isInteger(v) ? `${v}.0` : `${v}`;
+}
+
+function strokeAttrs(a: Record<string, string>, s: ShapeStyle): void {
+	if (s.strokeWidth !== 1) a["stroke-width"] = `${s.strokeWidth}`;
+	const { hex, alpha } = colorParts(s.stroke);
+	a.stroke = hex;
+	if (alpha !== 255) a["stroke-opacity"] = opacity(alpha);
+	a.fill = "none";
+}
+
+function fillAttrs(a: Record<string, string>, s: ShapeStyle): void {
+	if (s.paint === "fill") a.stroke = "none";
+	else strokeAttrs(a, s);
+	if (s.paint === "stroke") {
+		a.fill = "none";
+	} else {
+		const { hex, alpha } = colorParts(s.fill);
+		if (hex === "#000000") delete a.fill;
+		else a.fill = hex;
+		if (alpha !== 255) a["fill-opacity"] = opacity(alpha);
+	}
+}
+
+const PORT_RADIUS = (pin: Instance) => (isInputPin(pin) ? PORT_INPUT_RADIUS : PORT_OUTPUT_RADIUS);
+
+export function writeAppearanceShape(s: AppearanceShape): XmlElement {
+	const a: Record<string, string> = {};
+	switch (s.kind) {
+		case "rect":
+			Object.assign(a, { x: `${s.x}`, y: `${s.y}`, width: `${s.w}`, height: `${s.h}` });
+			fillAttrs(a, s);
+			if (s.rx > 0) Object.assign(a, { rx: `${s.rx}`, ry: `${s.rx}` });
+			return el("rect", a);
+		case "oval":
+			Object.assign(a, {
+				cx: javaDouble(s.x + s.w / 2),
+				cy: javaDouble(s.y + s.h / 2),
+				rx: javaDouble(s.w / 2),
+				ry: javaDouble(s.h / 2),
+			});
+			fillAttrs(a, s);
+			return el("ellipse", a);
+		case "line":
+			Object.assign(a, { x1: `${s.x0}`, y1: `${s.y0}`, x2: `${s.x1}`, y2: `${s.y1}` });
+			strokeAttrs(a, s);
+			return el("line", a);
+		case "curve":
+			a.d = `M${s.x0},${s.y0} Q${s.cx},${s.cy} ${s.x1},${s.y1}`;
+			fillAttrs(a, s);
+			return el("path", a);
+		case "poly":
+			a.points = s.xs.map((x, i) => `${x},${s.ys[i]}`).join(" ");
+			fillAttrs(a, s);
+			return el(s.closed ? "polygon" : "polyline", a);
+		case "text": {
+			Object.assign(a, { x: `${s.x}`, y: `${s.y}` });
+			const { hex, alpha } = colorParts(s.fill);
+			if (hex !== "#000000") a.fill = hex;
+			if (alpha !== 255) a["fill-opacity"] = opacity(alpha);
+			a["font-family"] = s.font.family;
+			a["font-size"] = `${s.font.size}`;
+			if (s.font.style === "italic" || s.font.style === "bolditalic") a["font-style"] = "italic";
+			if (s.font.style === "bold" || s.font.style === "bolditalic") a["font-weight"] = "bold";
+			a["text-anchor"] = s.align;
+			return el("text", a, [s.text]);
+		}
+		case "port": {
+			const r = PORT_RADIUS(s.pin);
+			return el("circ-port", {
+				x: `${locX(s.loc) - r}`,
+				y: `${locY(s.loc) - r}`,
+				width: `${2 * r}`,
+				height: `${2 * r}`,
+				pin: `${s.pin.x},${s.pin.y}`,
+			});
+		}
+		case "anchor":
+			return el("circ-anchor", {
+				x: `${locX(s.loc) - ANCHOR_RADIUS}`,
+				y: `${locY(s.loc) - ANCHOR_RADIUS}`,
+				width: `${2 * ANCHOR_RADIUS}`,
+				height: `${2 * ANCHOR_RADIUS}`,
+				facing: s.facing,
+			});
+	}
+}
+
+/** PortManager.computeDefaultLocation */
+function defaultPortLocation(shapes: AppearanceShape[], pin: Instance, others: Map<Instance, Loc>): Loc {
+	const used = new Set(others.values());
+	const facing = pinFacing(pin);
+	const sameWay = Array.from(others.keys()).filter((p) => pinFacing(p) === facing);
+	if (sameWay.length > 0) {
+		sameWay.push(pin);
+		sortPinList(sameWay, facing);
+		const index = sameWay.indexOf(pin);
+		// the previous pin in order, or the next one if this is the first
+		const neighbor = index > 0 ? sameWay[index - 1] : sameWay[1];
+		const [dx, dy] = facing === "east" || facing === "west" ? [0, 10] : [10, 0];
+		let l = others.get(neighbor) as Loc;
+		do l = loc(locX(l) + dx, locY(l) + dy);
+		while (used.has(l));
+		if (locX(l) >= 0 && locY(l) >= 0) return l;
+		do l = loc(locX(l) - dx, locY(l) - dy);
+		while (used.has(l));
+		return l;
+	}
+	// otherwise on the boundary of the bounding rectangle
+	let bds: Bounds | null = null;
+	for (const s of shapes) {
+		const b = s.kind === "anchor" || s.kind === "port" ? Bounds.ofLoc(s.loc) : shapeBounds(s);
+		bds = bds === null ? b : bds.add(b);
+	}
+	const b = bds ?? Bounds.create(0, 0, 0, 0);
+	let x: number;
+	let y: number;
+	let dx = 0;
+	let dy = 0;
+	if (facing === "east") {
+		x = b.x - 7;
+		y = b.y + 5;
+		dy = 10;
+	} else if (facing === "west") {
+		x = b.x + b.width - 3;
+		y = b.y + 5;
+		dy = 10;
+	} else if (facing === "south") {
+		x = b.x + 5;
+		y = b.y - 7;
+		dx = 10;
+	} else {
+		x = b.x + 5;
+		y = b.y + b.height - 3;
+		dx = 10;
+	}
+	x = Math.trunc((x + 9) / 10) * 10; // round up to the grid
+	y = Math.trunc((y + 9) / 10) * 10;
+	let l = loc(x, y);
+	while (used.has(l)) l = loc(locX(l) + dx, locY(l) + dy);
+	return l;
+}
+
 /** CircuitAppearance: how a circuit looks when used as a subcircuit. */
 export class CircuitAppearance {
 	/** Raw <appear> children, kept verbatim for round-tripping. */
@@ -485,14 +644,76 @@ export class CircuitAppearance {
 		return this.custom === null;
 	}
 
+	/** Shapes changed in the editor or by the port manager: write them, not the read XML. */
+	private edited = false;
+
+	/** The <appear> children to save, or null for the default appearance. */
+	toXml(): XmlElement[] | null {
+		if (this.custom === null) return null;
+		this.getShapes();
+		if (!this.edited && this.customXml !== null) return this.customXml;
+		return this.custom.map(writeAppearanceShape);
+	}
+
+	/** Pins changed since the ports were last updated (handled together, like one transaction). */
+	private portsDirty = false;
+
 	pinsChanged(): void {
 		this.cachedDefault = null;
+		if (this.custom !== null) this.portsDirty = true;
+		this.revision++;
+	}
+
+	/** PortManager.performUpdate: ports follow pins added to or removed from the circuit. */
+	private updatePorts(): void {
+		const shapes = this.custom as AppearanceShape[];
+		const pins = new Set(this.circuit.pins);
+		const ports = new Map<Instance, Loc>();
+		for (const s of shapes) if (s.kind === "port") ports.set(s.pin, s.loc);
+		const removed = shapes.filter((s) => s.kind === "port" && !pins.has(s.pin));
+		const added = Array.from(pins).filter((p) => !ports.has(p));
+		const hasAnchor = shapes.some((s) => s.kind === "anchor");
+		if (removed.length === 0 && added.length === 0 && hasAnchor) return;
+		let next = shapes.filter((s) => !removed.includes(s));
+		for (const r of removed) if (r.kind === "port") ports.delete(r.pin);
+		if (!hasAnchor) {
+			const anchor = buildDefaultAppearance(Array.from(pins)).find((s) => s.kind === "anchor");
+			next.push(anchor ?? { kind: "anchor", loc: loc(100, 100), facing: "east" });
+		}
+		// sorted so they are placed predictably (they need not all face east)
+		sortPinList(added, "east");
+		const newPorts: AppearanceShape[] = [];
+		for (const pin of added) {
+			const where = defaultPortLocation(next, pin, ports);
+			newPorts.push({ kind: "port", loc: where, pin });
+			ports.set(pin, where);
+		}
+		// replaceAutomatically: added just below the topmost object (the anchor)
+		const at = Math.max(0, next.length - 1);
+		next = [...next.slice(0, at), ...newPorts, ...next.slice(at)];
+		this.custom = next;
+		this.edited = true;
+	}
+
+	/** The editor's model: a copy of the current shapes (default ones when not custom). */
+	getEditableShapes(): AppearanceShape[] {
+		return this.getShapes().map((s) => ({ ...s }));
+	}
+
+	/** Replace the custom appearance (null reverts to the default one). */
+	setShapes(shapes: AppearanceShape[] | null): void {
+		this.custom = shapes;
+		this.portsDirty = false;
+		this.customXml = null;
+		this.edited = shapes !== null;
 		this.revision++;
 	}
 
 	setCustom(xml: XmlElement[] | null): void {
 		this.customXml = xml;
 		this.custom = null;
+		this.edited = false;
+		this.portsDirty = false;
 		if (xml !== null) {
 			const pins = new Map<Loc, Instance>();
 			for (const p of this.circuit.pins) pins.set(p.loc, p);
@@ -509,7 +730,13 @@ export class CircuitAppearance {
 	}
 
 	getShapes(): AppearanceShape[] {
-		if (this.custom !== null) return this.custom;
+		if (this.custom !== null) {
+			if (this.portsDirty) {
+				this.portsDirty = false;
+				this.updatePorts();
+			}
+			return this.custom as AppearanceShape[];
+		}
 		if (this.cachedDefault === null) {
 			this.cachedDefault = buildDefaultAppearance(this.circuit.pins);
 		}

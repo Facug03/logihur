@@ -7,6 +7,7 @@
 //   circ   <file>    <circuit>                      analyzer contents for a circuit
 //   build  <inputs>  <outputs>  <exprs ; separated> <twoInputs> <nands>
 //   stats  <file>    <circuit>                      FileStatistics counts
+//   appear <file>    <circuit>                      default appearance and PortManager updates
 import java.io.File;
 import java.nio.file.*;
 import java.util.*;
@@ -146,6 +147,39 @@ class AnalyzeReference {
             + a.getRecursiveCount() + "],\"with\":[" + b.getSimpleCount() + "," + b.getUniqueCount() + "," + b.getRecursiveCount() + "]}";
     }
 
+    static String svg(org.w3c.dom.Element e) {
+        ArrayList<String> attrs = new ArrayList<>();
+        org.w3c.dom.NamedNodeMap map = e.getAttributes();
+        for (int i = 0; i < map.getLength(); i++) attrs.add(q(map.item(i).getNodeName()) + ":" + q(map.item(i).getNodeValue()));
+        Collections.sort(attrs);
+        return "{\"tag\":" + q(e.getTagName()) + ",\"attrs\":{" + String.join(",", attrs) + "},\"text\":" + q(e.getTextContent()) + "}";
+    }
+
+    /** Custom appearance = default one; then remove the first pin and add two (PortManager). */
+    static String appear(String[] f) throws Exception {
+        LogisimFile file = new Loader(null).openLogisimFile(new File(f[1]));
+        Circuit circuit = file.getCircuit(f[2]);
+        com.cburch.logisim.circuit.appear.CircuitAppearance app = circuit.getAppearance();
+        org.w3c.dom.Document doc = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        ArrayList<String> before = new ArrayList<>();
+        for (com.cburch.draw.model.CanvasObject o : app.getObjectsFromBottom()) before.add(svg(((com.cburch.draw.model.AbstractCanvasObject) o).toSvgElement(doc)));
+        app.setDefaultAppearance(false);
+        CircuitMutation xn = new CircuitMutation(circuit);
+        Component first = null;
+        for (Component c : circuit.getNonWires()) if (c.getFactory() instanceof Pin && (first == null || c.getLocation().compareTo(first.getLocation()) < 0)) first = c;
+        if (first != null) xn.remove(first);
+        AttributeSet a1 = Pin.FACTORY.createAttributeSet();
+        xn.add(Pin.FACTORY.createComponent(Location.create(20, 900), a1));
+        AttributeSet a2 = Pin.FACTORY.createAttributeSet();
+        a2.setValue(StdAttr.FACING, Direction.SOUTH);
+        a2.setValue(Pin.ATTR_TYPE, Boolean.TRUE);
+        xn.add(Pin.FACTORY.createComponent(Location.create(900, 20), a2));
+        xn.execute();
+        ArrayList<String> after = new ArrayList<>();
+        for (com.cburch.draw.model.CanvasObject o : app.getObjectsFromBottom()) after.add(svg(((com.cburch.draw.model.AbstractCanvasObject) o).toSvgElement(doc)));
+        return "{\"default\":[" + String.join(",", before) + "],\"edited\":[" + String.join(",", after) + "]}";
+    }
+
     public static void main(String[] args) throws Exception {
         for (String line : Files.readAllLines(Paths.get(args[0]))) {
             String[] f = line.split("\t", -1);
@@ -155,6 +189,7 @@ class AnalyzeReference {
                 case "circ": System.out.println(circ(f)); break;
                 case "build": System.out.println(build(f)); break;
                 case "stats": System.out.println(stats(f)); break;
+                case "appear": System.out.println(appear(f)); break;
                 default: throw new IllegalArgumentException(f[0]);
             }
         }
