@@ -575,12 +575,19 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 	const onWheel = (e: React.WheelEvent) => {
 		const v = getView();
 		const p = toCircuit(e.clientX, e.clientY);
+		const scale = wheelDeltaScale(e.deltaMode);
+		const dx = e.deltaX * scale;
+		const dy = e.deltaY * scale;
 		if (e.ctrlKey || e.metaKey) {
-			zoomAround(v, Math.exp(-e.deltaY * 0.01), p.sx, p.sy);
+			// Trackpad pinch sends many small deltas; a mouse wheel notch sends a
+			// single large one (~100px). Clamp each event, like Excalidraw, so a
+			// notch is a ~10% step while pinch keeps its continuous feel.
+			const step = Math.max(-MAX_WHEEL_ZOOM_STEP, Math.min(MAX_WHEEL_ZOOM_STEP, dy));
+			zoomAround(v, Math.exp(-step * 0.01), p.sx, p.sy);
 			onZoomChange?.(v.zoom);
 		} else {
-			v.originX += e.deltaX / v.zoom;
-			v.originY += e.deltaY / v.zoom;
+			v.originX += dx / v.zoom;
+			v.originY += dy / v.zoom;
 		}
 		redraw();
 	};
@@ -637,6 +644,16 @@ export const CircuitCanvas = forwardRef<CircuitCanvasHandle, Props>(function Cir
 		</div>
 	);
 });
+
+/** Max wheel delta (px) applied per event when zooming: ≈10% per mouse notch. */
+const MAX_WHEEL_ZOOM_STEP = 10;
+
+/** Converts WheelEvent deltas to pixels (Firefox may report lines or pages). */
+function wheelDeltaScale(deltaMode: number): number {
+	if (deltaMode === 1) return 16; // DOM_DELTA_LINE
+	if (deltaMode === 2) return 800; // DOM_DELTA_PAGE
+	return 1;
+}
 
 function zoomAround(v: Viewport, factor: number, sx: number, sy: number): void {
 	const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, v.zoom * factor));
