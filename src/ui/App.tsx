@@ -784,7 +784,7 @@ export default function App() {
 						{QUICK_TOOLS.map((q) => (
 							<IconButton
 								key={q.id}
-								label={q.label}
+								label={t(q.label)}
 								active={tool.kind === "add" && tool.id === q.id}
 								onClick={() => ws.selectAddTool(q.factory, q.id, q.preset)}
 							>
