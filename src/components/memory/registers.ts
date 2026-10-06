@@ -23,6 +23,12 @@ import {
 } from "@/engine/component";
 import { Bounds } from "@/engine/geom";
 import { drawCenteredText, drawText, H_CENTER, V_CENTER, V_TOP } from "@/engine/graphics";
+import {
+	bitWidthConfigurator,
+	integerConfigurator,
+	JoinedConfigurator,
+	type KeyConfigurator,
+} from "@/engine/key-config";
 import { Value } from "@/engine/value";
 import { EDGE_TRIGGER, LABEL, LABEL_FONT, TRIGGER, WIDTH } from "../std-attrs";
 import { ClockState, labelAbove } from "./flipflops";
@@ -103,6 +109,10 @@ function registerPoker(): Poker {
 }
 
 class Register extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "Register";
 	readonly library = "#Memory";
 	readonly displayKey = "memory.register";
@@ -197,6 +207,10 @@ export const COUNTER_ON_GOAL = optionAttr("ongoal", "memory.counterGoal", [
 ]);
 
 class Counter extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "Counter";
 	readonly library = "#Memory";
 	readonly displayKey = "memory.counter";
@@ -440,6 +454,10 @@ function stageRowY(bds: Bounds, label: string): number {
 }
 
 class ShiftRegister extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(integerConfigurator(SHIFT_LENGTH, 1, 32, 0), bitWidthConfigurator(WIDTH));
+	}
+
 	readonly name = "Shift Register";
 	readonly library = "#Memory";
 	readonly displayKey = "memory.shiftRegister";
@@ -646,6 +664,10 @@ class RandomData extends ClockState {
 }
 
 class RandomFactory extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "Random";
 	readonly library = "#Memory";
 	readonly displayKey = "memory.random";

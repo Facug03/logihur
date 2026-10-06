@@ -25,6 +25,12 @@ import type { AnyAttribute, AttributeSet } from "@/engine/attributes";
 import { CIRCUIT_NAME_ATTR, Circuit } from "@/engine/circuit";
 import { type ComponentFactory, Instance, type Poker } from "@/engine/component";
 import { type Direction, type Loc, loc, locX, locY } from "@/engine/geom";
+import {
+	KeyConfigurationEvent,
+	type KeyConfigurationResult,
+	type KeyConfigurationType,
+	type KeyConfigurator,
+} from "@/engine/key-config";
 import { prefs } from "@/engine/prefs";
 import { type CircuitState, InstanceStateImpl } from "@/engine/simulation";
 import { Wire } from "@/engine/wire";
@@ -106,6 +112,12 @@ export class Workspace {
 	/** The combinational analysis window's model; like Logisim's, it outlives projects. */
 	readonly analyzer = new AnalyzerModel();
 	private clipboard: ClipboardData | null = null;
+	/** AddTool/WiringTool.lastAddition, undone by Backspace. */
+	private lastAddition: { kind: "component" | "wire"; tx: Transaction | null } | null = null;
+	/** AddTool.keyHandler, one per add tool. */
+	private toolKeyHandlers = new Map<string, KeyConfigurator | null>();
+	/** SelectTool.keyHandlers for the current selection. */
+	private selectionKeyHandlers = new Map<Instance, KeyConfigurator | null>();
 
 	private listeners = new Set<Listener>();
 	version = 0;
@@ -628,8 +640,8 @@ export class Workspace {
 
 	// --- editing ---------------------------------------------------------
 
-	/** Run an undoable edit on the viewed circuit, then repair wires. */
-	edit(label: string, fn: (tx: Transaction, circuit: Circuit) => void, repair = true): void {
+	/** Run an undoable edit on the viewed circuit, then repair wires. Returns whether it was recorded. */
+	edit(label: string, fn: (tx: Transaction, circuit: Circuit) => void, repair = true): boolean {
 		const tx = new Transaction(label);
 		const circuit = this.viewCircuit;
 		fn(tx, circuit);
@@ -637,14 +649,15 @@ export class Workspace {
 		if (Array.from(tx.circuits()).some((c) => this.project.isLibraryCircuit(c))) {
 			tx.undo();
 			this.notify(localized("Este circuito pertenece a una librería y no se puede modificar acá."));
-			return;
+			return false;
 		}
 		if (repair) {
 			for (const c of tx.circuits()) repairWires(tx, c);
 		}
-		if (tx.ops.length === 0) return;
+		if (tx.ops.length === 0) return false;
 		this.history.push(tx);
 		this.afterEdit();
+		return true;
 	}
 
 	private afterEdit(): void {
@@ -687,15 +700,79 @@ export class Workspace {
 		const tool = this.tool;
 		if (tool.kind !== "add" || !this.canPlace(tool.factory)) return null;
 		const inst = new Instance(tool.factory, at, tool.attrs.clone());
-		this.edit(t("Agregar {0}", [tool.factory.name]), (tx, c) => tx.addComponent(c, inst));
+		if (this.edit(t("Agregar {0}", [tool.factory.name]), (tx, c) => tx.addComponent(c, inst)))
+			this.lastAddition = { kind: "component", tx: this.history.lastTransaction() };
 		return inst;
 	}
 
 	addWires(wires: Wire[]): void {
 		if (wires.length === 0) return;
-		this.edit(msg("Agregar cable"), (tx, c) => {
+		const added = this.edit(msg("Agregar cable"), (tx, c) => {
 			for (const w of wires) tx.addWire(c, w);
 		});
+		if (added) this.lastAddition = { kind: "wire", tx: this.history.lastTransaction() };
+	}
+
+	/**
+	 * Backspace in AddTool (last component) or WiringTool/EditTool with an
+	 * empty selection (last wire): undo it if it is still the last action.
+	 */
+	undoLastAddition(kind: "component" | "wire"): boolean {
+		const last = this.lastAddition;
+		if (!last || last.kind !== kind || last.tx !== this.history.lastTransaction()) return false;
+		this.lastAddition = null;
+		this.undo();
+		return true;
+	}
+
+	/**
+	 * SelectTool/AddTool.processKeyEvent: offer a key to the key configurators
+	 * of the selected components (Edit tool) or of the add tool. Returns
+	 * whether a configurator consumed it.
+	 */
+	keyConfigure(type: KeyConfigurationType, key: string, mods: number, when = Date.now()): boolean {
+		const tool = this.tool;
+		if (tool.kind === "add") {
+			let handler = this.toolKeyHandlers.get(tool.id);
+			if (handler === undefined) {
+				handler = tool.factory.createKeyConfigurator();
+				this.toolKeyHandlers.set(tool.id, handler);
+			}
+			if (!handler) return false;
+			const event = new KeyConfigurationEvent(type, key, mods, tool.attrs, when);
+			const result = handler.keyEventReceived(event);
+			if (result) {
+				for (const [attr, value] of result) tool.factory.setAttribute(tool.attrs, attr, value);
+				this.changed();
+			}
+			return event.consumed || result !== null;
+		}
+		if (tool.kind !== "edit" || this.selection.size === 0) return false;
+		// like SelectTool, handlers live while the selection stays the same
+		const handlers = this.selectionKeyHandlers;
+		if (handlers.size !== this.selection.size || Array.from(this.selection).some((c) => !handlers.has(c))) {
+			handlers.clear();
+			for (const comp of this.selection) handlers.set(comp, comp.factory.createKeyConfigurator());
+		}
+		let consumed = false;
+		const results: [Instance, KeyConfigurationResult][] = [];
+		for (const [comp, handler] of handlers) {
+			if (!handler) continue;
+			const event = new KeyConfigurationEvent(type, key, mods, comp.attrs, when);
+			const result = handler.keyEventReceived(event);
+			consumed ||= event.consumed;
+			if (result) results.push([comp, result]);
+		}
+		if (results.length > 0) {
+			this.edit(msg("Cambiar atributos del componente"), (tx, circuit) => {
+				for (const [comp, result] of results) {
+					tx.changeAttributes(circuit, comp, (attrs) => {
+						for (const [attr, value] of result) comp.factory.setAttribute(attrs, attr, value);
+					});
+				}
+			});
+		}
+		return consumed || results.length > 0;
 	}
 
 	deleteSelection(): void {

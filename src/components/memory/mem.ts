@@ -19,6 +19,7 @@ import {
 } from "@/engine/component";
 import { Bounds } from "@/engine/geom";
 import { drawCenteredText, drawText, type Graphics, H_CENTER, H_RIGHT, V_BASELINE } from "@/engine/graphics";
+import { bitWidthConfigurator, JoinedConfigurator, type KeyConfigurator } from "@/engine/key-config";
 import { Value } from "@/engine/value";
 import { ClockState } from "./flipflops";
 import { loadHex, MemContents, saveHex } from "./mem-contents";
@@ -296,6 +297,10 @@ function memPoker(getState: (state: InstanceState) => MemState): Poker {
 }
 
 abstract class Mem extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(bitWidthConfigurator(MEM_ADDR, 2, 24, 0), bitWidthConfigurator(MEM_DATA));
+	}
+
 	readonly library = "#Memory";
 	protected abstract readonly isRom: boolean;
 

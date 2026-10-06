@@ -9,6 +9,7 @@ import {
 	port,
 } from "@/engine/component";
 import { Bounds, locX, locY } from "@/engine/geom";
+import { bitWidthConfigurator, type KeyConfigurator } from "@/engine/key-config";
 import { Value } from "@/engine/value";
 import { FACING, LABEL, LABEL_FONT } from "../std-attrs";
 import { darker, IO_COLOR, IO_LABEL_COLOR, IO_LABEL_LOC, ioTextField } from "./common";
@@ -111,6 +112,10 @@ export interface JoystickData {
 	y: number;
 }
 class Joystick extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(JOYSTICK_BITS, 2, 5);
+	}
+
 	readonly name = "Joystick";
 	readonly library = "#I/O";
 	readonly displayKey = "io.joystick";

@@ -20,6 +20,7 @@ import {
 	V_CENTER_OVERALL,
 	V_TOP,
 } from "@/engine/graphics";
+import { bitWidthConfigurator, type KeyConfigurator } from "@/engine/key-config";
 import { FACING, LABEL, LABEL_FONT, WIDTH } from "../std-attrs";
 
 const MARGIN = 3;
@@ -64,6 +65,10 @@ function computeBounds(p: LabelPlacement, textWidth: number, textHeight: number)
 }
 
 class Tunnel extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "Tunnel";
 	readonly library = "#Wiring";
 	readonly displayKey = "wiring.tunnel";

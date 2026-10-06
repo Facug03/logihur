@@ -20,6 +20,12 @@ import {
 } from "@/engine/component";
 import { Bounds, type Direction, dirRadians, type Loc, loc, locX, locY, translateDir } from "@/engine/geom";
 import { H_CENTER, V_CENTER } from "@/engine/graphics";
+import {
+	bitWidthConfigurator,
+	integerConfigurator,
+	JoinedConfigurator,
+	type KeyConfigurator,
+} from "@/engine/key-config";
 import { prefs } from "@/engine/prefs";
 import { Value } from "@/engine/value";
 import { FACING, LABEL, LABEL_FONT, WIDTH } from "../std-attrs";
@@ -94,6 +100,13 @@ export function pullOutput(value: Value, outType: string): Value {
 }
 
 export abstract class AbstractGate extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(
+			integerConfigurator(GATE_INPUTS, 2, MAX_INPUTS, 0),
+			bitWidthConfigurator(WIDTH),
+		);
+	}
+
 	readonly library = "#Gates";
 	override readonly facingAttr = FACING;
 	protected bonusWidth = 0;

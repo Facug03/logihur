@@ -187,6 +187,11 @@ export class History {
 		return this.undoStack.at(-1)?.label ?? null;
 	}
 
+	/** Project.getLastAction(): the transaction Undo would revert. */
+	lastTransaction(): Transaction | null {
+		return this.undoStack.at(-1) ?? null;
+	}
+
 	redoLabel(): string | null {
 		return this.redoStack.at(-1)?.label ?? null;
 	}

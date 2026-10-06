@@ -12,6 +12,12 @@ import {
 } from "@/engine/component";
 import { Bounds, locX, locY } from "@/engine/geom";
 import { drawCenteredText, type Graphics } from "@/engine/graphics";
+import {
+	bitWidthConfigurator,
+	integerConfigurator,
+	JoinedConfigurator,
+	type KeyConfigurator,
+} from "@/engine/key-config";
 import { Value } from "@/engine/value";
 import { WIDTH } from "../std-attrs";
 
@@ -20,6 +26,10 @@ const BOX = Bounds.create(-40, -20, 40, 40);
 
 /** Arithmetic components share the 40x40 box and a single WIDTH attribute. */
 abstract class ArithFactory extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly library = "#Arithmetic";
 
 	createAttributeSet(): AttributeSet {
@@ -589,6 +599,13 @@ function bitAdderOutputBits(width: number, inputs: number): number {
 }
 
 class BitAdder extends ArithFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(
+			integerConfigurator(BIT_ADDER_INPUTS, 1, 32, 0),
+			bitWidthConfigurator(WIDTH),
+		);
+	}
+
 	readonly name = "BitAdder";
 	readonly displayKey = "arith.bitAdder";
 	override readonly iconName = "bitadder.gif";

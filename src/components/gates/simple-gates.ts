@@ -12,6 +12,7 @@ import {
 } from "@/engine/component";
 import { Bounds, dirRadians, type Loc, loc, locX, locY, reverseDir, translateDir } from "@/engine/geom";
 import { drawCenteredText, H_CENTER, H_LEFT, V_BASELINE } from "@/engine/graphics";
+import { bitWidthConfigurator, type KeyConfigurator } from "@/engine/key-config";
 import { prefs } from "@/engine/prefs";
 import { Value } from "@/engine/value";
 import { FACING, LABEL, LABEL_FONT, WIDTH } from "../std-attrs";
@@ -67,6 +68,10 @@ function repair(state: InstanceState, v: Value): Value {
 }
 
 class NotGate extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "NOT Gate";
 	readonly library = "#Gates";
 	readonly displayKey = "gates.not";
@@ -159,6 +164,10 @@ class NotGate extends ComponentFactory {
 }
 
 class Buffer extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "Buffer";
 	readonly library = "#Gates";
 	readonly displayKey = "gates.buffer";
@@ -235,6 +244,10 @@ export const CONTROL_ATTR = optionAttr("control", "gate.controlSide", [
 ]);
 
 class ControlledBuffer extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name: string;
 	readonly library = "#Gates";
 	readonly displayKey: string;

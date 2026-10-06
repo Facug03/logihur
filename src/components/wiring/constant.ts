@@ -10,6 +10,12 @@ import {
 } from "@/engine/component";
 import { Bounds, locX, locY } from "@/engine/geom";
 import { drawCenteredText } from "@/engine/graphics";
+import {
+	bitWidthConfigurator,
+	ConstantConfigurator,
+	JoinedConfigurator,
+	type KeyConfigurator,
+} from "@/engine/key-config";
 import { Value } from "@/engine/value";
 import { FACING, WIDTH } from "../std-attrs";
 
@@ -18,6 +24,13 @@ export const CONSTANT_VALUE = hexAttr("value", "constant.value");
 const BACKGROUND_COLOR = "#e6e6e6";
 
 class Constant extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(
+			new ConstantConfigurator(CONSTANT_VALUE, WIDTH),
+			bitWidthConfigurator(WIDTH),
+		);
+	}
+
 	readonly name = "Constant";
 	readonly library = "#Wiring";
 	readonly displayKey = "wiring.constant";

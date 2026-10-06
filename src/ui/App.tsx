@@ -37,6 +37,7 @@ import type { Circuit } from "@/engine/circuit";
 import type { Instance } from "@/engine/component";
 import type { Direction } from "@/engine/geom";
 import { setTextMeasurer } from "@/engine/graphics";
+import { MOD_ALT, MOD_CTRL, MOD_META, MOD_SHIFT } from "@/engine/key-config";
 import { localized, type Message, msg, renderMessage, TranslatedError, t } from "@/i18n/i18n";
 import { measureWith } from "@/render/canvas-graphics";
 import { APPEARANCE_TOOLS, AppearanceEditor, type AppearanceEditorHandle } from "./AppearanceEditor";
@@ -119,6 +120,16 @@ const ARROWS: Record<string, Direction> = {
 	ArrowLeft: "west",
 	ArrowRight: "east",
 };
+
+/**
+ * The character a key types, as Java's KEY_TYPED reports it. With Alt held,
+ * macOS turns digits into symbols ("¡", "™"…), so take digits from the key code.
+ */
+function typedChar(e: KeyboardEvent): string | null {
+	const digit = /^(?:Digit|Numpad)([0-9])$/.exec(e.code);
+	if (e.altKey && digit) return digit[1];
+	return e.key.length === 1 ? e.key : null;
+}
 
 function formatFreq(f: number): string {
 	return f >= 1024 ? `${f / 1024} KHz` : `${f} Hz`;
@@ -483,6 +494,24 @@ export default function App() {
 
 	// keyboard shortcuts (Logisim's where they exist)
 	useEffect(() => {
+		/** Toolbar order: Poke, Edit, Wiring, Text, then the quick add tools. */
+		const selectToolbarItem = (index: number) => {
+			if (index === 0) ws.setTool({ kind: "poke" });
+			else if (index === 1) ws.setTool({ kind: "edit" });
+			else if (index === 2) ws.setTool({ kind: "wiring" });
+			else if (index === 3) ws.selectTextTool();
+			else {
+				const q = QUICK_TOOLS[index - 4];
+				if (q) ws.selectAddTool(q.factory, q.id, q.preset);
+			}
+		};
+		/** KEY_PRESSED then KEY_TYPED, as Swing delivers them to the tool's key configurators. */
+		const keyConfigure = (e: KeyboardEvent, mods: number): boolean => {
+			let consumed = ws.keyConfigure("pressed", e.key, mods);
+			const ch = typedChar(e);
+			if (ch !== null) consumed = ws.keyConfigure("typed", ch, mods) || consumed;
+			return consumed;
+		};
 		const onKey = (e: KeyboardEvent) => {
 			const target = e.target as HTMLElement;
 			if (
@@ -515,6 +544,14 @@ export default function App() {
 				return;
 			}
 			if (mod) {
+				// KeyboardToolSelection: Ctrl/⌘+1…9 pick the toolbar's Nth tool (0 is the 10th)
+				const toolDigit = /^Digit([0-9])$/.exec(e.code);
+				if (toolDigit && !e.altKey && !e.shiftKey) {
+					const n = Number(toolDigit[1]);
+					selectToolbarItem(n === 0 ? 9 : n - 1);
+					e.preventDefault();
+					return;
+				}
 				if (k === "z" && !e.shiftKey) ws.undo();
 				else if (k === "y" || (k === "z" && e.shiftKey)) ws.redo();
 				else if (k === "c") ws.copy();
@@ -545,17 +582,24 @@ export default function App() {
 					return;
 				}
 			}
-			if (e.key === "Delete" || e.key === "Backspace") ws.deleteSelection();
-			else if (e.key === "Escape") ws.setTool({ kind: "edit" });
-			else if (ARROWS[e.key]) ws.setFacing(ARROWS[e.key]);
-			else if (/^[2-9]$/.test(e.key)) {
-				// Logisim: typing a digit sets the number of gate inputs
-				const inputs = Number(e.key);
-				const owner = Array.from(ws.selection)[0] ?? (ws.tool.kind === "add" ? ws.tool : null);
-				const attr = owner?.factory.getAttributes(owner.attrs).find((a) => a.name === "inputs");
-				if (attr) ws.setAttribute(attr, inputs);
-				else return;
-			} else return;
+			const mods =
+				(e.shiftKey ? MOD_SHIFT : 0) |
+				(e.ctrlKey ? MOD_CTRL : 0) |
+				(e.altKey ? MOD_ALT : 0) |
+				(e.metaKey ? MOD_META : 0);
+			const kind = ws.tool.kind;
+			if (kind === "edit" && e.key === "Insert" && mods === 0) ws.duplicate();
+			else if ((e.key === "Delete" || e.key === "Backspace") && ws.hasSelection()) ws.deleteSelection();
+			else if (
+				e.key === "Backspace" &&
+				mods === 0 &&
+				(kind === "add" || kind === "edit" || kind === "wiring")
+			) {
+				// AddTool / WiringTool: Backspace takes back what was just added
+				ws.undoLastAddition(kind === "add" ? "component" : "wire");
+			} else if (e.key === "Escape") ws.setTool({ kind: "edit" });
+			else if (ARROWS[e.key] && mods === 0) ws.setFacing(ARROWS[e.key]);
+			else if (!keyConfigure(e, mods)) return;
 			e.preventDefault();
 		};
 		window.addEventListener("keydown", onKey);

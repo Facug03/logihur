@@ -5,6 +5,7 @@ import type { AnyAttribute, Attribute, AttributeSet, Font } from "./attributes";
 import type { Direction, Loc } from "./geom";
 import { Bounds, loc, locX, locY } from "./geom";
 import type { Graphics } from "./graphics";
+import type { KeyConfigurator } from "./key-config";
 import type { Value } from "./value";
 
 export type PortType = "input" | "output" | "inout";
@@ -188,6 +189,11 @@ export abstract class ComponentFactory {
 	}
 
 	createPoker(_instance: Instance): Poker | null {
+		return null;
+	}
+
+	/** getFeature(KeyConfigurator.class): a fresh handler of typed keys, or null. */
+	createKeyConfigurator(): KeyConfigurator | null {
 		return null;
 	}
 }

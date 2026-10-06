@@ -20,6 +20,7 @@ import {
 	H_RIGHT,
 	V_BASELINE,
 } from "@/engine/graphics";
+import { bitWidthConfigurator, JoinedConfigurator, type KeyConfigurator } from "@/engine/key-config";
 import { Value } from "@/engine/value";
 import { compareVersion } from "@/engine/version";
 import { FACING, WIDTH } from "../std-attrs";
@@ -124,6 +125,10 @@ function drawStub(painter: InstancePainter, index: number, len: number, dx: numb
 }
 
 class Multiplexer extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(bitWidthConfigurator(PLEXER_SELECT, 1, 5, 0), bitWidthConfigurator(WIDTH));
+	}
+
 	readonly name = "Multiplexer";
 	readonly library = "#Plexers";
 	readonly displayKey = "plexers.multiplexer";
@@ -288,6 +293,10 @@ class Multiplexer extends ComponentFactory {
 }
 
 class Demultiplexer extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(bitWidthConfigurator(PLEXER_SELECT, 1, 5, 0), bitWidthConfigurator(WIDTH));
+	}
+
 	readonly name = "Demultiplexer";
 	readonly library = "#Plexers";
 	readonly displayKey = "plexers.demultiplexer";
@@ -468,6 +477,10 @@ class Demultiplexer extends ComponentFactory {
 }
 
 class Decoder extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(PLEXER_SELECT, 1, 5, 0);
+	}
+
 	readonly name = "Decoder";
 	readonly library = "#Plexers";
 	readonly displayKey = "plexers.decoder";
@@ -630,6 +643,10 @@ const PRI_EN_OUT = 2;
 const PRI_GS = 3;
 
 class PriorityEncoder extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(PLEXER_SELECT, 1, 5, 0);
+	}
+
 	readonly name = "Priority Encoder";
 	readonly library = "#Plexers";
 	readonly displayKey = "plexers.priorityEncoder";
@@ -728,6 +745,13 @@ class PriorityEncoder extends ComponentFactory {
 export const BIT_SELECTOR_GROUP = bitWidthAttr("group", "plexer.bitSelectorGroup");
 
 class BitSelector extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(
+			bitWidthConfigurator(BIT_SELECTOR_GROUP, 1, 32, 0),
+			bitWidthConfigurator(WIDTH),
+		);
+	}
+
 	readonly name = "BitSelector";
 	readonly library = "#Plexers";
 	readonly displayKey = "plexers.bitSelector";

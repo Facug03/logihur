@@ -18,6 +18,14 @@ import {
 } from "@/engine/component";
 import { Bounds, type Direction, loc, locX, locY, manhattanTo } from "@/engine/geom";
 import { drawText, H_LEFT, H_RIGHT, V_BASELINE, V_TOP } from "@/engine/graphics";
+import {
+	bitWidthConfigurator,
+	integerConfigurator,
+	JoinedConfigurator,
+	type KeyConfigurator,
+	MOD_ALT,
+	ParallelConfigurator,
+} from "@/engine/key-config";
 import type { SplitterLike } from "@/engine/netlist";
 import { compareVersion } from "@/engine/version";
 import { WIRE_WIDTH } from "@/engine/wire";
@@ -170,6 +178,16 @@ const SPINE_WIDTH = WIRE_WIDTH + 2;
 const SPINE_DOT = WIRE_WIDTH + 4;
 
 class SplitterFactory extends ComponentFactory implements SplitterLike {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(
+			integerConfigurator(SPLITTER_FANOUT, 1, 32, 0),
+			new ParallelConfigurator(
+				bitWidthConfigurator(SPLITTER_WIDTH),
+				integerConfigurator(SPLITTER_FANOUT, 1, 32, MOD_ALT),
+			),
+		);
+	}
+
 	readonly name = "Splitter";
 	readonly library = "#Wiring";
 	readonly displayKey = "wiring.splitter";

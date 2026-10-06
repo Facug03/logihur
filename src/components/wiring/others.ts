@@ -22,6 +22,7 @@ import {
 	translateDir,
 } from "@/engine/geom";
 import { drawText, H_CENTER, H_LEFT, H_RIGHT, V_BASELINE, V_CENTER, V_TOP } from "@/engine/graphics";
+import { bitWidthConfigurator, JoinedConfigurator, type KeyConfigurator } from "@/engine/key-config";
 import type { PullLike } from "@/engine/netlist";
 import { Value } from "@/engine/value";
 import { WIRE_WIDTH } from "@/engine/wire";
@@ -33,6 +34,10 @@ function rotationFromEast(facing: Direction): number {
 }
 
 class PowerGround extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly library = "#Wiring";
 	override readonly facingAttr = FACING;
 
@@ -256,6 +261,10 @@ function passErrors(input: Value, width: number): Value {
 }
 
 class Transistor extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "Transistor";
 	readonly library = "#Wiring";
 	readonly displayKey = "wiring.transistor";
@@ -374,6 +383,10 @@ class Transistor extends ComponentFactory {
 export const TRANSISTOR = new Transistor();
 
 class TransmissionGate extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return bitWidthConfigurator(WIDTH);
+	}
+
 	readonly name = "Transmission Gate";
 	readonly library = "#Wiring";
 	readonly displayKey = "wiring.transmissionGate";
@@ -515,6 +528,13 @@ export const extenderLabels = {
 };
 
 class BitExtender extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(
+			bitWidthConfigurator(EXTENDER_OUT),
+			bitWidthConfigurator(EXTENDER_IN, 1, 32, 0),
+		);
+	}
+
 	readonly name = "Bit Extender";
 	readonly library = "#Wiring";
 	readonly displayKey = "wiring.extender";

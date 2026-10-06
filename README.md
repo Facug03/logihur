@@ -25,7 +25,9 @@ Los botones de la barra permiten mostrar u ocultar Componentes/Circuitos y Atrib
 arrastrá los separadores para ajustar el ancho; doble clic restaura el tamaño original. Los paneles,
 secciones y categorías recuerdan su estado al recargar. En móvil se cierran con el fondo o Escape.
 
-**Atajos** en la barra inferior (o **?**) muestra la ayuda de teclado. Esa barra también indica la
+**Atajos** en la barra inferior (o **?**) muestra la ayuda de teclado. Como en Logisim, con un componente
+seleccionado (o su herramienta activa) los dígitos cambian sus entradas u otros parámetros y Alt + dígitos
+el ancho de bits; Ctrl/⌘ + 1…9 eligen herramientas de la barra. Esa barra también indica la
 herramienta activa y el autoguardado: es una copia en este navegador; **Guardar** descarga un `.circ`.
 Con trackpad, Ctrl/⌘ + rueda o pellizco hace zoom en el circuito; la rueda desplaza el lienzo.
 

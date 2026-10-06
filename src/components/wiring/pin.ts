@@ -20,6 +20,13 @@ import {
 } from "@/engine/component";
 import { Bounds, type Direction } from "@/engine/geom";
 import { drawCenteredText, H_CENTER, H_LEFT, H_RIGHT, V_BOTTOM, V_CENTER, V_TOP } from "@/engine/graphics";
+import {
+	bitWidthConfigurator,
+	DirectionConfigurator,
+	JoinedConfigurator,
+	type KeyConfigurator,
+	MOD_ALT,
+} from "@/engine/key-config";
 import { Value } from "@/engine/value";
 import { FACING, LABEL, LABEL_FONT, LABEL_LOC, WIDTH } from "../std-attrs";
 import { RADIX, radixMaxLength, radixToString } from "./radix";
@@ -187,6 +194,10 @@ export function isInputPin(instance: Instance): boolean {
 }
 
 class Pin extends ComponentFactory {
+	override createKeyConfigurator(): KeyConfigurator {
+		return new JoinedConfigurator(bitWidthConfigurator(WIDTH), new DirectionConfigurator(LABEL_LOC, MOD_ALT));
+	}
+
 	readonly name = "Pin";
 	readonly library = "#Wiring";
 	readonly displayKey = "wiring.pin";
